@@ -2,7 +2,7 @@
 
 # global constant configurations
 
-$tblpre = "gmis_sds_";
+$tblpre = "";
 $conf = array();
 
 # super site id
@@ -21,7 +21,7 @@ $conf['smarty']		= $appdir.'/mod/Smarty-3.1.7/libs';
 $conf['uploaddir']	= 'upld';
 $conf['septag']		= '_J_A_Z_';
 
-$conf['maindb']		= 'gmisdb';
+$conf['maindb']		= '';
 $conf['maintbl']	= $tblpre.'customertbl';
 $conf['usertbl']	= $tblpre.'info_usertbl';
 $conf['welcometbl']	= $tblpre.'info_welcometbl';
@@ -35,10 +35,10 @@ $conf['display_style_index']		= 0;
 $conf['display_style_smttpl']		= 1; 
 
 # db info
-$conf['dbhost'] 	= 'localhost';
+$conf['dbhost'] 	= '';
 $conf['dbport'] 	= '3306';
-$conf['dbuser'] 	= 'gmis';
-$conf['dbpassword'] 	= 'gmispwd1433';
+$conf['dbuser'] 	= '';
+$conf['dbpassword'] 	= '';
 $conf['dbname'] 	= $conf['maindb'];
 
 # misc
