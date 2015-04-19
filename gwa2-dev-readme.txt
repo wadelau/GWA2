@@ -58,7 +58,7 @@ $hm = $webapp->getBy("*", $condition);
 ...
 
 
-##### 数据库建表注意事项
+##### 数据库建表注意事项， 以 MySQL 为例
 
 1. 不使用中文字符做 comment
 
@@ -82,6 +82,18 @@ $hm = $webapp->getBy("*", $condition);
 
 9. 使用 -gMIS 作为管理后台的话，需要有些基础设置表
 
+10. 不使用 name, value, key 等这些容易与保留关键词冲突，或者容易 -GTAjax 中eval出错的词语作为 字段名或者表名.
+	推荐的命名方法，可以使用 “i+实际名称”, 如 iname, ivalue, iage, ikey, idesc, isomethingelse 等 
+	Sun Apr 19 09:14:53 CST 2015
+
+11. 字段的长度, 以一个字节 8 为基本单位， 如 char(50) 应改为 char(48)， char 以外的多数靠名称决定长度
+	INT 是靠名称决定, 如下，但有时写成 int(11) 意思是 在客户端显示的时候用11位（字节），也即 01234567890 
+	TINYINT = 1 byte (8 bit)
+	SMALLINT = 2 bytes (16 bit)
+	MEDIUMINT = 3 bytes (24 bit)
+	INT = 4 bytes (32 bit)
+	BIGINT = 8 bytes (64 bit).
+		Sun Apr 19 09:22:18 CST 2015
 
 ##### 数据从后台到前端 ####################### 
 阿成，我来演示前端读取 adlist了
