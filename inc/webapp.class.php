@@ -32,13 +32,20 @@ class WebApp implements WebAppInterface
 		//-
 	}
 	//-
-	function set($field,$value)
-	{
-		$this->hmf[$field] = $value;
+	function set($field,$value=null){ # update, Sat May 16 08:54:54 CST 2015
+		if($value === null){
+			if(is_array($field)){
+				foreach($field as $k=>$v){
+					$this->hmf[$k] = $v;	
+				}		
+			}
+		}
+		else{
+			$this->hmf[$field] = $value;
+		}
 	}
 	//-
-	function get($field)
-	{
+	function get($field){
 		if(array_key_exists($field,$this->hmf))
 		{
 			return $this->hmf[$field];
@@ -84,8 +91,7 @@ class WebApp implements WebAppInterface
 	 * mandatory return $hm = (0 => true|false, 1 => string|array);
 	 * Thu Jul 21 11:31:47 UTC 2011, wadelau@gmail.com
 	 */
-	function setBy($fields, $conditions)
-	{
+	function setBy($fields, $conditions){
 		$sql = "";
 		$hm = array();
 		$isupdate = 0;
@@ -182,6 +188,7 @@ class WebApp implements WebAppInterface
 		}
 		#print '<br/>/inc/webapp.class.php: sql:['.$sql.']';
         #error_log(__FILE__.": getBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
+        var_dump($sql);
 		$hm = $this->dba->select($sql, $this->hmf);
 		return $hm;
 	}
