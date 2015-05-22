@@ -19,8 +19,8 @@ require(__ROOT__."/inc/cache.class.php");
 require(__ROOT__."/inc/filesystem.class.php");
 
 
-class WebApp implements WebAppInterface
-{
+class WebApp implements WebAppInterface{
+	
 	var $dba = null;
 	var $hm = array();
 	var $hmf = array(); # container for the Object which extends this class	
@@ -52,24 +52,21 @@ class WebApp implements WebAppInterface
 		}
 		else if($field != 'id' & $field != 'tbl') #! Otherwise, this will cause a dead loop with ._setAll.
 		{
-			if($this->_setAll())
-			{
+			if($this->_setAll()) {
 				return $this->hmf[$field];
 			}
-			else
-			{
+			else {
 				return '';
 			}
 		}
-		else
-		{
+		else {
 			return '';
 		}
 	}
 		
-	function setTbl($tbl)
-	{
+	function setTbl($tbl){
 		$this->set("tbl",$tbl);
+		if($this->dba == null){ $this->dba = new DBA(); }
 	}
 
 	function getTbl()
@@ -138,6 +135,8 @@ class WebApp implements WebAppInterface
 			$sql .= " where ".$conditions;
 		}
 		#error_log(__FILE__.": setBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
+		//var_dump($sql);
+		//var_dump($this ->hmf);
 		if($issqlready == 1)
 		{
 			if($this->getId() != ""){ $this->hmf["pagesize"] = 1; } # single record
@@ -188,7 +187,7 @@ class WebApp implements WebAppInterface
 		}
 		#print '<br/>/inc/webapp.class.php: sql:['.$sql.']';
         #error_log(__FILE__.": getBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
-        var_dump($sql);
+        #var_dump($sql);
 		$hm = $this->dba->select($sql, $this->hmf);
 		return $hm;
 	}
