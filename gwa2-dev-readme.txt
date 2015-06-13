@@ -144,3 +144,12 @@ admin -- 管理后台, 通常使用 -gMIS 作为管理后台
 index.php --> language.php (ctrl/include/language.php) 
 	--> langlist.php (lang/langlist.php) --> en_US / zh_CN (lang/en_US.properties)
 
+
+####### 关于代码风格 ############## Sun Jun 14 06:41:45 CST 2015
+
+水哥(7221995) 22:04:21 
+再强调一下代码风格：1）强烈不建议自行写sql，读取和写入使用 getBy 和 setBy
+水哥(7221995) 22:05:03 
+@小小鱼/:-D 2）如果自行组装sql，一定要考虑到sql injection和环境变量，程序的可移植性等问题；
+水哥(7221995) 22:05:38 
+3）if(xxx) yyy; 是禁止的，即便只有一句，也需要 if(xxx){ yyy; }
