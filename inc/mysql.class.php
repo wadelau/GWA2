@@ -9,8 +9,7 @@ ini_set("memory_limit","256M");
 # Wed Nov  5 14:10:39 CST 2014
 require_once(__ROOT__."/inc/config.class.php");
 
-class MySQLDB 
-{ 
+class MySQLDB { 
 	var $m_host; 
 	var $m_port; 
 	var $m_user; 
@@ -44,8 +43,7 @@ class MySQLDB
 		return false;
 	} 
 
-	function MySQLDB($config) 
-	{             
+	function MySQLDB($config){             
 		$this->m_host     = $config->mDbHost;
 		$this->m_port     = $config->mDbPort; 
 		$this->m_user     = $config->mDbUser; 
@@ -54,8 +52,7 @@ class MySQLDB
 		$this->m_link=0;
 	} 
 	//- for test purpose, wadelau@gmail.com, Wed Jul 13 19:21:37 UTC 2011
-	function showConf()
-	{
+	function showConf(){
 		print "<br/>/inc/class.mysql-1.2.php: current db:[".$this->m_name."].";
 	}	
 
@@ -76,10 +73,8 @@ class MySQLDB
 	function selectDb($database)
 	{
 		$this->m_name = $database;
-		if ("" != $this->m_name)
-		{
-			if ($this->m_link == 0)
-			{
+		if ("" != $this->m_name){
+			if ($this->m_link == 0){
 				$this->_initconnection();
 			}
 			mysql_select_db($this->m_name, $this->m_link) or eval($this->Err("use $database"));
@@ -87,8 +82,7 @@ class MySQLDB
 	}
 
 	//--- for sql injection, added on 20061113 by wadelau
-	function query($sql,$hmvars,$idxarr)
-	{
+	function query($sql,$hmvars,$idxarr){
 		$hm = array();
 		if ($this->m_link == 0){
 			$this->_initconnection();
@@ -100,8 +94,7 @@ class MySQLDB
 			$hm[0] = true;
 			$hm[1] = $result;
 		}
-		else
-		{
+		else{
 			$hm[0] = false;
 			$hm[1] = array('error'=>'Query failed');
 		}
@@ -109,31 +102,28 @@ class MySQLDB
 
 	}
 	
-	function _enSafe($sql,$idxarr,$hmvars)
-	{
-		$sql = trim($sql);
+	function _enSafe($sql,$idxarr,$hmvars){
+		$sql = $origSql = trim($sql);
 		$newsql = "";
         $wherepos = strpos($sql, " where ");
 		if( (strpos($sql,"delete ")!==false || strpos($sql,"update ")!==false) 
-			&& $wherepos === false
-		){
+			&& $wherepos === false){
 			$this->Err("table action [update, delete] need [where] clause.sql:[".$sql."]");
 		}
-		else
-		{
+		else{
         	/*
       		if(strpos($sql, "select ") !== false && $wherepos !== false){
         		$newsql = substr($sql, 0, $wherepos);     
       		}
       		*/
+			#print __FILE__."\n: sql:[".$sql."] sql_new:[".$newsql."]\n";
 			$a = strpos($sql,"?");
 			$i = 0;
 			$n = count($idxarr);
-			while($a !== false)
-			{
-				if($i>=$n)
-				{
-					$this->Err("_enSafe, fields not matched with vars.sql:[".$sql."] i:[".$i."] n:[".$n."].");
+			while($a !== false){
+				#if($i>=$n){
+				if($i>$n){
+					$this->Err("_enSafe, fields not matched with vars.sql:[".$origSql."] i:[".$i."] n:[".$n."].");
 				}
 				$t = substr($sql,0,$a+1);
 				#print __FILE__.": t:[".$t."] i:[".$i."] vars:[".$idxarr[$i]."] hmv:[".$hmvars[$idxarr[$i]]."]\n";
@@ -142,8 +132,7 @@ class MySQLDB
 				$a = strpos($sql,"?");
 				$i++;
 			}
-			if($sql!="")
-			{
+			if($sql!=""){
 				$newsql .=  $sql ;
 			}
 			#print __FILE__."\n: sql:[".$sql."] sql_new:[".$newsql."]\n";
@@ -151,8 +140,7 @@ class MySQLDB
 		}
 	}
 	//--- for sql injection, added on 20061113 by wadelau
-	function _QuoteSafe($value)
-	{
+	function _QuoteSafe($value){
 		// Quote variable to make safe
 		// Stripslashes
 		//if (get_magic_quotes_gpc()){
@@ -172,16 +160,14 @@ class MySQLDB
 		return $value;
 	}
 
-	function getErrno()
-	{
+	function getErrno(){
 		if ($this->m_link == 0)
 		{
 			$this->_initconnection();
 		}
 		return mysql_errno($this->m_link);
 	}
-	function getError()
-	{
+	function getError(){
 		if ($this->m_link == 0)
 		{
 			$this->_initconnection();
@@ -189,8 +175,7 @@ class MySQLDB
 		return mysql_error($this->m_link);
 	}
 	
-	function FetchArray($result) 
-	{ 
+	function FetchArray($result) { 
 		if ($this->m_link == 0)
 		{
 			$this->_initconnection();

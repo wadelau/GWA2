@@ -18,9 +18,10 @@ interface WebAppInterface
 
 	function setBy($fields, $conditions);
 	function getBy($fields, $conditions);
+	function execBy($fields, $conditions);
 	function rmBy($conditions);
 
-  function toString($object);
+  	function toString($object);
 
 	/*
 	function setLang($lang);
