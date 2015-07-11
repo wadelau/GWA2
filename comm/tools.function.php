@@ -1,4 +1,8 @@
 <?php
+#
+# global functions, by wadelau@ufqi.com
+# update Sat Jul 11 09:20:03 CST 2015
+#
 
 /* get Smarty template file name
    wadelau, Wed Feb 15 09:18:27 CST 2012
@@ -10,8 +14,6 @@ function getSmtTpl($file, $act){
     $scriptname = $scriptname[0];
     return $smttpl = $scriptname.'_'.($act==''?'main':$act).'.html';
 }
-
-
 
 /** 
  * Send a POST requst using cURL, refer to http://www.php.net/manual/en/function.curl-exec.php 
@@ -50,8 +52,7 @@ function curlPost($url, array $post = NULL, array $options = array())
  * @para string $body, message body
  * return array(0=>true|false, 1=>array('error'=>'...'));
  */
-function sendMail($to,$subject,$body, $from='', $local=0)
-{
+function sendMail($to,$subject,$body, $from='', $local=0){
     $rtnarr = array();
 	
 	if($local == 0){
@@ -70,7 +71,8 @@ function sendMail($to,$subject,$body, $from='', $local=0)
 
 		$rtnarr[0] = true;
     
-	}else if($local == 1){
+	}
+	else if($local == 1){
         global $_CONFIG;
         include($_CONFIG['appdir']."/mod/mailer.class.php");
 
@@ -119,7 +121,6 @@ function mkUrl($file, $_REQU){
     $url = $file."?";
     /*
     $noneeddata = array('act','PHPSESSID','JSESSIONID','userufqi','iweb_shoppingcart','iweb_user_id','iweb_user_pwd','iweb_username','iweb_head_ico','iweb_safecode');
-    foreach($_REQUEST as $k=>$v){
         if(!in_array($k,$noneeddata)){
             $url .= $k."=".$v."&";
         }
@@ -223,8 +224,6 @@ function alert($str,$type="back",$topWindow="",$timeout=100){
 	exit();
 }
 
-
-
 /** 
  * URL redirect
  */
@@ -237,12 +236,14 @@ function redirect($url, $time=0, $msg='') {
         // redirect
         if (0 === $time) {
             header("Location: " . $url);
-        } else {
-            header("refresh:{$time};url={$url}");
+        } 
+        else{
+            header("Refresh:{$time};url={$url}");
             echo($msg);
         }
         exit();
-    } else {
+    } 
+    else{
         $str = "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
         if ($time != 0)
             $str .= $msg;
@@ -253,13 +254,23 @@ function redirect($url, $time=0, $msg='') {
 
 function isEmail($email){
     if(!preg_match('|^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]{2,})+$|i', $email)){
-    
-      return 0;
-    
-    }else{
-      
+    	return 0;
+    }
+    else{
       return 1;
-
     }
 }
-?>
+
+# get Ids list from array|hash
+# by wadelau@ufqi.com, Sat Jul 11 09:21:13 CST 2015
+function getIdList($iarray, $ikey){
+	$tmpIds = "999999,";
+
+	foreach($iarray as $k=>$v){
+		$tmpIds .= $v[$ikey].",";
+	}
+	$tmpIds = substr($tmpIds, 0, strlen($tmpIds)-1);
+
+	return $tmpIds;
+
+}
