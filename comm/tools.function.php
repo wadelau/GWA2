@@ -117,6 +117,11 @@ function inList($needle, $haystack){
     return ($pos === false ? false : true);
 }
 
+function inString($needle, $haystack){
+    $pos = stripos($haystack, $needle);
+    return ($pos === false ? false : true);
+}
+
 function mkUrl($file, $_REQU){
     $url = $file."?";
     /*
