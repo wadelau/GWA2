@@ -19,11 +19,8 @@ class Mailer
 		
 	  $this->pass = $pass;  
 		
-		
 	  $this->host_name = "localhost"; //is used in HELO command   
 	  $this->log_file = "";  
-		
-		 
 		
 	  $this->sock = FALSE;  
    
@@ -37,7 +34,8 @@ class Mailer
    
  $mail_from = $this->get_address($this->strip_comment($from));  
    
- $body = ereg_replace("(^|(\r\n))(\.)", "\1.\3", $body);  
+ #$body = ereg_replace("(^|(\r\n))(\.)", "\1.\3", $body);  
+ $body = preg_replace("/(^|(\r\n))(\.)/", "\1.\3", $body);  
    
    
  $header = "";  
@@ -251,7 +249,8 @@ class Mailer
    
  {  
    
- $domain = ereg_replace("^.+@([^@]+)$", "\1", $address);  
+ #$domain = ereg_replace("^.+@([^@]+)$", "\1", $address);  
+ $domain = preg_replace("/^.+@([^@]+)$/", "\1", $address);  
    
  if (!@getmxrr($domain, $MXHOSTS)) {  
    
@@ -333,7 +332,8 @@ class Mailer
    
     
    
- if (!ereg("^[23]", $response)) {  
+ #if (!ereg("^[23]", $response)) {  
+ if (!preg_match("/^[23]/", $response)) {  
    
  fputs($this->sock, "QUIT\r\n");  
    
@@ -417,11 +417,13 @@ class Mailer
    
  {  
    
-  $comment = "\([^()]*\)";  
+  $comment = "/\([^()]*\)/";  
     
-  while (ereg($comment, $address)) {  
+  #while (ereg($comment, $address)) {  
+  while (preg_match($comment, $address)) {  
     
-   $address = ereg_replace($comment, "", $address);  
+   #$address = ereg_replace($comment, "", $address);  
+   $address = preg_replace($comment, "", $address);  
     
   }  
     
@@ -435,9 +437,11 @@ class Mailer
    
  {  
    
-  $address = ereg_replace("([ \t\r\n])+", "", $address);  
+  #$address = ereg_replace("([ \t\r\n])+", "", $address);  
+  $address = preg_replace("/([ \t\r\n])+/", "", $address);  
     
-  $address = ereg_replace("^.*<(.+)>.*$", "\1", $address);  
+  #$address = ereg_replace("^.*<(.+)>.*$", "\1", $address);  
+  $address = preg_replace("/^.*<(.+)>.*$/", "\1", $address);  
     
   return $address;  
    
