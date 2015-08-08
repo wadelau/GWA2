@@ -6,7 +6,9 @@
  * Sun Jul 17 10:16:03 UTC 2011
  * Mon Jan 23 12:14:15 GMT 2012
  * 08:42 Sunday, June 14, 2015
+ * Sat Aug  8 11:22:40 CST 2015
  */
+
 
 if(!defined('__ROOT__')){
   define('__ROOT__', dirname(dirname(__FILE__)));
@@ -18,6 +20,7 @@ require(__ROOT__."/inc/dba.class.php");
 require(__ROOT__."/inc/session.class.php");
 require(__ROOT__."/inc/cache.class.php");
 require(__ROOT__."/inc/filesystem.class.php");
+
 
 class WebApp implements WebAppInterface{
 	
@@ -188,9 +191,8 @@ class WebApp implements WebAppInterface{
 			if($pagesize == 0){ $pagesize = 99999; } # maximum records per query
 			$sql .= ' limit '.(($pagenum-1)*$pagesize).','.$pagesize;	
 		}
-		#print '<br/>/inc/webapp.class.php: sql:['.$sql.']';
+		#print __FILE__.':<br/>/inc/webapp.class.php: sql:['.$sql.']';
         #error_log(__FILE__.": getBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
-        #var_dump($sql);
 		$hm = $this->dba->select($sql, $this->hmf);
 		return $hm;
 	}
@@ -199,11 +201,13 @@ class WebApp implements WebAppInterface{
      * added on Mon Jan 23 12:20:24 GMT 2012 by wadelau@ufqi.com
      */
     function execBy($sql, $conditions=array()){
+	
         $hm = array();
         if($conditions == null){
             $conditions = array();
         }
         $pos = stripos($sql, "select");
+		
         if($pos === 0){
 			#
 		}
@@ -216,6 +220,7 @@ class WebApp implements WebAppInterface{
                 $pos = stripos($sql, "show");
             }
         }
+		#error_log(__FILE__.": select!! sql:$pos");
         if($pos === 0){
             $hm = $this->dba->select($sql, $conditions);
             #error_log(__FILE__.": select!! sql:[$sql] pos:[$pos]");
@@ -299,7 +304,7 @@ class WebApp implements WebAppInterface{
     /*- toString, added on 
      * added on Tue Jan 24 05:02:16 GMT 2012
      */
-    function toString($object){
+    public function toString($object){
         $str = '';
         if(is_array($object)){
             foreach($object as $k=>$v){
@@ -336,5 +341,18 @@ class WebApp implements WebAppInterface{
         }
         return $isNumeric;
     }
+
+	# get count based on some conditions
+	# Sat Aug  8 11:25:09 CST 2015 by wadelau
+	public function getCount($pCondi){
+		$ro = $this->getBy("count(*) as inum", $pCondi);
+		if($ro[0]){
+			return intval($ro[1][0]['inum']==null ? 0 : $ro[1][0]['inum']);
+		}
+		else{
+			return 0;
+		}
+	}
+
 }
 ?>
