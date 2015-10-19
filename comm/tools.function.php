@@ -131,7 +131,7 @@ function mkUrl($file, $_REQU){
         }
     }
     */
-    $needdata = array('id','tbl','db','oid','otbl','oldv','field','linkfield','linkfield2','tit');
+    $needdata = array('id','tbl','db','oid','otbl','oldv','field','linkfield','linkfield2','tit','tblrotate');
     foreach($_REQU as $k=>$v){
         if(in_array($k, $needdata) || startsWith($k,'pn') || startsWith($k, "oppn")){
             if($k == 'oldv'){
@@ -256,6 +256,18 @@ function redirect($url, $time=0, $msg='') {
     }
 }
 
+# added by wadelau@ufqi.com,  Wed Oct 24 09:54:10 CST 2012
+function isImg($file){
+	$isimg = 0;
+	if($file != ''){
+		$tmpfileext = substr($file, strlen($file)-4);
+		if(in_array($tmpfileext,array("jpeg",".jpg",".png",".gif",".bmp"))){
+			$isimg = 1;    
+		}   
+	}       
+	return $isimg;
+
+}  
 
 function isEmail($email){
     if(!preg_match('|^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]{2,})+$|i', $email)){
@@ -278,4 +290,50 @@ function getIdList($iarray, $ikey){
 
 	return $tmpIds;
 
+}
+
+# write log in a simple approach
+# by wadelau@ufqi.com, Sat Oct 17 17:38:26 CST 2015
+# e.g. 
+# debug($user); 
+# debug($user, 'userinfo');  # with tag 'userinfo'
+# debug($user, 'userinfo', 1); # with tag 'userinfo' and in backend and frontend
+function debug($obj, $tag='', $output=null){
+	$caller = debug_backtrace();
+	if(is_array($obj)){
+		if(isset($user)){
+			$s .= $user->toString($obj);
+		}
+		else{
+			$s .= serialize($obj);
+		}
+	}
+	else{
+		$s .= $obj;
+	}
+
+	if($tag != ''){
+		$s = " $tag:[$s]";
+	}
+	$callidx = count($caller) - 2; 
+	$s .= ' func:['.$caller[$callidx]['function'].'] file:['.$caller[$callidx]['file'].']';
+
+	if($output != null){
+		if($output == 0){ # in backend only
+			error_log($s); 
+		}
+		else if($output == 1){ # in backend and frontend
+			error_log($s);
+			print $s;
+		}
+		else if($output == 2){ # in backend and frontend with backtrace
+			$s .= " backtrace:[".serialize($caller)."]";
+			error_log($s);
+			print $s;	
+		}
+	}
+	else{ 
+		error_log($s); # default mode
+	}
+	
 }
