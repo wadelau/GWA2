@@ -24,8 +24,12 @@ $data['time'] = date("H:i", time());
 # tpl
 
 if($out == '' && $smttpl == ''){ # if other module do not define a smttpl and $conf['display_style_smttpl']? 
-	     
-	$smttpl = 'homepage.html';
+	if(isset($fmt) && $fmt == 'json'){
+		# API
+	}
+	else{
+		$smttpl = 'homepage.html';
+	}
 }
 
 ?>
