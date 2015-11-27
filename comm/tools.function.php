@@ -184,75 +184,86 @@ function base62x($s,$dec=0,$numType=''){
  *  @timeout
  */
 function alert($str,$type="back",$topWindow="",$timeout=100){
-	echo "<script>".chr(10);
+	echo "<!DOCTYPE html><html><head><title>Alert!</title></head><body><script type=\"text/javascript\">".chr(10);
 	if(!empty($str)){
 		echo "window.alert(\"警告:\\n\\n{$str}\\n\\n\");".chr(10);
 	}
-	
 	#print "window.alert('type:[".$type."]');\n";
-
 	echo "function _r_r_(){";
 	$winName=(!empty($topWindow))?"top":"self";
 	Switch (StrToLower($type)){
-	case "#":
-		break;
-	case "back":
-		echo $winName.".history.go(-1);".chr(10);
-		break;
-	case "reload":
-		echo $winName.".window.location.reload();".chr(10);
-		break;
-	case "close":
-		echo "window.opener=null;window.close();".chr(10);
-		break;
-	case "function":
-		echo "var _T=new Function('return {$topWindow}')();_T();".chr(10);
-		break;
-		//Die();
-	default:
-		if($type!=""){
-			//echo "window.{$winName}.location.href='{$type}';";
-			echo "window.{$winName}.location=('{$type}');";
-		}
+		case "#":
+			break;
+		case "back":
+			echo $winName.".history.go(-1);".chr(10);
+			break;
+		case "reload":
+			echo $winName.".window.location.reload();".chr(10);
+			break;
+		case "close":
+			echo "window.opener=null;window.close();".chr(10);
+			break;
+		case "function":
+			echo "var _T=new Function('return {$topWindow}')();_T();".chr(10);
+			break;
+			//Die();
+		default:
+			if($type!=""){
+				//echo "window.{$winName}.location.href='{$type}';";
+				echo "window.{$winName}.location=('{$type}');";
+			}
 	}
-
 	echo "}".chr(10);
-
 	//avoid firefox not excute setTimeout
-	echo "if(setTimeout(\"_r_r_()\",".$timeout.")==2){_r_r_();}";
+	echo "if(window.setTimeout(\"_r_r_()\",".$timeout.")==2){_r_r_();}";
 	if($timeout==100){
 		echo "_r_r_();".chr(10);
-	} else {
-		echo "setTimeout(\"_r_r_()\",".$timeout.");".chr(10);
+	}
+	else{
+		echo "window.setTimeout(\"_r_r_()\",".$timeout.");".chr(10);
 	}
 	echo "</script>".chr(10);
+	print "</script></body></html>";
 	exit();
 }
 
 /** 
- * URL redirect
+ * URL redirect, remedy by wadelau@ufqi.com 09:52 Tuesday, November 24, 2015
  */
 function redirect($url, $time=0, $msg='') {
-    //multi URL addr support
+    //multi URL addr support ?
     $url = str_replace(array("\n", "\r"), '', $url);
-    if (empty($msg))
-        $msg = "系统将在{$time}秒之后自动跳转到{$url}！";
+	if(!inString('://', $url)){ # relative to absolute path
+		$url = $_SERVER['SERVER_NAME'].$url;
+	}
+	if($time < 10){ $time = $time * 1000; } # in case of milliseconds
+	$hideMsg = "<!DOCTYPE html><html><head>";
+	$hideMsg .= "<meta http-equiv=\"refresh\" content=\"{$time};URL='{$url}'\">"; # HTML
+	$hideMsg .= "</head><body>";  # remedy Mon Nov 23 22:03:24 CST 2015
+    if (empty($msg)){
+        #$msg = "系统将在{$time}秒之后自动跳转到{$url}！";
+		$hideMsg = $hideMsg." <a href=\"".$url."\">系统将在{$time}秒之后自动跳转</a> <!-- {$url}！--> ..."; 
+	}
+	else{
+		$hideMsg = $hideMsg . $msg;
+	}
+	$hideMsg .= "<script type='text/javascript'>window.setTimeout(function(){window.location.href='".$url."';}, ".$time.");</script>"; # JavaScript
+	$hideMsg .= "</body></html>";
     if (!headers_sent()) {
         // redirect
-        if (0 === $time) {
-            header("Location: " . $url);
+        if (1 || 0 === $time) {
+            header("Location: " . $url); # HTTP 
+			print $hideMsg;
         } 
-        else{
+        else if(0){  # Refresh in HTTP is non-standard.
             header("Refresh:{$time};url={$url}");
             echo($msg);
         }
         exit();
     } 
     else{
-        $str = "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
-        if ($time != 0)
-            $str .= $msg;
-        exit($str);
+        print $hideMsg;
+        exit();
     }
 }
 
