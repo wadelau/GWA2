@@ -23,24 +23,23 @@ class MySQLDB {
 		global $HTTP_HOST;
 		global $REMOTE_ADDR;
 		global $PHP_SELF;
+		$str = '';
 		if($this->isdebug){
-			// --- leo 2002-11-01 21:42:03  start --- //
-			echo "<br>xxxxxx";
-			echo "<font color=red>error sql : </font><br>&nbsp;&nbsp;".$sql;
-			echo "<br>";
-			echo "<font color=red>error number : </font><br>&nbsp;&nbsp;".$this->getErrno();
-			echo "<br>";
-			echo "<font color=red>error information : </font><br>&nbsp;&nbsp;".$this->getError();
-			// --- leo 2002-11-01 21:42:06  end --- //
+			$str .= "<br>Error:";
+			$str .= "<font color=red>error sql : </font><br>&nbsp;&nbsp;".$sql;
+			$str .= "<br>";
+			$str .= "<font color=red>error number : </font><br>&nbsp;&nbsp;".$this->getErrno();
+			$str .= "<br>";
+			$str .= "<font color=red>error information : </font><br>&nbsp;&nbsp;".$this->getError();
 		}
-		else
-		{
-			//header ("Location: http://sms.fumobile.com/show_msg.php?ra=".$REMOTE_ADDR);
-			echo "<div id=\"errdiv_201210131751\" style=\"color:red;z-index:99;position:absolute\">Found internal error when process your transaction..., please report this to wadelau@gmail.com. [07211253]</div>\n";
+		else{
+			$str .= "<div id=\"errdiv_201210131751\" style=\"color:red;z-index:99;position:absolute\">Found internal error when process your transaction..., please report this to wadelau@gmail.com . [07211253]</div>\n";
 			error_log(__FILE__.": MYSQL_ERROR: err_no:[".$this->getErrno()."] err_info:[".$this->getError()."] err_sql:[".$sql."] [07211253]");
 		}
-		#exit;
-		return false;
+		$html = $_CONFIG['html_resp']; $html = str_replace("RESP_TITLE","Error!", $html); $html = str_replace("RESP_BODY", $str, $html);
+		echo $html;
+		exit(1);
+		#return false;
 	} 
 
 	function MySQLDB($config){             

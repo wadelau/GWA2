@@ -183,49 +183,49 @@ function base62x($s,$dec=0,$numType=''){
  *  @topWindow
  *  @timeout
  */
-function alert($str,$type="back",$topWindow="",$timeout=100){
-	echo "<script>".chr(10);
+function alert($str,$type="back",$topWindow="",$timeout=1000){
+	$str = '';
+	$str .= "<script type=\"text/javascript\">".chr(10);
 	if(!empty($str)){
-		echo "window.alert(\"警告:\\n\\n{$str}\\n\\n\");".chr(10);
+		$str .= "window.alert(\"警告:\\n\\n{$str}\\n\\n\");".chr(10);
 	}
-	
 	#print "window.alert('type:[".$type."]');\n";
-
-	echo "function _r_r_(){";
+	$str .= "function _r_r_(){";
 	$winName=(!empty($topWindow))?"top":"self";
 	Switch (StrToLower($type)){
-	case "#":
-		break;
-	case "back":
-		echo $winName.".history.go(-1);".chr(10);
-		break;
-	case "reload":
-		echo $winName.".window.location.reload();".chr(10);
-		break;
-	case "close":
-		echo "window.opener=null;window.close();".chr(10);
-		break;
-	case "function":
-		echo "var _T=new Function('return {$topWindow}')();_T();".chr(10);
-		break;
-		//Die();
-	default:
-		if($type!=""){
-			//echo "window.{$winName}.location.href='{$type}';";
-			echo "window.{$winName}.location=('{$type}');";
-		}
+		case "#":
+			break;
+		case "back":
+			$str .= $winName.".history.go(-1);".chr(10);
+			break;
+		case "reload":
+			$str .= $winName.".window.location.reload();".chr(10);
+			break;
+		case "close":
+			$str .= "window.opener=null;window.close();".chr(10);
+			break;
+		case "function":
+			$str .= "var _T=new Function('return {$topWindow}')();_T();".chr(10);
+			break;
+			//Die();
+		default:
+			if($type!=""){
+				//echo "window.{$winName}.location.href='{$type}';";
+				$str .= "window.{$winName}.location=('{$type}');";
+			}
 	}
-
-	echo "}".chr(10);
-
+	$str .= "}".chr(10);
 	//avoid firefox not excute setTimeout
-	echo "if(setTimeout(\"_r_r_()\",".$timeout.")==2){_r_r_();}";
+	$str .= "if(window.setTimeout(\"_r_r_()\",".$timeout.")==2){_r_r_();}";
 	if($timeout==100){
-		echo "_r_r_();".chr(10);
-	} else {
-		echo "setTimeout(\"_r_r_()\",".$timeout.");".chr(10);
+		$str .= "_r_r_();".chr(10);
 	}
-	echo "</script>".chr(10);
+	else{
+		$str .= "window.setTimeout(\"_r_r_()\",".$timeout.");".chr(10);
+	}
+	$str .= "</script>".chr(10);
+	$html = $_CONFIG['html_resp']; $html = str_replace("RESP_TITLE","Alert!", $html); $html = str_replace("RESP_BODY", $str, $html);
+	print $html;
 	exit();
 }
 

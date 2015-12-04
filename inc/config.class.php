@@ -42,6 +42,8 @@ $conf['dbpassword'] 	= '';
 $conf['dbname'] 	= $conf['maindb'];
 
 # misc
+$conf['is_debug'] = 1;
+$conf['html_resp'] = '<!DOCTYPE html><html><head><title>RESP_TITLE</title></head><body>RESP_BODY</body></html>';
 
 ############
 
