@@ -204,7 +204,7 @@ class WebApp implements WebAppInterface{
 	
         $hm = array();
         if($conditions == null){
-            $conditions = array();
+            $conditions = '';
         }
         $pos = stripos($sql, "select");
 		
@@ -221,13 +221,21 @@ class WebApp implements WebAppInterface{
             }
         }
 		#error_log(__FILE__.": select!! sql:$pos");
+		if($conditions != ''){
+			if(strpos($sql, " where") === false){
+				$sql .= " where ".$conditions;
+			}
+			else{
+				$sql .= $conditions;
+			}
+		}
         if($pos === 0){
-            $hm = $this->dba->select($sql, $conditions);
+            $hm = $this->dba->select($sql, $this->hmf);
             #error_log(__FILE__.": select!! sql:[$sql] pos:[$pos]");
         }
 		else{
             #error_log(__FILE__.": update!! sql:[$sql] pos:[$pos]");
-            $hm = $this->dba->update($sql, $conditions);
+            $hm = $this->dba->update($sql, $this->hmf);
         }
         return $hm;
     }
