@@ -313,7 +313,7 @@ function getIdList($iarray, $ikey){
 # debug($user, 'userinfo', 1); # with tag 'userinfo' and in backend and frontend
 function debug($obj, $tag='', $output=null){
 	$caller = debug_backtrace();
-	if(is_array($obj)){
+	if(is_array($obj) || is_object($obj)){
 		if(isset($user)){
 			$s .= $user->toString($obj);
 		}
