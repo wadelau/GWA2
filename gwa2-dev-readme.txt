@@ -19,14 +19,15 @@
 
 此前的: http://ufqi.com/dev/xxx/index.php?mod=web&act=preview&id=1234
 RESTful的: http://ufqi.com/dev/xxx/index.php/mod/web/act/preview/id/1234
+RESTful的: http://ufqi.com/dev/xxx/i/mod/web/act/preview/id/1234  ## use i as a soft link to index.php in server side
 
 2. 规则，"?" 后面的参数，总是成对出现，奇数位的是参数名称，偶数位是参数值, 
 
 3. 实现：
 在后台程序中，使用 $url."/para/value" 的样式拼合
-在Smarty模板红，使用那个 {$url}/para/value 的样式拼合
+在Smarty模板中，使用那个 {$url}/para/value 的样式拼合
 
-在入口程序中，./index.php 对 / 分割的参数重新转为 $_REQUEST 变量，同时重写
+在入口程序中，./index.php (i) 对 / 分割的参数重新转为 $_REQUEST 变量，同时重写
 
 $_REQUEST['para'] = value;
 $_SERVER['REQUEST_URI']; 
@@ -36,7 +37,8 @@ $_SERVER['QUERY_STRING'];
 
 5. TODO: 需要对 value 中的 "/" 做转义或者编码
 
-!!!RESTful URL地址风格在默认情况下不开启.
+6. 默认情况启用，since Sun Jan 24 14:00:51 CST 2016  ## !!!RESTful URL地址风格在默认情况下不开启.
+
 
 
 ################## 关于 class/module 与 table 的对应关系，10:42 Saturday, August 25, 2012

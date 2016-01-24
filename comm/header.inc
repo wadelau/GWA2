@@ -65,8 +65,27 @@ $display_style = $_CONFIG['display_style_index'];
 # page info
 header("Content-type: text/html;charset=utf-8");
 
-#$url = $rtvdir.'/index.php/';
-$url = $rtvdir.'/index.php?';
+## RESTful handler
+$entry_tag = $_CONFIG['entry_tag'];;
+$paraArr = explode("/", $_SERVER['REQUEST_URI']);
+$found_entry = 0; $query_string = '';
+$paraCount = count($paraArr);
+for($i=0; $i<$paraCount; $i++){
+	if($paraArr[$i] == $entry_tag){
+		$found_entry = 1;
+	}	
+	else{
+		if($found_entry == 1 && $paraArr[$i] != ''){
+			$_REQUEST[$paraArr[$i]] = $paraArr[++$i];		
+			$query_string .= $paraArr[$i-1]."=".$paraArr[$i].'&';
+		}
+	}
+}
+if($query_string != ''){ $query_string = substr($query_string, 0, strlen($query_string)-1); }
+$_SERVER['REQUEST_URI'] = $_SERVER['SCRIPT_NAME']; 
+$_SERVER['QUERY_STRING'] = $query_string;
+
+$url = $rtvdir.'/'.$entry_tag;
 $data['randi'] = rand(10000,999999);
 
 # global variables
@@ -81,12 +100,8 @@ if($isdbg){
 	else{
 		$sid = str_replace('<', '&lt;', $sid);	
 	}
-    #$url .= "sid/".$sid;
-    $url .= "sid=".$sid;
+    $url .= "/sid/".$sid;
 }
-
-#print __FILE__.": test info: \n";
-#print_r($_REQUEST);
 
 # convert user input data to variables, tag#userdatatovar
 foreach($_REQUEST as $k=>$v){
@@ -101,13 +116,11 @@ foreach($_REQUEST as $k=>$v){
             if(preg_match('/[^\x20-\x7e]/', $k)){
                 eval("\${$k} = \"$v\";");
             }
-            #error_log(__FILE__.": found req para:[$k_orig] k:[$k] v:[$v] matcharr:[".$user->toString($matcharr)."]");
-        }else{
-            #error_log(__FILE__.": found illegal req para:[$k]");
         }
-  }
+		else{
+        }
+  	}
 }
-
 
 function exception_handler($exception) {
 	echo '<div class="alert alert-danger">';

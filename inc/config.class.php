@@ -44,6 +44,7 @@ $conf['dbname'] 	= $conf['maindb'];
 # misc
 $conf['is_debug'] = 1;
 $conf['html_resp'] = '<!DOCTYPE html><html><head><title>RESP_TITLE</title></head><body>RESP_BODY</body></html>';
+$conf['entry_tag'] = 'i'; # application name or entry name for the application, added by wadelau@ufqi.com on Sun Jan 24 13:42:16 CST 2016
 
 ############
 
