@@ -17,7 +17,7 @@ class PageNavi extends WebApp{
 
        $this->dba = new DBA(); # added by wadelau@ufqi.com, Wed Jul 11 14:31:52 CST 2012
        $para = array();
-       $pdef = array('pnpn'=>1,'pnps'=>6,'pntc'=>0); # 2 for development
+       $pdef = array('pnpn'=>1,'pnps'=>28,'pntc'=>0); # 28 for development
 
        $file = $_SERVER['PHP_SELF'];
        #$rawurl =$_SERVER['REQUEST_URI'];
@@ -82,8 +82,8 @@ class PageNavi extends WebApp{
        }
        $str .= " &nbsp;<b><a href=\"javascript:pnAction('".$para['url']."&pnpn=".$totalpage."');\" title=\"最后一页\">&raquo;|</a> </b> &nbsp; &nbsp; <a href=\"javascript:void(0);\" title=\"改变显示条数\" onclick=\"javascript:var pnps=window.prompt('请输入新的每页显示条数:','".$para['pnps']."'); if(pnps>0){ myurl='".$para['url']."'; myurl=myurl.replace('/pnps/','/opnps/'); doAction(myurl+'&pnps='+pnps);};\"><b>".$para['pnps']."</b>条/页</a> &nbsp; 共 <b>".$para['pntc']."</b>条 / <b>".$totalpage."</b>页 &nbsp;";
        if($_REQUEST['isheader'] != '0'){
-           $str .= "<button name=\"initbtn\" onclick=\"javascript:pnAction('".$this->getInitUrl()."');\">初始页</button>";
-           $str .= "<button name=\"initbtn\" onclick=\"javascript:doAction('".str_replace("&list","&list-toexcel",$para['url'])."');\">导出xls</button>";
+           $str .= "<button name=\"initbtn\" onclick=\"javascript:pnAction('".$this->getInitUrl()."');\">初始页</button>&nbsp;";
+           $str .= "<button name=\"initbtn2\" onclick=\"javascript:doAction('".str_replace("&list","&list-toexcel",$para['url'])."');\">导出xls</button>";
        }
 
        return $str;
@@ -172,16 +172,29 @@ class PageNavi extends WebApp{
    function getCondition($gtbl, $user){
        $condition = "";
        $pnsm = $_REQUEST['pnsm']; $pnsm = $pnsm==''?"or":'and';
-       $hmfield = array(); # $gtbl->getFieldList();
+       $hmfield = array(); #  $gtbl->getFieldList(); # for -gMIS
+       if(count($hmfield) < 1){
+       		$hmfield = array();
+       		$tmpHm = $gtbl->execBy("desc ".$gtbl->getTbl());	
+			if($tmpHm[0]){
+				$tmpHm = $tmpHm[1];
+				foreach($tmpHm as $k=>$v){
+					$field = $v['Field'];
+					$fieldv = "fieldtype=".$v['Type'];
+					if(strtolower($field)=='id'){
+						$field = strtolower($field);
+					}
+					$hmfield[$field] = $fieldv;
+				}
+			}
+       }
 
         $objpnps = $gtbl->get("pagesize"); 
        if($objpnps > 0){
         $this->hmf['pnps'] = $objpnps; # in case that pnps does not exists in URL,  remedy by wadelau, Mon Nov 19 11:18:52 CST 2012
        }
-       #print __FILE__.": getCondi:";
-       #print_r($this->hmf);
 
-       $hidesk = ""; # $gtbl->getHideSk($user); # xml/hss_tuanduitbl.xml
+       $hidesk = ""; # $gtbl->getHideSk($user); # for -gMIS only 
        if($hidesk != ''){
            $harr = explode("|", $hidesk);
            foreach($harr as $k=>$v){
@@ -225,7 +238,7 @@ class PageNavi extends WebApp{
                         $fieldopv = "=";
                     }
                     if($fieldopv == 'inlist'){
-                        if($this->isNumeric($hmfield[$field]) && strpos($hmfiled[$field],'date') === false){
+                        if($this->isNumeric($hmfield[$field]) && strpos($hmfield[$field],'date') === false){
                             # numeric
                         }else{
                             $v = $this->addQuote($v);
@@ -258,9 +271,8 @@ class PageNavi extends WebApp{
                 }
             }
        }
-      
+
        $condition = substr($condition, 4); # first pnsm seg 
-       
        #error_log(__FILE__.":getCondition: condition: $condition");
        $pnsc = $_REQUEST['pnsc'];
        if($pnsc != ''){
