@@ -65,6 +65,36 @@ $display_style = $_CONFIG['display_style_index'];
 # page info
 header("Content-type: text/html;charset=utf-8");
 
+# convert user input data to variables, tag#userdatatovar
+foreach($_REQUEST as $k=>$v){
+    $k = trim($k);
+    if($k != ''){
+        if(preg_match("/([0-9a-z_]+)/i",$k,$matcharr)){
+            $k_orig = $k = $matcharr[1];
+			if(is_string($v)){
+				$v = trim($v);
+				if(stripos($v, "<") > -1){ # <script , <embed, <img, <iframe, etc.  Mon Feb  1 14:48:32 CST 2016
+					$v = str_ireplace("<", "&lt;", $v);
+					$_REQUEST[$k] = $v;
+				}   
+			}
+            $data[$k] = $v;
+            if(preg_match('/[^\x20-\x7e]/', $k)){
+                eval("\${$k} = \"$v\";");
+            }
+        }
+		else{
+        }
+  	}
+}
+# re-init global vars, 09:28 Monday, 29 February, 2016
+$mod = $_REQUEST['mod']; # which mod is requested?
+$act = $_REQUEST['act']; # what act needs to do?
+
+if($mod == ""){
+  $mod = "index";    
+}
+
 ## RESTful handler
 $entry_tag = $_CONFIG['entry_tag'];;
 $paraArr = explode("/", $_SERVER['REQUEST_URI']);
@@ -101,29 +131,6 @@ if($isdbg){
 		$sid = str_replace('<', '&lt;', $sid);	
 	}
     $url .= "/sid/".$sid;
-}
-
-# convert user input data to variables, tag#userdatatovar
-foreach($_REQUEST as $k=>$v){
-    $k = trim($k);
-    if($k != ''){
-        if(preg_match("/([0-9a-z_]+)/i",$k,$matcharr)){
-            $k_orig = $k = $matcharr[1];
-			if(is_string($v)){
-				$v = trim($v);
-				if(stripos($v, "<") > -1){ # <script , <embed, <img, <iframe, etc.  Mon Feb  1 14:48:32 CST 2016
-					$v = str_ireplace("<", "&lt;", $v);
-					$_REQUEST[$k] = $v;
-				}   
-			}
-            $data[$k] = $v;
-            if(preg_match('/[^\x20-\x7e]/', $k)){
-                eval("\${$k} = \"$v\";");
-            }
-        }
-		else{
-        }
-  	}
 }
 
 function exception_handler($exception) {
