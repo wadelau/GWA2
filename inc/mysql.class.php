@@ -126,10 +126,19 @@ class MySQLDB {
 				}
 				$t = substr($sql,0,$a+1);
 				#print __FILE__.": t:[".$t."] i:[".$i."] vars:[".$idxarr[$i]."] hmv:[".$hmvars[$idxarr[$i]]."]\n";
-				$newsql .= str_replace("?",$this->_QuoteSafe($hmvars[$idxarr[$i]]),$t);
-				$sql = substr($sql,$a+1);
-				$a = strpos($sql,"?");
-				$i++;
+				if(strpos($t, $idxarr[$i]) === false){
+					# in case that, field was not set by $obj->set but written in sql with '?', Sat Apr  2 23:54:48 CST 2016
+					debug(__FILE__.": found unmatched field:[$t].");
+					$sql = substr($sql,$a+1);
+					$a = strpos($sql,"?");
+					$newsql .= str_replace("?", '\'\'', $t);
+				}
+				else{
+					$sql = substr($sql,$a+1);
+					$a = strpos($sql,"?");
+					$newsql .= str_replace("?",$this->_QuoteSafe($hmvars[$idxarr[$i]]),$t);
+					$i++;
+				}
 			}
 			if($sql!=""){
 				$newsql .=  $sql ;
