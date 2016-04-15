@@ -1,7 +1,9 @@
 # GWA2
-GWA2 is general web application architecture.
+GWA2 is general web application architecture. From demand to design, from interface to interactions.
 ----
 *From Interface to Interactions*
+
+*From Demand to Design*
 
 ***Three Layers***
 ----
