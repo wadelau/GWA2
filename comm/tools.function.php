@@ -247,13 +247,12 @@ function redirect($url, $time=0, $msg='') {
 	$hideMsg .= "</body></html>";
     if (!headers_sent()) {
         // redirect
-        if (1 || 0 === $time) {
+        if (0 === $time) {
             header("Location: " . $url);
 			print $hideMsg;
         } 
-        else if(0){  # Refresh in HTTP is non-standard.
-            header("Refresh:{$time};url={$url}");
-            echo($msg);
+        else {  
+			print $hideMsg;
         }
         exit();
     } 
