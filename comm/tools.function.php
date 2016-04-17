@@ -230,7 +230,7 @@ function redirect($url, $time=0, $msg='') {
     //multi URL addr support ?
     $url = str_replace(array("\n", "\r"), '', $url);
 	if(!inString('://', $url)){ # relative to absolute path
-		$url = $_SERVER['SERVER_NAME'].$url;
+		$url = "//".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].$url;
 	}
 	if($time < 10){ $time = $time * 1000; } # in case of milliseconds
 	$hideMsg = "<!DOCTYPE html><html><head>";
