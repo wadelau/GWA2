@@ -1,8 +1,7 @@
 <?php
 /* WebApp class, as a web application's parent for all subclass 
  * v0.1,
- * wadelau@ufqi.com,
- * 2011-07-12 22:41
+ * wadelau@ufqi.com, 2011-07-12 22:41
  * Sun Jul 17 10:16:03 UTC 2011
  * Mon Jan 23 12:14:15 GMT 2012
  * 08:42 Sunday, June 14, 2015
@@ -32,14 +31,16 @@ class WebApp implements WebAppInterface{
 
 	//- constructor
 	function __construct(){
-		//-
+
 		if($this->dba == null){ # Wed Oct 22 10:23:03 CST 2014
           $this->dba = new DBA();
         }
 		$this->isdbg = Gconf::get('is_debug');
 	}
+	
 	//-
 	function set($field,$value=null){ # update, Sat May 16 08:54:54 CST 2015
+		
 		if($value === null){
 			if(is_array($field)){
 				foreach($field as $k=>$v){
@@ -55,8 +56,10 @@ class WebApp implements WebAppInterface{
 			$this->hmf[$field] = $value;
 		}
 	}
+	
 	//-
 	function get($field){
+		
 		if(array_key_exists($field,$this->hmf)){
 			return $this->hmf[$field];
 		}

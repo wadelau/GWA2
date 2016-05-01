@@ -10,31 +10,30 @@ if(!defined('__ROOT__')){
 }
 require_once(__ROOT__.'/inc/webapp.class.php');  
 
-class User extends WebApp
-{
+class User extends WebApp{
+	
 	var $sep = "|";
 	var $eml = "email";
     
 	//-
-	function User()
-	{
+	function User(){
 		//-
 		$this->dba = new DBA();
 		$this->setTbl(Gconf::get('tblpre').'info_siteusertbl');
 	}
+	
 	//-
-	function setEmail($email)
-	{
+	function setEmail($email){
 		$this->set($this->eml,$email);
 	}
 
-	function getEmail()
-	{
+	//-
+	function getEmail(){
 		return $this->get($this->eml);
 	}
 
-	function isLogin()
-	{
+	//-
+	function isLogin(){
 		return $this->getId() != '';
 	}
 
