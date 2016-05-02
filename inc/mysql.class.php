@@ -18,6 +18,7 @@ class MySQLDB {
 	var $m_link; 
 	var $isdebug = 0; # debug mode
 	var $ismagicquote = 0;
+	var $mode = '';
 
 	function Err($sql = ""){
 		global $HTTP_HOST;
@@ -34,8 +35,9 @@ class MySQLDB {
 		}
 		else{
 			$str .= "<div id=\"errdiv_201210131751\" style=\"color:red;z-index:99;position:absolute\">Found internal error when process your transaction..., please report this to wadelau@gmail.com . [07211253]</div>\n";
-			error_log(__FILE__.": MYSQL_ERROR: err_no:[".$this->getErrno()."] err_info:[".$this->getError()."] err_sql:[".$sql."] [07211253]");
+			error_log(__FILE__.": MYSQL_ERROR: err_no:[".$this->getErrno()."] err_info:[".$this->getError()."] err_sql:[".serialize($sql)."] [07211253]");
 		}
+		debug($sql);
 		$html = $_CONFIG['html_resp']; $html = str_replace("RESP_TITLE","Error!", $html); $html = str_replace("RESP_BODY", $str, $html);
 		echo $html;
 		exit(1);
@@ -50,27 +52,35 @@ class MySQLDB {
 		$this->m_name     = $config->mDbDatabase; 
 		$this->m_link=0;
 	} 
+
 	//- for test purpose, wadelau@gmail.com, Wed Jul 13 19:21:37 UTC 2011
 	function showConf(){
 		print "<br/>/inc/class.mysql-1.2.php: current db:[".$this->m_name."].";
 	}	
 
+	//-
 	function _initconnection(){
 		if ($this->m_link==0){
 			$real_host = $this->m_host.":".$this->m_port;    
 			//echo $real_host,$this->m_user,$this->m_password;
-			$this->m_link = mysql_connect($real_host,$this->m_user,$this->m_password) or die($this->Err("mysql connect")); 
+			$this->mode = function_exists('mysqli_connect') ? 'mysqli' : 'mysql';
+			if($this->mode == 'mysqli'){
+				$this->m_link = new mysqli($this->m_host, $this->m_user, $this->m_password, $this->m_name, $this->m_port);	
+			}
+			else{
+				$this->m_link = mysql_connect($real_host,$this->m_user,$this->m_password) or die($this->Err("mysql connect")); 
+			}
 			//echo $this->Err();
 			//echo "[".$this->m_link."]";
-			if ("" != $this->m_name){
+			if ($this->mode == 'mysql' && "" != $this->m_name){
 				mysql_select_db($this->m_name, $this->m_link) or die($this->Err("use ".$this->m_name));
 			}             
 			if(get_magic_quotes_gpc()){ $this->ismagicquote = 1; }
 		}
 	}
 
-	function selectDb($database)
-	{
+	//-
+	function selectDb($database){
 		$this->m_name = $database;
 		if ("" != $this->m_name){
 			if ($this->m_link == 0){
@@ -88,7 +98,12 @@ class MySQLDB {
 		}
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
 		#$result=mysql_query($sql,$this->m_link) or eval($this->Err($sql)); 
-		$result=mysql_query($sql,$this->m_link) or $this->Err($sql); 
+		if($this->mode == 'mysqli'){
+			$result = $this->m_link->query($sql); 
+		}
+		else{
+			$result=mysql_query($sql,$this->m_link) or $this->Err($sql); 
+		}
 		if($result){
 			$hm[0] = true;
 			$hm[1] = $result;
@@ -148,7 +163,7 @@ class MySQLDB {
 		}
 	}
 	//--- for sql injection, added on 20061113 by wadelau
-	function _QuoteSafe($value){
+	function _QuoteSafe($value, $defaultValue=null){
 		// Quote variable to make safe
 		// Stripslashes
 		//if (get_magic_quotes_gpc()){
@@ -158,12 +173,26 @@ class MySQLDB {
 		// Quote if not a number or a numeric string
 		if (!is_numeric($value)) {
 			//$value = "'".addslashes($value)."'";
-			$value = "'".mysql_real_escape_string($value,$this->m_link)."'";
+			#$value = "'".mysql_real_escape_string($value,$this->m_link)."'";
+			if($this->mode == 'mysqli'){
+				$value = "'".$this->m_link->real_escape_string($value)."'";
+			}
+			else{
+				$value = "'".mysql_real_escape_string($value, $this->m_link)."'";
+			}
             # in some case, e.g. $value = '010003', which is expected to be a string, but is_numeric return true.
             # this should be handled by $webapp->execBy with manual sql components...
 		}
 		else{
-			#	
+			# in some case, e.g. $value = '010003', which is expected to be a string, but is_numeric return true.
+			if($defaultValue == ''){
+				if($this->mode == 'mysqli'){
+					$value = "'".$this->m_link->real_escape_string($value)."'";
+				}
+				else{
+					$value = "'".mysql_real_escape_string($value, $this->m_link)."'";
+				}
+			}
 		} 
 		return $value;
 	}
@@ -173,14 +202,14 @@ class MySQLDB {
 		{
 			$this->_initconnection();
 		}
-		return mysql_errno($this->m_link);
+		return ($this->mode == 'mysqli')? mysqli_errno($this->m_link) : mysql_errno($this->m_link);
 	}
 	function getError(){
 		if ($this->m_link == 0)
 		{
 			$this->_initconnection();
 		}
-		return mysql_error($this->m_link);
+		return ($this->mode == 'mysqli')? mysqli_error($this->m_link) : mysql_error($this->m_link);
 	}
 	
 	function FetchArray($result) { 
@@ -309,27 +338,27 @@ class MySQLDB {
 	 * mandatory return $hm = (0 => true|false, 1 => string|array);
 	 * Sun Jul 24 21:20:04 UTC 2011, wadelau@ufqi.com
 	 */
-	function readSingle($sql,$hmvars,$idxarr)
-	{
+	function readSingle($sql,$hmvars,$idxarr){
 		$hm = array();
-		if ($this->m_link == 0)
-		{
+		if ($this->m_link == 0){
 			$this->_initconnection();
 		}
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);	
-		if( strpos($sql,"limit")===false && strpos($sql,"show tables")===false)
-		{
+		if( strpos($sql,"limit")===false && strpos($sql,"show tables")===false){
 			$sql .= " limit 1 ";
 		} 
         #error_log(__FILE__.": query: sql:[".$sql."]\n");
-		$result = mysql_query($sql) or $this->Err($sql);
-		if($result)
-		{
-			if($row = mysql_fetch_array($result,MYSQL_ASSOC) )
-			{
-				mysql_free_result($result) or $this->Err($result);
+        if($this->mode == 'mysqli'){
+			$result = $this->m_link->query($sql);
+		}
+		else{
+			$result = mysql_query($sql) or $this->Err($sql);
+		}
+		if($result){
+			if($row = ($this->mode=='mysqli') ?  $result->fetch_array(MYSQL_ASSOC) : mysql_fetch_array($result,MYSQL_ASSOC) ){
 				$hm[0] = true;
 				$hm[1][0] = $row;
+				($this->mode=='mysqli') ? mysqli_free_result($result) : mysql_free_result($result);
 			}
 			else
 			{
@@ -346,14 +375,14 @@ class MySQLDB {
 		}
 		return $hm;
 	}
+
 	//--- added on 20060705 by wadelau, for quick get batch record
 	//--- return a multiple-record array, two-dimension
 	/*
 	 * mandatory return $hm = (0 => true|false, 1 => string|array);
 	 * Sun Jul 24 21:20:04 UTC 2011, wadelau@ufqi.com
 	 */
-	function readBatch($sql,$hmvars,$idxarr)
-	{
+	function readBatch($sql,$hmvars,$idxarr){
 		$hm = array();
 		if($this->m_link == 0)
 		{
@@ -361,19 +390,32 @@ class MySQLDB {
 		}
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
 		#print "<br/>/inc/class.mysql.php: readBatch sql:[".$sql."]";	
-    #error_log(__FILE__.": query in readBatch: sql:[".$sql."]\n");
+    	#error_log(__FILE__.": query in readBatch: sql:[".$sql."]\n");
 		$rtnarr = array();	
-		$result = mysql_query($sql) or $this->Err($sql);
-		if($result && !is_bool($result))
-		{
+		#$result = mysql_query($sql) or $this->Err($sql);
+        if($this->mode == 'mysqli'){
+			$result = $this->m_link->query($sql);
+		}
+		else{
+			$result = mysql_query($sql) or $this->Err($sql);
+		}
+		if($result && !is_bool($result)){
 			$i = 0;
-			while($row = mysql_fetch_array($result,MYSQL_ASSOC) )
-			{
-				$rtnarr[$i] =  $row ;		
-				$i++;
+			if($this->mode == 'mysqli'){
+				while($row = $result->fetch_array(MYSQL_ASSOC) ){
+					$rtnarr[$i] =  $row ;		
+					$i++;
+				}
+				mysqli_free_result($result);
 			}
-			//--- refined by tim's advice on 20060804 by wadelau
-			mysql_free_result($result) ;
+			else{
+				while($row = mysql_fetch_array($result,MYSQL_ASSOC) ){
+					$rtnarr[$i] =  $row ;		
+					$i++;
+				}
+				//--- refined by tim's advice on 20060804 by wadelau
+				mysql_free_result($result);
+			}
 		} 
 		if( count($rtnarr)>0 )
 		{
