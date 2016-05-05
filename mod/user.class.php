@@ -45,5 +45,6 @@ class User extends WebApp{
     function getGroup(){
         return $this->get('usergroup');
     }
+	
 }
 ?>

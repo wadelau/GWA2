@@ -9,8 +9,8 @@ $conf = array();
 $conf['siteid'] = 'default'; # or template them code or id, e.g. 'site-18'
 
 $conf['tblpre'] 	= $tblpre;
-$conf['appname'] 	= 'Shundaishao';
-$conf['appchnname'] 	= '顺带捎';
+$conf['appname'] 	= '-GWA2';
+$conf['appchnname'] 	= '-通用网络应用架构';
 $conf['appdir']		= $appdir;
 
 $conf['rtvdir'] 	= $rtvdir;

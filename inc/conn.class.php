@@ -12,8 +12,7 @@ if(!defined('__ROOT__')){
 require_once(__ROOT__."/inc/config.class.php");
 
 
-class Config_Master
-{
+class Config_Master{
 	var $mDbHost     = "";	
 	var $mDbUser     = "";
 	var $mDbPassword = ""; 
@@ -31,8 +30,7 @@ class Config_Master
 	} 
 }
 
-class Config_slave
-{
+class Config_slave{
 	var $mDbHost     = "";	
 	var $mDbUser     = "";
 	var $mDbPassword = ""; 
