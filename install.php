@@ -391,9 +391,9 @@ else if($step == 'db'){
 		#print "<br/>sqlstr:[$sqlstr]";
 		$sqlarr = explode(';', $sqlstr);
 		foreach($sqlarr as $k=>$v){
-			#print "<br/>sql-".($i++).": ".$v;	
 			$sql = $v;
 			$query = (($mysqlmode == 'mysql') ? @mysql_query($sql) : $link->query($sql));
+			#print "<br/>sql-".($i++).": ".$v." result:[$query]";	
 		}
 		
 		$sql = 'show tables'; # from '.$_CONFIG['dbname'];
@@ -466,13 +466,15 @@ else if($step == 'finalize'){
 		# mark installed
 		replace_in_file($config_file, 'INSTALL_AUTO', 'INSTALL_DONE');
 
+        # request dir
+        $reqdir = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'));
 		#
 		$out .= "Finalize and clearance done. 恭喜安装完成!";
-		$out .= "<br/> 继续体验 <a href='".$rtvdir."' target='_blank'>$rtvdir</a> .";
+		$out .= "<br/> 继续体验 <a href='".$reqdir."/' target='_blank'>$reqdir/</a> .";
 	}
 	else{
 		$out .= "Finalize and clearance done. 恭喜安装完成!";
-		$out .= "<br/> 继续体验 <a href='".$rtvdir."' target='_blank'>$rtvdir</a> .";
+		$out .= "<br/> 继续体验 <a href='".$reqdir."/' target='_blank'>$reqdir/</a> .";
 
 	}
 
