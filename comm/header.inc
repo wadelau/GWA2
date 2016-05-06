@@ -6,8 +6,13 @@ date_default_timezone_set("Asia/Chongqing");
 $isdbg = 1;
 
 $docroot = $_SERVER['DOCUMENT_ROOT'];
-$rtvdir = dirname(dirname(__FILE__)); # relative dir
-$rtvdir = str_replace($docroot,"", $rtvdir);
+if(0){ # physical dir, to-do: how to detect?
+	$rtvdir = dirname(dirname(__FILE__)); # relative dir
+	$rtvdir = str_replace($docroot,"", $rtvdir);
+}
+else{ # logical or soft-link dir
+	$rtvdir = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'));
+}
 $appdir = $docroot.$rtvdir;
 
 require($appdir."/inc/config.class.php");
