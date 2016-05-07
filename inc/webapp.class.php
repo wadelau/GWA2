@@ -111,93 +111,114 @@ class WebApp implements WebAppInterface{
 	/* 
 	 * mandatory return $hm = (0 => true|false, 1 => string|array);
 	 * Thu Jul 21 11:31:47 UTC 2011, wadelau@gmail.com
+	 * update by extending to writeObject by wadelau, Sat May  7 11:06:37 CST 2016
 	 */
 	function setBy($fields, $conditions){
-		$sql = "";
-		$hm = array();
-		$isupdate = 0;
-		if($this->getId() == ''){
-			$sql = "insert into ".$this->getTbl()." set ";
+
+		if(strpos($fields, ':') !== false){ # write to  file: or http(s):
+			$hm = $this->writeObject($type=$fields, $args=$conditions);
 		}
 		else{
-			$sql = "update ".$this->getTbl()." set ";
-			$isupdate = 1;
-		}
-		$fieldarr = explode(",",$fields);
-		
-		foreach($fieldarr as $k => $v){
-			$v = trim($v);
-			if($v == "updatetime" || $v == 'inserttime' || $v == 'createtime'){
-				$sql .= $v."=NOW(), ";
-                unset($this->hmf[$v]);
+			# write to db
+			$sql = "";
+			$hm = array();
+			$isupdate = 0;
+			if($this->getId() == ''){
+				$sql = "insert into ".$this->getTbl()." set ";
 			}
 			else{
-				$sql .= $v."=?, ";
+				$sql = "update ".$this->getTbl()." set ";
+				$isupdate = 1;
+			}
+			$fieldarr = explode(",",$fields);
+
+			foreach($fieldarr as $k => $v){
+				$v = trim($v);
+				if($v == "updatetime" || $v == 'inserttime' || $v == 'createtime'){
+					$sql .= $v."=NOW(), ";
+					unset($this->hmf[$v]);
+				}
+				else{
+					$sql .= $v."=?, ";
+				}
+			}
+			$sql = substr($sql,0,strlen($sql)-2); //- drop ", " at the end, Sun Jul 17 22:51:44 UTC 2011
+			$issqlready = 1;
+			if($conditions == null || $conditions == ""){
+				if($this->getId() != ""){
+					$sql .= " where id=?";
+				}
+				else if($isupdate == 1){
+					error_log("/inc/webapp.class.php: setBy: unconditonal update is forbidden.");
+					$issqlready = 0;
+					$hm[0] = false;
+					$hm[1] = array("error"=>"unconditonal update is forbidden.");
+				}
+			}
+			else{
+				$sql .= " where ".$conditions;
+			}
+
+			if($issqlready == 1){
+				if($this->getId() != ""){ $this->hmf["pagesize"] = 1; } # single record
+					$hm = $this->dba->update($sql, $this->hmf);
 			}
 		}
-		$sql = substr($sql,0,strlen($sql)-2); //- drop ", " at the end, Sun Jul 17 22:51:44 UTC 2011
-		$issqlready = 1;
-		if($conditions == null || $conditions == ""){
-			if($this->getId() != ""){
-				$sql .= " where id=?";
-			}
-			else if($isupdate == 1){
-				error_log("/inc/webapp.class.php: setBy: unconditonal update is forbidden.");
-				$issqlready = 0;
-				$hm[0] = false;
-				$hm[1] = array("error"=>"unconditonal update is forbidden.");
-			}
-		}
-		else{
-			$sql .= " where ".$conditions;
-		}
-		#error_log(__FILE__.": setBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
-		#print(__FILE__.": setBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
-		if($issqlready == 1){
-			if($this->getId() != ""){ $this->hmf["pagesize"] = 1; } # single record
-			$hm = $this->dba->update($sql, $this->hmf);
-		}
+
 		return $hm;
+
 	}
 
 	/* 
 	 * mandatory return $hm = (0 => true|false, 1 => string|array);
 	 * Thu Jul 21 11:31:47 UTC 2011, wadelau@gmail.com
+	 * update by extending to readObject by wadelau, Sat May  7 11:06:37 CST 2016
 	 */
 	function getBy($fields, $conditions){
-		$sql = "";
-		$hm = array();
-		$haslimit1 = 0;
-		#print_r($this->hmf);
-		$pagenum = 1; # default pagenum set to "1", unless pre set in hmvar, 20080903  
-		$pagesize = 0;# default pagesize set to "0", unless pre set in hmvar, "0" means all, no limit, 20080903
-		if(array_key_exists('pagenum',$this->hmf)){ $pagenum = $this->hmf['pagenum'];}
-		if(array_key_exists('pagesize',$this->hmf)){ $pagesize = $this->hmf['pagesize'];}
-		$sql .= "select ".$fields." from ".$this->getTbl()." where ";
-		if($conditions == null || $conditions == ""){
-			if($this->getId() != ""){
-				$sql .= "id=?";
-				$haslimit1 = 1;
+
+		if(strpos($fields, ':') !== false){ # read from file: or http(s):
+			$hm = $this->readObject($type=$fields, $args=$conditions);
+		}
+		else{
+			# get from db 
+			$sql = "";
+			$hm = array();
+			$haslimit1 = 0;
+			#print_r($this->hmf);
+			$pagenum = 1; # default pagenum set to "1", unless pre set in hmvar, 20080903  
+			$pagesize = 0;# default pagesize set to "0", unless pre set in hmvar, "0" means all, no limit, 20080903
+			if(array_key_exists('pagenum',$this->hmf)){ $pagenum = $this->hmf['pagenum'];}
+			if(array_key_exists('pagesize',$this->hmf)){ $pagesize = $this->hmf['pagesize'];}
+
+			$sql .= "select ".$fields." from ".$this->getTbl()." where ";
+			if($conditions == null || $conditions == ""){
+				if($this->getId() != ""){
+					$sql .= "id=?";
+					$haslimit1 = 1;
+				}
+				else{
+					$sql .= "1=1";
+				}
 			}
 			else{
-				$sql .= "1=1";
+				$sql .= $conditions;
 			}
+
+			if(array_key_exists('orderby',$this->hmf)){ $sql .= " order by ".$this->hmf['orderby'];}
+			if($haslimit1 == 1){
+				$sql .= " limit 1 ";
+			}
+			else{
+				if($pagesize == 0){ $pagesize = 99999; } # maximum records per query
+					$sql .= ' limit '.(($pagenum-1)*$pagesize).','.$pagesize;	
+			}
+			#print __FILE__.':<br/>/inc/webapp.class.php: sql:['.$sql.']';
+			#error_log(__FILE__.": getBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
+			$hm = $this->dba->select($sql, $this->hmf);
 		}
-		else{
-			$sql .= $conditions;
-		}
-		if(array_key_exists('orderby',$this->hmf)){ $sql .= " order by ".$this->hmf['orderby'];}
-		if($haslimit1 == 1){
-			$sql .= " limit 1 ";
-		}
-		else{
-			if($pagesize == 0){ $pagesize = 99999; } # maximum records per query
-			$sql .= ' limit '.(($pagenum-1)*$pagesize).','.$pagesize;	
-		}
-		#print __FILE__.':<br/>/inc/webapp.class.php: sql:['.$sql.']';
-        #error_log(__FILE__.": getBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
-		$hm = $this->dba->select($sql, $this->hmf);
+
 		return $hm;
+
 	}
 
     /*
@@ -347,23 +368,196 @@ class WebApp implements WebAppInterface{
             || strpos($fieldtype, "float") !== false
             || strpos($fieldtype, "double") !== false
             || strpos($fieldtype, "date") !== false){
-            
-            $isNumeric = 1;
-        }
-        return $isNumeric;
+
+		    $isNumeric = 1;
+	    }
+	return $isNumeric;
     }
 
-	# get count based on some conditions
-	# Sat Aug  8 11:25:09 CST 2015 by wadelau
-	public function getCount($pCondi){
-		$ro = $this->getBy("count(*) as inum", $pCondi);
-		if($ro[0]){
-			return intval($ro[1][0]['inum']==null ? 0 : $ro[1][0]['inum']);
-		}
-		else{
-			return 0;
-		}
-	}
+    # get count based on some conditions
+    # Sat Aug  8 11:25:09 CST 2015 by wadelau
+    public function getCount($pCondi){
+	    $ro = $this->getBy("count(*) as inum", $pCondi);
+	    if($ro[0]){
+		    return intval($ro[1][0]['inum']==null ? 0 : $ro[1][0]['inum']);
+	    }
+	    else{
+		    return 0;
+	    }
+    }
+
+
+    //- read an object of file or http post|get
+    //- by wadelau, Fri May  6 18:57:17 CST 2016
+	//- $args: 'target', 'method', 'parameter', and so on....
+    public function readObject($type, $args){
+
+	    $obj = '';
+
+	    if($type == 'file:'){
+		    //-- local or network file system
+		    $obj = file_get_contents($args['target']);
+			if($obj !== false){
+				$obj = array(true, array('content'=>$obj));	
+			}
+			else{
+				$obj = array(false, 
+					array('errorcode'=>'1605071131', 
+						'errordesc'=>'file:['.$args['target'].'] read failed.'
+					)
+				);
+			}
+	    }
+	    else if($type == 'url:'){
+
+		    //-- http(s) request
+		    if($args['method'] == 'post'){
+			    //- curl or fsockopen, todo
+			    //- or file_get_contents with  stream_context_create() 
+				$header = '';
+				if(is_array($args['header'])){
+					foreach($args['header'] as $k=>$v){
+						$header .= "$k: $v\r\n";	
+					}	
+				}
+			    $reqContext = stream_context_create(array('http'=>array('method'=>'POST', 
+								'header'=>$header,
+								'content'=>http_build_query($args['parameters'])
+							)
+						)
+					); # $args: 'method', 'header', 'content'...
+				$obj = file_get_contents($args['target'], false, $reqContext);
+				if($obj !== false){
+			    	$obj = array(true, array('content'=>$obj, 'headers'=>$http_response_header));
+				}
+				else{
+					$obj = array(false, 
+						array('errorcode'=>'1605071139', 
+							'errordesc'=>'file:['.$args['target'].'] read failed. response header:['.$http_response_header.']'
+						)
+					);	
+				}
+		    }
+		    else{
+			    //- http(s) get or not specified
+			    $obj = file_get_contents($args['target'].'?'.http_build_query($args['parameter']));
+				if($obj !== false){
+			    	$obj = array(true, array('content'=>$obj, 'headers'=>$http_response_header));
+				}
+				else{
+					$obj = array(false, 
+						array('errorcode'=>'1605071140', 
+							'errordesc'=>'file:['.$args['target'].'] read failed. response header:['.$http_response_header.']'
+						)
+					);	
+				}
+		    }
+	    }
+	    else{
+		    $obj = array(false, 
+			    	array('errorcode'=>'1605071049', 
+			    	'errordesc'=>'Unsupported objecttype:['.$type.']'
+		    	)
+	    	);
+	    }
+
+	    return $obj;
+
+    } 
+
+	//- write to an object of file or http post
+    //- by wadelau, Sat May  7 11:14:47 CST 2016
+	# $args, 'target', 'method', 'content'.... 
+    public function writeObject($type, $args){
+
+	    $obj = '';
+
+	    if($type == 'file:'){
+		    //-- local or network file system
+			# test dir
+			$dirfile = $args['target'];
+			$parts = explode('/', $dirfile);
+			$file = array_pop($parts);
+			$dir = '';
+			foreach($parts as $part){
+				if(!is_dir($dir .= "/$part")){ mkdir($dir); }
+			}
+
+			# write data
+			debug($dir.'/'.$file);
+			$flags = 0;
+			if($args['islock']){ $flags = $flags |  LOCK_EX; }
+			if($args['isappend']){ $flags = $flags | FILE_APPEND; }
+			$obj = file_put_contents($dir.'/'.$file, $args['content'], $flags);
+			if($obj !== false){
+				$obj = array(true, $obj);	
+			}
+			else{
+				$obj = array(false, 
+					array('errorcode'=>'1605071211', 
+						'errordesc'=>'file:['.$args['target'].'] write failed. response header:['.$http_response_header.']'
+						)
+					);
+			}
+
+	    }
+	    else if($type == 'url:'){
+		    //-- http(s) request
+		    if($args['method'] == 'post'){
+			    //- curl or fsockopen, todo
+			    //- or file_get_contents with  stream_context_create() 
+				$header = '';
+				if(is_array($args['header'])){
+					foreach($args['header'] as $k=>$v){
+						$header .= "$k: $v\r\n";	
+					}	
+				}
+			    $reqContext = stream_context_create(array('http'=>array('method'=>'POST', 
+								'header'=>$header,
+								'content'=>http_build_query($args['parameters'])
+							)
+						)
+					); # $args: 'method', 'header', 'content'...
+				$obj = file_get_contents($args['target'], false, $reqContext);
+				if($obj !== false){
+			    	$obj = array(true, array('content'=>$obj, 'headers'=>$http_response_header));
+				}
+				else{
+					$obj = array(false, 
+						array('errorcode'=>'1605071212', 
+							'errordesc'=>'url:['.$args['target'].'] write failed. response header:['.$http_response_header.']'
+						)
+					);	
+				}
+		    }
+		    else{
+			    //- http(s) get or not specified
+			    $obj = file_get_contents($args['target'].'?'.http_build_query($args['parameter']));
+				if($obj !== false){
+			    	$obj = array(true, array('content'=>$obj, 'headers'=>$http_response_header));
+				}
+				else{
+					$obj = array(false, 
+						array('errorcode'=>'1605071213', 
+							'errordesc'=>'url:['.$args['target'].'] write failed. response header:['.$http_response_header.']'
+						)
+					);	
+				}
+		    }
+	    }
+	    else{
+		    $obj = array(false, 
+			    	array('errorcode'=>'1605071215', 
+			    	'errordesc'=>'Unsupported objecttype:['.$type.']'
+		    	)
+	    	);
+	    }
+
+	    return $obj;
+
+    } 
+
 
 }
+
 ?>

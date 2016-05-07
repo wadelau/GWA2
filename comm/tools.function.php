@@ -22,6 +22,9 @@ function getSmtTpl($file, $act){
  * @param array $post values to send 
  * @param array $options for cURL 
  * @return string 
+  !!! This can be replaced with $WebApp->setBy('url:', array('target'=>$url, 'parameter'=>$post)); !!!
+ ! since Sat May  7 13:11:15 CST 2016, by wadelau
+ */ 
  */ 
 function curlPost($url, array $post = NULL, array $options = array()){ 
     $defaults = array( 
