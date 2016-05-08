@@ -172,7 +172,9 @@ function replace_in_file($myFile, $oldStr, $newStr){
 
 $out = '';
 $sid = $_REQUEST['sid'] == '' ? rand(100, 999999) :  $_REQUEST['sid'] ;
-$file = $_SERVER['PHP_SELF']."?sid=".$sid;
+$reqProto = $_SERVER['HTTPS'] == '' ? "http" : "https";
+$srvName = (strlen($_SERVER['SERVER_NAME']) > 3 ? $_SERVER['SERVER_NAME'] : $_SERVER['SERVER_ADDR']); # shortest domain, a.bc
+$file = $reqProto."://".$srvName.":".$_SERVER['SERVER_PORT'].$_SERVER['PHP_SELF']."?sid=".$sid;
 
 $docroot = $_SERVER['DOCUMENT_ROOT'];
 $rtvdir = dirname(__FILE__); # relative dir

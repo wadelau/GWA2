@@ -390,6 +390,7 @@ class WebApp implements WebAppInterface{
     //- read an object of file or http post|get
     //- by wadelau, Fri May  6 18:57:17 CST 2016
 	//- $args: 'target', 'method', 'parameter', and so on....
+	//- http://ufqi.com/blog/gwa2-add-read-write-object-201605/
     public function readObject($type, $args){
 
 	    $obj = '';
