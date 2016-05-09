@@ -28,6 +28,7 @@ class WebApp implements WebAppInterface{
 	var $hmf = array(); # container for the Object which extends this class	
 	var $isdbg = 1;  # Gconf::get('is_debug');
 	var $sep = "|"; # separating tag for self-defined message body
+	var $myId = 'id'; # field name 'id', in case that it can be renamed as nameid, name_id, nameId, nameID, ID, iD, Id, and so on, by wadelau@ufqi.com Mon May  9 13:34:45 CST 2016
 
 	//- constructor
 	function __construct(){
@@ -63,7 +64,7 @@ class WebApp implements WebAppInterface{
 		if(array_key_exists($field,$this->hmf)){
 			return $this->hmf[$field];
 		}
-		else if($field != 'id' & $field != 'tbl' && $field != 'er'){
+		else if($field != $this->myId & $field != 'tbl' && $field != 'er'){
 			#! Otherwise, this will cause a dead loop with ._setAll.
 			if($this->get('er') != 1){
 				if($this->_setAll()){
@@ -87,9 +88,10 @@ class WebApp implements WebAppInterface{
 		}
 	}
 	
+	//-
 	function setTbl($tbl){
 		$tblpre = Gconf::get('tblpre');
-		if(strpos($tbl, $tblpre) !== 0){
+		if($tblpre != '' && strpos($tbl, $tblpre) !== 0){
 			$tbl = $tblpre.$tbl;
 		}
 		$this->set("tbl",$tbl);
@@ -101,11 +103,12 @@ class WebApp implements WebAppInterface{
 	}
 
 	function setId($id){
-		$this->set("id", $id);
+		debug("id:$id, myId:".$this->myId);
+		$this->set($this->myId, $id);
 	}
 
 	function getId(){
-		return $this->get("id");
+		return $this->get($this->myId);
 	}
 
 	/* 
@@ -146,7 +149,7 @@ class WebApp implements WebAppInterface{
 			$issqlready = 1;
 			if($conditions == null || $conditions == ""){
 				if($this->getId() != ""){
-					$sql .= " where id=?";
+					$sql .= " where ".$this->myId."=?";
 				}
 				else if($isupdate == 1){
 					error_log("/inc/webapp.class.php: setBy: unconditonal update is forbidden.");
@@ -193,7 +196,7 @@ class WebApp implements WebAppInterface{
 			$sql .= "select ".$fields." from ".$this->getTbl()." where ";
 			if($conditions == null || $conditions == ""){
 				if($this->getId() != ""){
-					$sql .= "id=?";
+					$sql .= $this->myId."=?";
 					$haslimit1 = 1;
 				}
 				else{
@@ -274,7 +277,7 @@ class WebApp implements WebAppInterface{
 		$sql = "delete from ".$this->getTbl()." where ";
 		if($conditions == null || $conditions == ""){
 			if($this->getId() != ""){
-				$sql .= "id=?";
+				$sql .= $this->myId."=?";
 				$issqlready = 1;
 			}
 			else{
@@ -557,6 +560,15 @@ class WebApp implements WebAppInterface{
 	    return $obj;
 
     } 
+
+	//-
+	public function setMyId($myId){
+		
+		$this->myId = $myId;
+
+		return 0;
+
+	}
 
 
 }
