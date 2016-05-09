@@ -9,14 +9,13 @@
 require_once(__ROOT__."/inc/conn.class.php");
 require_once(__ROOT__."/inc/mysql.class.php");
 
-class DBA 
-{
+class DBA {
+	
 	var $conf = null; 
 	var $dbconn = null;
 
 	//-construct
-	function DBA()
-	{
+	function DBA(){
 		//-
 		$this->conf = new Config_Master; //- need to be changed to Config_zoneli when sync to product enviro.
 		$this->dbconn = new MySQLDB($this->conf);

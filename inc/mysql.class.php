@@ -10,6 +10,7 @@ ini_set("memory_limit","256M");
 require_once(__ROOT__."/inc/config.class.php");
 
 class MySQLDB { 
+
 	var $m_host; 
 	var $m_port; 
 	var $m_user; 
@@ -38,7 +39,7 @@ class MySQLDB {
 			error_log(__FILE__.": MYSQL_ERROR: err_no:[".$this->getErrno()."] err_info:[".$this->getError()."] err_sql:[".serialize($sql)."] [07211253]");
 		}
 		debug($sql);
-		$html = $_CONFIG['html_resp']; $html = str_replace("RESP_TITLE","Error!", $html); $html = str_replace("RESP_BODY", $str, $html);
+		$html = GConf::get('html_resp'); $html = str_replace("RESP_TITLE","Error!", $html); $html = str_replace("RESP_BODY", $str, $html);
 		echo $html;
 		exit(1);
 		#return false;
@@ -99,7 +100,7 @@ class MySQLDB {
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
 		#$result=mysql_query($sql,$this->m_link) or eval($this->Err($sql)); 
 		if($this->mode == 'mysqli'){
-			$result = $this->m_link->query($sql); 
+			$result = $this->m_link->query($sql) or $this->Err($sql); 
 		}
 		else{
 			$result=mysql_query($sql,$this->m_link) or $this->Err($sql); 
