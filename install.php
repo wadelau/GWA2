@@ -144,13 +144,13 @@ function dir_writeable($dir) {
 function execInBackground($cmd) { 
 	
 	#print "cmd:[$cmd]";
-
 	if (substr(php_uname(), 0, 7) == "Windows"){ 
 		pclose(popen("start /B ". $cmd, "r"));  
 	} 
 	else { 
 		exec($cmd . " > /dev/null &");   
-	} 
+	}
+	sleep(1);
 
 	return 0;
 
@@ -460,7 +460,7 @@ else if($step == 'finalize'){
 		
 		$rd = rand(1000, 9999999);
 		$cmd = "mv ./".$_SERVER['PHP_SELF']." ./".$_SERVER['PHP_SELF'].".$rd.php";
-		#print $cmd;
+		print $cmd;
 		execInBackground($cmd);
 		
 		# mark installed

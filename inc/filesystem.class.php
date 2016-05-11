@@ -6,16 +6,25 @@
  */
 
 
- class FileSystem
- {
+ class FileSystem{
+	 
  	//- construct
-	function FileSystem()
-	{
+	function __construct(){
 		//-
 	}
 
 	# Todo: to be implemented in second stage for uniting the storage engine.
 
  	# need todo ....
+	
+	/*
+	 * WebApp.class has been added two extended methods as
+		$webapp->setBy('url:', $args);
+		$webapp->setBy('file:', $args);
+		$webapp->getBy('url:', $args);
+		$webapp->getBy('file:', $args);
+	* 2016-05-10
+	*/
+	
  }
 ?>

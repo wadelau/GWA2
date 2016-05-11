@@ -1,9 +1,16 @@
 <?php
+/*
+ * remedy by wadelau@ufqi.com
+ * 2016-05-09
+ */
+
  class FileUpload {
+	 
   private $filepath;    //指定上传文件保存的路径
   private $allowtype=array('gif', 'jpg', 'png', 'jpeg','doc','txt','xls','zip','7z','gzip','tar.gz','tar','pdf','bmp');  //充许上传文件的类型
   private $maxsize=100000000;  //允上传文件的最大长度 1M
   private $israndname=true;  //是否随机重命名， true false不随机，使用原文件名
+  
   private $originName;  //源文件名称
   private $tmpFileName;  //临时文件名
   private $fileType;  //文件类型
@@ -16,9 +23,7 @@
   private $newFileTypes=array(); //文件类型列表
   private $newFileSizes=array(); //文件大小列表
 
- 
-
-  //用于对上传文件初使化
+   //用于对上传文件初使化
   //1. 指定上传路径， 2，充许的类型， 3，限制大小， 4，是否使用随机文件名称
   //让用户可以不用按位置传参数，后面参数给值不用将前几个参数也提供值
   function __construct($options=array()){
@@ -34,9 +39,8 @@
  
  
   }
- 
 
-
+  //-
   private function getError(){
    $str="上传文件<font color='red'>{$this->originName}</font>时出错：";
 
@@ -72,6 +76,7 @@
    }
    return true;
   }
+  
   //用来检查文件上传的大小
   private function checkFileSize() {
    if($this->fileSize > $this->maxsize){
@@ -91,6 +96,7 @@
     return false;
    }
   }
+  
   //设置上传后的文件名称
   private function setNewFileName(){
    if($this->israndname){
@@ -99,8 +105,6 @@
     $this->setOption('newFileName', $this->originName);
    }
   }
-
- 
 
   //设置随机文件名称
   private function proRandName(){
@@ -111,6 +115,7 @@
   private function setOption($key, $val){
    $this->$key=$val;
   }
+  
   //用来上传一个文件
   function uploadFile($fileField){
    $return=true;
@@ -120,7 +125,6 @@
     return false;
    }
 
-   
    $name=$_FILES[$fileField]['name'];
    $tmp_name=$_FILES[$fileField]['tmp_name'];
 	 
@@ -175,7 +179,9 @@
 
     $this->errorMess=$errors;
     return $return;
-   } else {
+	
+   } 
+   else {
 
      if($this->setFiles($name, $tmp_name, $size, $error)){
       if($this->checkFileSize() && $this->checkFileType()){
@@ -203,6 +209,7 @@
    }   
   }
 
+  //-
   private function copyFile(){
    if(!$this->errorNum){
     $filepath=rtrim($this->filepath, '/').'/';
@@ -262,8 +269,10 @@
   function getNewFileSizes(){
    return $this->newFileSizes;
   }	
+  
   //上传如果失败，则调用这个方法，就可以查看错误报告
   function getErrorMsg() {
    return $this->errorMess;
   }
+  
  }	 
