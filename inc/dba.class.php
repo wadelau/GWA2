@@ -15,9 +15,10 @@ class DBA {
 	var $dbconn = null;
 
 	//-construct
-	function DBA(){
+	function DBA($dbconf=''){
+		$dbconf = ($dbconf=='' ? 'Config_Master' : $dbconf);
 		//-
-		$this->conf = new Config_Master; //- need to be changed to Config_zoneli when sync to product enviro.
+		$this->conf = new $dbconf; //- need to be changed to Config_zoneli when sync to product enviro.
 		$this->dbconn = new MySQLDB($this->conf);
 	}	
 
@@ -45,8 +46,7 @@ class DBA {
 	/* 
 	 * mandatory return $hm = (0 => true|false, 1 => string|array);
 	 */
-	function select($sql, $hmvars)
-	{
+	function select($sql, $hmvars){
 		$hm = array();
 		$result = 0;
 		$idxarr = $this->hm2idxArray($sql,$hmvars);

@@ -356,7 +356,7 @@ class MySQLDB {
 			$result = mysql_query($sql) or $this->Err($sql);
 		}
 		if($result){
-			if($row = ($this->mode=='mysqli') ?  $result->fetch_array(MYSQL_ASSOC) : mysql_fetch_array($result,MYSQL_ASSOC) ){
+			if($row = ($this->mode=='mysqli') ?  $result->fetch_array(MYSQLI_ASSOC) : mysql_fetch_array($result,MYSQL_ASSOC) ){
 				$hm[0] = true;
 				$hm[1][0] = $row;
 				($this->mode=='mysqli') ? mysqli_free_result($result) : mysql_free_result($result);
@@ -403,7 +403,7 @@ class MySQLDB {
 		if($result && !is_bool($result)){
 			$i = 0;
 			if($this->mode == 'mysqli'){
-				while($row = $result->fetch_array(MYSQL_ASSOC) ){
+				while($row = $result->fetch_array(MYSQLI_ASSOC) ){
 					$rtnarr[$i] =  $row ;		
 					$i++;
 				}

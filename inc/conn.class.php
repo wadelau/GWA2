@@ -30,7 +30,7 @@ class Config_Master{
 	} 
 }
 
-class Config_slave{
+class Config_Slave{
 	var $mDbHost     = "";	
 	var $mDbUser     = "";
 	var $mDbPassword = ""; 
@@ -39,11 +39,11 @@ class Config_slave{
 	
 	function __construct(){
 		$gconf = new Gconf();
-		$this->mDbHost = $gconf->get('dbhost');
-		$this->mDbPort = $gconf->get('dbport');
-		$this->mDbUser = $gconf->get('dbuser');
-		$this->mDbPassword = $gconf->get('dbpassword');
-		$this->mDbDatabase = $gconf->get('dbname');
+		$this->mDbHost = $gconf->get('dbhost_slave');
+		$this->mDbPort = $gconf->get('dbport_slave');
+		$this->mDbUser = $gconf->get('dbuser_slave');
+		$this->mDbPassword = $gconf->get('dbpassword_slave');
+		$this->mDbDatabase = $gconf->get('dbname_slave');
 
 	} 
 }
