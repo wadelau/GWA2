@@ -15,8 +15,8 @@ class DBA {
 	var $dbconn = null;
 
 	//-construct
-	function DBA($dbconf=''){
-		$dbconf = ($dbconf=='' ? 'Config_Master' : $dbconf);
+	function DBA($dbconf=null){
+		$dbconf = ($dbconf==null ? 'Config_Master' : $dbconf);
 		//-
 		$this->conf = new $dbconf; //- need to be changed to Config_zoneli when sync to product enviro.
 		$this->dbconn = new MySQLDB($this->conf);

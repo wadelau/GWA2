@@ -31,10 +31,13 @@ class WebApp implements WebAppInterface{
 	var $myId = 'id'; # field name 'id', in case that it can be renamed as nameid, name_id, nameId, nameID, ID, iD, Id, and so on, by wadelau@ufqi.com Mon May  9 13:34:45 CST 2016
 
 	//- constructor
-	function __construct($dbconf=''){
+	function __construct($args=null){
 
 		if($this->dba == null){ # Wed Oct 22 10:23:03 CST 2014
-          $this->dba = new DBA($dbconf);
+          if($args != null && is_array($args) && array_key_exists('dbconf', $args)){
+			 $dbconf = $args['dbconf']; 
+		  }
+		  $this->dba = new DBA($dbconf);
         }
 		$this->isdbg = Gconf::get('is_debug');
 	}
