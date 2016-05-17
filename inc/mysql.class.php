@@ -330,7 +330,12 @@ class MySQLDB {
 		{
 			$this->_initconnection();
 		}
-		return mysql_insert_id($this->m_link);
+		if($this->mode == 'mysqli'){
+			return mysqli_insert_id($this->m_link);
+		}
+		else{
+			return mysql_insert_id($this->m_link);
+		}
 	}
 
 	//--- added on 20060705 by wadelau, for quick get one record

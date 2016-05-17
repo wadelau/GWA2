@@ -167,7 +167,8 @@ class WebApp implements WebAppInterface{
 
 			if($issqlready == 1){
 				if($this->getId() != ""){ $this->hmf["pagesize"] = 1; } # single record
-					$hm = $this->dba->update($sql, $this->hmf);
+				$hm = $this->dba->update($sql, $this->hmf);
+				$hm[]['isupdate'] = $isupdate;
 			}
 		}
 
@@ -293,7 +294,7 @@ class WebApp implements WebAppInterface{
 			$sql .= $conditions;
 			$issqlready = 1;
 		}
-		error_log(__FILE__.": rmBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
+		#error_log(__FILE__.": rmBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
 		if($issqlready == 1){
 			$hm = $this->dba->update($sql, $this->hmf);
 		}
