@@ -64,6 +64,11 @@ if($smttpl != ''){
 else{
 	
 	//var_dump($_REQUEST);
+	$isOB = 0;
+	if(ob_start('ob_gzhandler')){ $isOB = 1; }
+	else if(ob_start()){ 
+		$isOB = 1; 
+	}
 	if(isset($fmt)){
 		if($fmt == 'json'){
 			header("Content-type: application/json;charset=utf-8");
@@ -79,6 +84,7 @@ else{
 		#error_log(__FILE__.": smttpl is empty. not display with Smarty.req:[".$_SERVER['REQUEST_URI']);
 		print $out;
 	}
+	if($isOB){ ob_end_flush(); }
 }
 
 #error_log(__FILE__.": out:[".$out."]");
