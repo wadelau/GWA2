@@ -175,17 +175,21 @@ class MySQLDB {
 		if (!is_numeric($value)) {
 			//$value = "'".addslashes($value)."'";
 			#$value = "'".mysql_real_escape_string($value,$this->m_link)."'";
-			if($this->mode == 'mysqli'){
-				$value = "'".$this->m_link->real_escape_string($value)."'";
+			if(strpos($value, '","') !== false || strpos($value, "','") !== false){
+				# in str list, leave alone, 10:29 Thursday, May 19, 2016
 			}
 			else{
-				$value = "'".mysql_real_escape_string($value, $this->m_link)."'";
+				if($this->mode == 'mysqli'){
+					$value = "'".$this->m_link->real_escape_string($value)."'";
+				}
+				else{
+					$value = "'".mysql_real_escape_string($value, $this->m_link)."'";
+				}
 			}
             # in some case, e.g. $value = '010003', which is expected to be a string, but is_numeric return true.
             # this should be handled by $webapp->execBy with manual sql components...
 		}
 		else{
-			# in some case, e.g. $value = '010003', which is expected to be a string, but is_numeric return true.
 			if($defaultValue == ''){
 				if($this->mode == 'mysqli'){
 					$value = "'".$this->m_link->real_escape_string($value)."'";

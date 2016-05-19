@@ -113,9 +113,9 @@ class DBA {
 						$nextpos = strpos($sql,$spacek."=",$kpos+1);
 			  			$nextpos = $nextpos === false ? strpos($sql,$spacek." ",$kpos+1) : $nextpos;
 
-						while($nextpos !== false)
-						{
-							$tmparr[$nextpos] = $k.".".(count($tmpposarr)>0?$tmpposarr[$k]:""); 
+						while($nextpos !== false){
+							
+							$tmparr[$nextpos] = $k.(count($tmpposarr)>0?".".$tmpposarr[$k]:""); 
 							/* 
 							 *  Attention: 
 							 *      one field matches more than two values, 
