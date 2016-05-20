@@ -22,6 +22,7 @@ class MySQLDB {
 	var $mode = '';
 
 	function Err($sql = ""){
+		
 		global $HTTP_HOST;
 		global $REMOTE_ADDR;
 		global $PHP_SELF;
@@ -43,20 +44,23 @@ class MySQLDB {
 		echo $html;
 		exit(1);
 		#return false;
+		
 	} 
 
-	function MySQLDB($config){             
+	function MySQLDB($config){  
+	
 		$this->m_host     = $config->mDbHost;
 		$this->m_port     = $config->mDbPort; 
 		$this->m_user     = $config->mDbUser; 
 		$this->m_password = $config->mDbPassword; 
 		$this->m_name     = $config->mDbDatabase; 
 		$this->m_link=0;
+		
 	} 
 
 	//- for test purpose, wadelau@gmail.com, Wed Jul 13 19:21:37 UTC 2011
 	function showConf(){
-		print "<br/>/inc/class.mysql-1.2.php: current db:[".$this->m_name."].";
+		print __FILE__.":[".$this->m_name."].";
 	}	
 
 	//-
@@ -93,6 +97,7 @@ class MySQLDB {
 
 	//--- for sql injection, added on 20061113 by wadelau
 	function query($sql,$hmvars,$idxarr){
+		
 		$hm = array();
 		if ($this->m_link == 0){
 			$this->_initconnection();
@@ -119,50 +124,51 @@ class MySQLDB {
 	
 	function _enSafe($sql,$idxarr,$hmvars){
 		$sql = $origSql = trim($sql);
-		$newsql = "";
-        $wherepos = strpos($sql, " where ");
-		if( (strpos($sql,"delete ")!==false || strpos($sql,"update ")!==false) 
-			&& $wherepos === false){
-			$this->Err("table action [update, delete] need [where] clause.sql:[".$sql."]");
+		if($hmvars[Gconf::get('no_sql_check')]){
+			$hmvars[Gconf::get('no_sql_check')] = false; # valid only once
+			return $origSql;
 		}
 		else{
-        	/*
-      		if(strpos($sql, "select ") !== false && $wherepos !== false){
-        		$newsql = substr($sql, 0, $wherepos);     
-      		}
-      		*/
-			#print __FILE__."\n: sql:[".$sql."] sql_new:[".$newsql."]\n";
-			$a = strpos($sql,"?");
-			$i = 0;
-			$n = count($idxarr);
-			while($a !== false){
-				#if($i>=$n){
-				if($i>$n){
-					$this->Err("_enSafe, fields not matched with vars.sql:[".$origSql."] i:[".$i."] n:[".$n."].");
-				}
-				$t = substr($sql,0,$a+1);
-				#print __FILE__.": t:[".$t."] i:[".$i."] vars:[".$idxarr[$i]."] hmv:[".$hmvars[$idxarr[$i]]."]\n";
-				if(strpos($t, $idxarr[$i]) === false){
-					# in case that, field was not set by $obj->set but written in sql with '?', Sat Apr  2 23:54:48 CST 2016
-					debug(__FILE__.": found unmatched field:[$t].");
-					$sql = substr($sql,$a+1);
-					$a = strpos($sql,"?");
-					$newsql .= str_replace("?", '\'\'', $t);
-				}
-				else{
-					$sql = substr($sql,$a+1);
-					$a = strpos($sql,"?");
-					$newsql .= str_replace("?",$this->_QuoteSafe($hmvars[$idxarr[$i]]),$t);
+			$newsql = "";
+			$wherepos = strpos($sql, " where ");
+			if( (strpos($sql,"delete ")!==false || strpos($sql,"update ")!==false) 
+				&& $wherepos === false){
+				$this->Err("table action [update, delete] need [where] clause.sql:[".$sql."]");
+			}
+			else{
+				$a = strpos($sql,"?");
+				$i = 0;
+				$n = count($idxarr);
+				while($a !== false){
+					#if($i>=$n){
+					if($i>$n){
+						$this->Err("_enSafe, fields not matched with vars.sql:[".$origSql."] i:[".$i."] n:[".$n."].");
+					}
+					$t = substr($sql,0,$a+1);
+					#print __FILE__.": t:[".$t."] i:[".$i."] vars:[".$idxarr[$i]."] hmv:[".$hmvars[$idxarr[$i]]."]\n";
+					if(!array_key_exists($idxarr[$i], $hmvars)){
+						# in case that, field was not set by $obj->set but written in sql with '?', Sat Apr  2 23:54:48 CST 2016
+						debug(__FILE__.": found unmatched field:[$t].");
+						$sql = substr($sql,$a+1);
+						$a = strpos($sql,"?");
+						$newsql .= str_replace("?", '\'\'', $t);
+					}
+					else{
+						$sql = substr($sql,$a+1);
+						$a = strpos($sql,"?");
+						$newsql .= str_replace("?",$this->_QuoteSafe($hmvars[$idxarr[$i]]),$t);
+					}
 					$i++;
 				}
+				if($sql!=""){
+					$newsql .=  $sql ;
+				}
+				#print __FILE__."\n: sql:[".$sql."] sql_new:[".$newsql."]\n";
+				return $newsql;
 			}
-			if($sql!=""){
-				$newsql .=  $sql ;
-			}
-			#print __FILE__."\n: sql:[".$sql."] sql_new:[".$newsql."]\n";
-			return $newsql;
 		}
 	}
+
 	//--- for sql injection, added on 20061113 by wadelau
 	function _QuoteSafe($value, $defaultValue=null){
 		// Quote variable to make safe
@@ -175,18 +181,13 @@ class MySQLDB {
 		if (!is_numeric($value)) {
 			//$value = "'".addslashes($value)."'";
 			#$value = "'".mysql_real_escape_string($value,$this->m_link)."'";
-			if(strpos($value, '","') !== false || strpos($value, "','") !== false){
-				# in str list, leave alone, 10:29 Thursday, May 19, 2016
+			if($this->mode == 'mysqli'){
+				$value = "'".$this->m_link->real_escape_string($value)."'";
 			}
 			else{
-				if($this->mode == 'mysqli'){
-					$value = "'".$this->m_link->real_escape_string($value)."'";
-				}
-				else{
-					$value = "'".mysql_real_escape_string($value, $this->m_link)."'";
-				}
+				$value = "'".mysql_real_escape_string($value, $this->m_link)."'";
 			}
-            # in some case, e.g. $value = '010003', which is expected to be a string, but is_numeric return true.
+		    # in some case, e.g. $value = '010003', which is expected to be a string, but is_numeric return true.
             # this should be handled by $webapp->execBy with manual sql components...
 		}
 		else{

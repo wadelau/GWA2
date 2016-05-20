@@ -40,6 +40,7 @@ class WebApp implements WebAppInterface{
 		  $this->dba = new DBA($dbconf);
         }
 		$this->isdbg = Gconf::get('is_debug');
+		
 	}
 	
 	//-
@@ -217,7 +218,7 @@ class WebApp implements WebAppInterface{
 			}
 			else{
 				if($pagesize == 0){ $pagesize = 99999; } # maximum records per query
-					$sql .= ' limit '.(($pagenum-1)*$pagesize).','.$pagesize;	
+				$sql .= ' limit '.(($pagenum-1)*$pagesize).','.$pagesize;	
 			}
 			#print __FILE__.':<br/>/inc/webapp.class.php: sql:['.$sql.']';
 			#error_log(__FILE__.": getBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");

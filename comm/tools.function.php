@@ -307,7 +307,7 @@ function getIdList($iarray, $ikey){
 # debug($user, 'userinfo');  # with tag 'userinfo'
 # debug($user, 'userinfo', 1); # with tag 'userinfo' and in backend and frontend
 function debug($obj, $tag='', $output=null){
-	$caller = debug_backtrace();
+	$caller = debug_backtrace();	
 	if(is_array($obj) || is_object($obj)){
 		if(isset($user)){
 			$s .= $user->toString($obj);
@@ -324,7 +324,7 @@ function debug($obj, $tag='', $output=null){
 		$s = " $tag:[$s]";
 	}
 	$callidx = count($caller) - 2; 
-	$s .= ' func:['.$caller[$callidx]['function'].'] file:['.$caller[$callidx]['file'].']';
+	$s .= ' func:['.$caller[$callidx]['function'].'] file:['.$caller[$callidx]['file'].'] line:['.$caller[$callidx]['line'].']';
 
 	if($output != null){
 		if($output == 0){ # in backend only
