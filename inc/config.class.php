@@ -46,7 +46,7 @@ $conf['is_debug'] = 1;
 $conf['html_resp'] = '<!DOCTYPE html><html><head><title>RESP_TITLE</title></head><body>RESP_BODY</body></html>';
 $conf['entry_tag'] = 'i'; # application name or entry name for the application, added by wadelau@ufqi.com on Sun Jan 24 13:42:16 CST 2016
 $conf['auto_install'] = 'INSTALL_AUTO';
-$conf['no_sql_check'] = 'omit_sql_security_check'; # keep original form of sql in some cases, 14:24 Friday, May 20, 2016
+$conf['no_sql_check'] = 'omit_sql_security_check'; # keep original form of sql in some cases, 14:24 Friday, May 20, 2016, refer: http://php.net/manual/en/mysqli-stmt.bind-param.php, "2 asb(.d o,t )han(a t)n i h e i(d.o_t)dk ¶"
 
 ############
 
