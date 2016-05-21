@@ -1,23 +1,14 @@
 <?php
 #
-# This class, mysql.class, and all of db drivers' classes are working with dba.class, 
+# This class, sqlserver.class, and all of db drivers' classes are working with dba.class, 
 #  which is coordinator between db and objects.
-# Rewrited by Wadelau@ufqi.com, 18:35 21 May 2016
-# 
+# Init by Wadelau@ufqi.com, 07:32 22 May 2016
+# Ref. http://php.net/manual/en/book.sqlsrv.php
 
-ini_set("memory_limit","256M");
-//--- added on 20060704 by wadelau for "allowed memory exhausted" sayError.
-//--- updated from 16M to 64M  on 20060816, from 64M to 256M on 20110708
-//--- add "SQL Injection Attacks" prevension, updated on 2006113 by wadelau
-//--- v1.2, new remedies on 20110708 by wadelau
-//--- v1.3, update hm2idxArr by wadelau on  Sat Nov  3 20:38:55 CST 2012
-//--- v1.4, update seperate from mysqli on 22:41 20 May 2016
-
-# Wed Nov  5 14:10:39 CST 2014
 require_once(__ROOT__."/inc/config.class.php");
 
 
-class MYSQL { 
+class SQLSERVER { 
 
 	var $m_host; 
 	var $m_port; 
@@ -43,14 +34,15 @@ class MYSQL {
 	function _initConnection(){
 		
 		if ($this->m_link==0){
-			$real_host = $this->m_host.":".$this->m_port;
-			$this->m_link = mysql_connect($real_host,$this->m_user,$this->m_password) 
-				or die($this->sayErr("mysql connect")); 
-			if("" != $this->m_name){
-				mysql_select_db($this->m_name, $this->m_link) or die($this->sayErr("use ".$this->m_name));
-			}             
+			if($this->m_port == ''){ $this->m_port = '1433'; }
+			$this->m_link = sqlsrv_connect($this->m_host.', '.$this->m_port, array(
+				'Database'=>$this->m_name,
+				'UID'=>$this->m_user,
+				'PWD'=>$this->m_password
+				)) or $this->sayErr(sqlsrv_errors);           
 		}
 		return $this->m_link;
+		
 	}
 
 	//--- for sql injection remedy, added on 20061113 by wadelau
@@ -61,12 +53,12 @@ class MYSQL {
 			$this->_initConnection();
 		}
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
-		$result = mysql_query($sql,$this->m_link) or $this->sayErr($sql); 
+		$result = $this->sqlsrv_query($this->m_link, $sql, null) or $this->Err($sql);		
 		
 		if($result){
 			$hm[0] = true;
 			$hm[1] = $result;
-			mysql_free_result($result);
+			sqlsrv_free_stmt($result);
 		}
 		else{
 			$hm[0] = false;
@@ -92,14 +84,13 @@ class MYSQL {
 		if( strpos($sql,"limit")===false && strpos($sql,"show tables")===false){
 			$sql .= " limit 1 ";
 		} 
-        #sayError_log(__FILE__.": query: sql:[".$sql."]\n");
-        $result = mysql_query($sql) or $this->sayErr($sql);
-		
+        $result = $this->sqlsrv_query($this->m_link, $sql, null) or $this->sayErr('[$sql] query failed. 201605220716.');
+        		
 		if($result){
-			if($row = mysql_fetch_array($result,MYSQL_ASSOC) ){
+			if($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC) ){
 				$hm[0] = true;
 				$hm[1][0] = $row;
-				mysql_free_result($result);
+				sqlsrv_free_stmt($result);
 			}
 			else{
 				$hm[0] = false;
@@ -129,15 +120,16 @@ class MYSQL {
 		}
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
 		$rtnarr = array();	
-		$result = mysql_query($sql) or $this->sayErr($sql);
+		$result = $this->sqlsrv_query($this->m_link, $sql, null) or $this->sayErr('[$sql] query failed. 201605220717.');
+		
    		if($result && !is_bool($result)){
 			$i = 0;
-			while($row = mysql_fetch_array($result,MYSQL_ASSOC) ){
+			while($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)){
 				$rtnarr[$i] =  $row ;		
 				$i++;
 			}
 			//--- refined by tim's advice on 20060804 by wadelau
-			mysql_free_result($result);
+			sqlsrv_free_stmt($result);
 		} 
 		if( count($rtnarr)>0 ){
 			$hm[0] = true;
@@ -153,13 +145,7 @@ class MYSQL {
 	
 	//-
 	function selectDb($database){
-		$this->m_name = $database;
-		if ("" != $this->m_name){
-			if ($this->m_link == 0){
-				$this->_initConnection();
-			}
-			mysql_select_db($this->m_name, $this->m_link) or eval($this->sayErr("use $database"));
-		}
+		#todo
 	}
 	
 	#
@@ -215,13 +201,13 @@ class MYSQL {
 	function _quoteSafe($value, $defaultValue=null){
 
 		if (!is_numeric($value)) {
-			$value = "'".mysql_real_escape_string($value, $this->m_link)."'";
+			$value = "'".mysqli_real_escape_string($value, $this->m_link)."'";
 		    # in some case, e.g. $value = '010003', which is expected to be a string, but is_numeric return true.
             # this should be handled by $webapp->execBy with manual sql components...
 		}
 		else{
 			if($defaultValue == ''){
-				$value = "'".mysql_real_escape_string($value, $this->m_link)."'";
+				$value = "'".mysqli_real_escape_string($value, $this->m_link)."'";
 			}
 		} 
 		return $value;
@@ -230,131 +216,33 @@ class MYSQL {
 	
 	#
 	function getErrno(){
+		#todo, http://php.net/manual/en/function.sqlsrv-errors.php
 		
-		if ($this->m_link == 0){
-			$this->_initConnection();
-		}
-		return mysql_errno($this->m_link);
-	
 	}
 	
 	#
 	function getError(){
-		if ($this->m_link == 0){
-			$this->_initConnection();
-		}
-		return mysql_error($this->m_link);
-	}
-	
-	#
-	function fetchArray($result) { 
-		if ($this->m_link == 0){
-			$this->_initConnection();
-		}
-		$row=mysql_fetch_array($result); 
-		return $row; 
-	}
-	
-	function fetchArray_Asoc($result){ //-- return assoc array (hash) only 
-
-		if ($this->m_link == 0){
-			$this->_initConnection();
-		}
-		$row=mysql_fetch_array($result,MYSQL_ASSOC); 
-		return $row; 
+		#todo, http://php.net/manual/en/function.sqlsrv-errors.php
 		
 	}
 	
-	#
-	function fetchRow($result){ //-- return number indices only
-
-		if ($this->m_link == 0){
-			$this->_initConnection();
-		}
-		$row=mysql_fetch_row($result); 
-		return $row; 
-		
-	} 
-
-	#
-	function fetchObject($result){ 
-		if ($this->m_link == 0){
-			$this->_initConnection();
-		}
-		$row=mysql_fetch_object($result); 
-		return $row; 
-	} 
-
 	#
 	function freeResult(&$result){ 
-		return mysql_free_result($result) or eval($this->sayErr()); 
+		return sqlsrv_free_stmt($result) or eval($this->sayErr()); 
 		
 	} 
 
 	#
-	function numRows($result){ 
-		if ($this->m_link == 0){
-			$this->_initConnection();
-		}
-		$result=mysql_num_rows($result) or eval($this->sayErr()); 
-		return $result; 
-		
-	} 
-	
-	#
-	function dataSeek($result,$row_id){ 
-		if ($this->m_link == 0){
-			$this->_initConnection();
-		}
-		$result=mysql_data_seek($result,$row_id);		
-		return $result; 
-		
-	}
-
-	#
-	function getAffectedRows(){ 
-		if ($this->m_link == 0){
-			$this->_initConnection();
-		}
-		$result=mysql_affected_rows($this->m_link); 
-		return $result; 
-		
-	}
-
-	#
-	function numFileds(){ 
-		if ($this->m_link == 0){
-			$this->_initConnection();
-		}
-		$result=mysql_num_fields($this->m_link); 
-		return $result; 
-		
-	}
-
-	#
-	function filedName(){ 
-		if ($this->m_link == 0){
-			$this->_initConnection();
-		}
-		$result=mysql_field_name($this->m_link); 
-		return $result; 
-		
-	}
-	
-	#	
 	function close(){
 		if( $this->m_link ){
-			mysql_close($this->m_link) or eval($this->sayErr());
+			mysqli_close($this->m_link) or eval($this->sayErr());
 		}
 		return 0;
 	}
 	
 	#
 	function getInsertId(){
-		if ($this->m_link == 0){
-			$this->_initConnection();
-		}
-		return mysql_insert_id($this->m_link);
+		#todo
 
 	}
 

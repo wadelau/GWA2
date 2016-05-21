@@ -6,8 +6,12 @@
  * Thu Sep 11 16:34:20 CST 2014
  */
 
-require_once(__ROOT__."/inc/conn.class.php");
-require_once(__ROOT__."/inc/mysql.class.php");
+require(__ROOT__."/inc/conn.class.php");
+include(__ROOT__."/inc/mysql.class.php");
+include(__ROOT__."/inc/mysqli.class.php");
+include(__ROOT__."/inc/pdox.class.php");
+include(__ROOT__."/inc/sqlserver.class.php");
+include(__ROOT__."/inc/oracle.class.php");
 
 class DBA {
 	
@@ -16,10 +20,14 @@ class DBA {
 
 	//-construct
 	function DBA($dbconf=null){
+		
 		$dbconf = ($dbconf==null ? 'Config_Master' : $dbconf);
 		//-
 		$this->conf = new $dbconf; //- need to be changed to Config_zoneli when sync to product enviro.
-		$this->dbconn = new MySQLDB($this->conf);
+		#$this->dbconn = new MySQLDB($this->conf);
+		$dbDriver = Gconf::get('dbdriver');
+		$this->dbconn = new $dbdriver($this->conf);
+		
 	}	
 
 	/* 

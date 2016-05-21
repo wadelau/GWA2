@@ -33,12 +33,16 @@ class WebApp implements WebAppInterface{
 	//- constructor
 	function __construct($args=null){
 
+		# db as backend
 		if($this->dba == null){ # Wed Oct 22 10:23:03 CST 2014
           if($args != null && is_array($args) && array_key_exists('dbconf', $args)){
 			 $dbconf = $args['dbconf']; 
 		  }
 		  $this->dba = new DBA($dbconf);
         }
+		
+		# other services
+		
 		$this->isdbg = Gconf::get('is_debug');
 		
 	}
