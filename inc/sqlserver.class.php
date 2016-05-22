@@ -201,13 +201,13 @@ class SQLSERVER {
 	function _quoteSafe($value, $defaultValue=null){
 
 		if (!is_numeric($value)) {
-			$value = "'".mysqli_real_escape_string($value, $this->m_link)."'";
+			$value = "'".sqlsrv_real_escape_string($value, $this->m_link)."'";
 		    # in some case, e.g. $value = '010003', which is expected to be a string, but is_numeric return true.
             # this should be handled by $webapp->execBy with manual sql components...
 		}
 		else{
 			if($defaultValue == ''){
-				$value = "'".mysqli_real_escape_string($value, $this->m_link)."'";
+				$value = "'".sqlsrv_real_escape_string($value, $this->m_link)."'";
 			}
 		} 
 		return $value;
@@ -235,7 +235,7 @@ class SQLSERVER {
 	#
 	function close(){
 		if( $this->m_link ){
-			mysqli_close($this->m_link) or eval($this->sayErr());
+			sqlsrv_close($this->m_link) or eval($this->sayErr());
 		}
 		return 0;
 	}
