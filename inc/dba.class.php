@@ -26,7 +26,7 @@ class DBA {
 		$this->conf = new $dbconf; //- need to be changed to Config_zoneli when sync to product enviro.
 		#$this->dbconn = new MySQLDB($this->conf);
 		$dbDriver = Gconf::get('dbdriver');
-		$this->dbconn = new $dbdriver($this->conf);
+		$this->dbconn = new $dbDriver($this->conf);
 		
 	}	
 
