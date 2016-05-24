@@ -5,7 +5,6 @@
 # Rewrited by Wadelau@ufqi.com, 18:35 21 May 2016
 # 
 
-ini_set("memory_limit","256M");
 //--- added on 20060704 by wadelau for "allowed memory exhausted" sayError.
 //--- updated from 16M to 64M  on 20060816, from 64M to 256M on 20110708
 //--- add "SQL Injection Attacks" prevension, updated on 2006113 by wadelau

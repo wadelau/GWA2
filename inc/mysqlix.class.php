@@ -5,9 +5,6 @@
 # Init by Wadelau@ufqi.com, 18:35 21 May 2016
 # 
 
-ini_set("memory_limit","256M");
-//--- v0.1, init and update seperate from mysql on 07:09 22 May 2016
-
 # Wed Nov  5 14:10:39 CST 2014
 require_once(__ROOT__."/inc/config.class.php");
 
@@ -54,7 +51,7 @@ class MYSQLIX {
 			$this->_initConnection();
 		}
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
-		$result = $this->m_link->query($sql) or $this->Err($sql);		
+		$result = $this->m_link->query($sql) or $this->sayErr($sql);		
 		
 		if($result){
 			$hm[0] = true;

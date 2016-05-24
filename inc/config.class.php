@@ -40,7 +40,7 @@ $conf['dbport'] 	= 'DB_PORT';
 $conf['dbuser'] 	= 'DB_USER';
 $conf['dbpassword'] 	= 'DB_PASSWORD';
 $conf['dbname'] 	= $conf['maindb'];
-$conf['dbdriver']	= 'MYSQL'; # 'MYSQLIX', 'PDOX', 'SQLSERVER', 'ORACLE' in support, UPCASE only
+$conf['dbdriver']	= 'MYSQL'; # 'MYSQL', 'MYSQLIX', 'PDOX', 'SQLSERVER', 'ORACLE' in support, UPCASE only
 
 # misc
 $conf['is_debug'] = 1;

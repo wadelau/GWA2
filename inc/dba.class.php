@@ -6,9 +6,11 @@
  * Thu Sep 11 16:34:20 CST 2014
  */
 
+ini_set("memory_limit","256M");
+
 require(__ROOT__."/inc/conn.class.php");
 include(__ROOT__."/inc/mysql.class.php");
-include(__ROOT__."/inc/mysqli.class.php");
+include(__ROOT__."/inc/mysqlix.class.php");
 include(__ROOT__."/inc/pdox.class.php");
 include(__ROOT__."/inc/sqlserver.class.php");
 include(__ROOT__."/inc/oracle.class.php");
