@@ -460,7 +460,7 @@ else if($step == 'finalize'){
 		
 		$rd = rand(1000, 9999999);
 		$cmd = "mv ./".$_SERVER['PHP_SELF']." ./".$_SERVER['PHP_SELF'].".$rd.php";
-		print $cmd;
+		#print $cmd;
 		execInBackground($cmd);
 		
 		# mark installed

@@ -20,7 +20,7 @@ require($appdir."/inc/FileUpload.class.php");
 require($appdir."/mod/user.class.php");
 require($appdir."/comm/tools.function.php");
 
-$siteid = $_CONFIG['siteid'];
+$siteid = $_CONFIG['siteid']; $isdbg = $_CONFIG['is_debug'];
 
 # user info
 session_start(); # in developping stage, using php built-in session manager
@@ -148,5 +148,6 @@ function exception_handler($exception) {
 }
 set_exception_handler('exception_handler');
 
+$fmt = $_REQUEST['fmt'];
 
 ?>

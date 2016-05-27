@@ -14,7 +14,7 @@ class ADS extends WebApp{
 
 		var $adname = "";
 
-		function ADS() {
+		function __construct() {
 				$this->dba = new DBA();
 				
 				if($_SESSION['language'] && $_SESSION['language'] == "en_US")

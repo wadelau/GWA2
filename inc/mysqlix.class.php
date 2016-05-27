@@ -27,14 +27,14 @@ class MYSQLIX {
 		$this->m_user     = $config->mDbUser; 
 		$this->m_password = $config->mDbPassword; 
 		$this->m_name     = $config->mDbDatabase; 
-		$this->m_link=0;
+		$this->m_link = null;
 		
 	} 
 
 	//-
 	function _initConnection(){
 		
-		if ($this->m_link==0){
+		if (!is_object($this->m_link)){
 			$real_host = $this->m_host.":".$this->m_port;
 			$this->m_link = new mysqli($this->m_host, $this->m_user, 
 				$this->m_password, $this->m_name, $this->m_port);           
@@ -47,16 +47,20 @@ class MYSQLIX {
 	function query($sql,$hmvars,$idxarr){
 		
 		$hm = array();
-		if ($this->m_link == 0){
+		if (!$this->m_link){
 			$this->_initConnection();
 		}
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
-		$result = $this->m_link->query($sql) or $this->sayErr($sql);		
+		
+		#debug($sql);
+		$result = $this->m_link->query($sql) or $this->sayErr("[$sql] 201605240944.");		
 		
 		if($result){
 			$hm[0] = true;
 			$hm[1] = $result;
-			mysqli_free_result($result);
+			if(!is_bool($result)){
+				mysqli_free_result($result);
+			}
 		}
 		else{
 			$hm[0] = false;
@@ -75,13 +79,15 @@ class MYSQLIX {
 	function readSingle($sql,$hmvars,$idxarr){
 		
 		$hm = array();
-		if ($this->m_link == 0){
+		if (!$this->m_link){
 			$this->_initConnection();
 		}
+		
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);	
 		if( strpos($sql,"limit")===false && strpos($sql,"show tables")===false){
 			$sql .= " limit 1 ";
 		} 
+		#debug($sql);
         $result = $this->m_link->query($sql) or $this->sayErr('[$sql] query failed. 201605220716.');
         		
 		if($result){
@@ -112,11 +118,12 @@ class MYSQLIX {
 	function readBatch($sql,$hmvars,$idxarr){
 		
 		$hm = array();
-		if($this->m_link == 0)
-		{
+		if (!$this->m_link){
 			$this->_initConnection();
 		}
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
+		
+		#debug($sql);
 		$rtnarr = array();	
 		$result = $this->m_link->query($sql) or $this->sayErr('[$sql] query failed. 201605220717.');
 		
@@ -145,10 +152,13 @@ class MYSQLIX {
 	function selectDb($database){
 		$this->m_name = $database;
 		if ("" != $this->m_name){
-			if ($this->m_link == 0){
+			
+			if (!$this->m_link){
 				$this->_initConnection();
 			}
+			
 			mysqli_select_db($this->m_name, $this->m_link) or eval($this->sayErr("use $database"));
+			
 		}
 	}
 	
@@ -205,13 +215,13 @@ class MYSQLIX {
 	function _quoteSafe($value, $defaultValue=null){
 
 		if (!is_numeric($value)) {
-			$value = "'".mysqli_real_escape_string($value, $this->m_link)."'";
+			$value = "'".mysqli_real_escape_string($this->m_link, $value)."'";
 		    # in some case, e.g. $value = '010003', which is expected to be a string, but is_numeric return true.
             # this should be handled by $webapp->execBy with manual sql components...
 		}
 		else{
 			if($defaultValue == ''){
-				$value = "'".mysqli_real_escape_string($value, $this->m_link)."'";
+				$value = "'".mysqli_real_escape_string($this->m_link, $value)."'";
 			}
 		} 
 		return $value;
@@ -221,30 +231,35 @@ class MYSQLIX {
 	#
 	function getErrno(){
 		
-		if ($this->m_link == 0){
+		if (!$this->m_link){
 			$this->_initConnection();
 		}
+		
 		return mysqli_errno($this->m_link);
 	
 	}
 	
 	#
 	function getError(){
-		if ($this->m_link == 0){
+
+		if (!$this->m_link){
 			$this->_initConnection();
 		}
+		
 		return mysqli_error($this->m_link);
 	}
 	
 	#
 	function freeResult(&$result){ 
+	
 		return mysqli_free_result($result) or eval($this->sayErr()); 
 		
 	} 
 
 	#
 	function getAffectedRows(){ 
-		if ($this->m_link == 0){
+		
+		if (!$this->m_link){
 			$this->_initConnection();
 		}
 		$result=mysqli_affected_rows($this->m_link); 
@@ -254,7 +269,8 @@ class MYSQLIX {
 
 	#
 	function numFileds(){ 
-		if ($this->m_link == 0){
+		
+		if (!$this->m_link){
 			$this->_initConnection();
 		}
 		$result=mysqli_num_fields($this->m_link); 
@@ -264,7 +280,7 @@ class MYSQLIX {
 
 	#	
 	function close(){
-		if( $this->m_link ){
+		if( !$this->m_link ){
 			mysqli_close($this->m_link) or eval($this->sayErr());
 		}
 		return 0;
@@ -272,7 +288,7 @@ class MYSQLIX {
 	
 	#
 	function getInsertId(){
-		if ($this->m_link == 0){
+		if (!$this->m_link){
 			$this->_initConnection();
 		}
 		return mysqli_insert_id($this->m_link);
@@ -307,7 +323,9 @@ class MYSQLIX {
 	
 	//- for test purpose, wadelau@gmail.com, Wed Jul 13 19:21:37 UTC 2011
 	function showConf(){
+		
 		print __FILE__.":[".$this->m_name."].";
+		
 	}	
 
 } 

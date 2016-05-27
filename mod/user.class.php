@@ -16,7 +16,7 @@ class User extends WebApp{
 	var $eml = "email";
     
 	//-
-	function User(){
+	function __construct(){
 		//-
 		$this->dba = new DBA();
 		$this->setTbl(Gconf::get('tblpre').'info_siteusertbl');

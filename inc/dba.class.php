@@ -21,7 +21,7 @@ class DBA {
 	var $dbconn = null;
 
 	//-construct
-	function DBA($dbconf=null){
+	function __construct($dbconf=null){
 		
 		$dbconf = ($dbconf==null ? 'Config_Master' : $dbconf);
 		//-

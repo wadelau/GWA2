@@ -5,13 +5,17 @@
  * Sat Jul 23 09:50:58 UTC 2011
  */
 
+if(!defined('__ROOT__')){
+  define('__ROOT__', dirname(dirname(__FILE__)));
+}
+
+require_once(__ROOT__."/inc/config.class.php");
 #require_once(__ROOT__."/inc/class.connectionpool.php");
 
- class Session
- {
+ class Session{
+	 
  	//- construct
-	function Session()
-	{
+	function __construct(){
 		//-
 	}
 
