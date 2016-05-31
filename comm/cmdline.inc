@@ -44,7 +44,7 @@ if(1){ # in some scenarios, this should be set as 0 to disable this function glo
 		empty( $_SERVER['REDIRECT_URL'] ) && $_SERVER['REDIRECT_URL'] = '';
 		#print_r($_SERVER);
 		
-		error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+		error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 	}
 	
