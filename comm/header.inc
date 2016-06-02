@@ -1,22 +1,23 @@
 <?php 
 
-global $sid, $appdir, $siteid, $user, $userid,$isdbg;
+global $sid, $appdir, $siteid, $user, $userid,$isdbg=1;
 date_default_timezone_set("Asia/Chongqing");
 
-$isdbg = 1;
-
+# dir manipulate
 $docroot = $_SERVER['DOCUMENT_ROOT'];
-if(0){ # physical dir, to-do: how to detect?
-	$rtvdir = dirname(dirname(__FILE__)); # relative dir
-	$rtvdir = str_replace($docroot,"", $rtvdir);
+$rtvdir = dirname(dirname(__FILE__)); # relative dir
+$rtvdir = str_replace($docroot,"", $rtvdir);
+$reqdir = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'));
+#$appdir = $docroot.$rtvdir;
+$appdir = $docroot.$reqdir;
+
+if($appdir == ''){
+    $appdir = $rtvdir;
 }
-else{ # logical or soft-link dir
-	$rtvdir = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'));
-}
-$appdir = $docroot.$rtvdir;
+#print "docroot:[$docroot] appdir:[$appdir] rtvdir:[$rtvdir] req_uri:[".$_SERVER['REQUEST_URI']."] req_dir:[".substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'))."]";
+#exit(0);
 
 require($appdir."/inc/config.class.php");
-require($appdir."/inc/FileUpload.class.php");
 require($appdir."/mod/user.class.php");
 require($appdir."/comm/tools.function.php");
 
@@ -25,8 +26,7 @@ $siteid = $_CONFIG['siteid']; $isdbg = $_CONFIG['is_debug'];
 # user info
 session_start(); # in developping stage, using php built-in session manager
 define('UID',$_CONFIG['agentalias'].'_user_id');
-global $data; # variables container for template file
-$data = array();
+global $data=array(); # variables container for template file
 
 $HTTP_REFERER = parse_url($_SERVER['HTTP_REFERER']);
 if (! isset($_SESSION['ref']) || $HTTP_REFERER['path'] != $_SERVER['REDIRECT_URL']){
@@ -40,8 +40,7 @@ if(!isset($user)){
     $user = new User(); 
 } 
 $userid = '';
-if(array_key_exists(UID,$_SESSION) && $_SESSION[UID] != '')
-{
+if(array_key_exists(UID,$_SESSION) && $_SESSION[UID] != ''){
 	$userid = $_SESSION[UID];
 	$user->setId($userid);
 	$data['islogin'] = 1;
@@ -66,9 +65,6 @@ $smttpl = '';
 
 global $display_style;  
 $display_style = $_CONFIG['display_style_index']; 
-
-# page info
-header("Content-type: text/html;charset=utf-8");
 
 # convert user input data to variables, tag#userdatatovar
 foreach($_REQUEST as $k=>$v){
