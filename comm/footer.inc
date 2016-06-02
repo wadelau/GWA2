@@ -7,6 +7,9 @@ if($isoput){
 	$out .= "</body></html>";
 }
 
+# page header
+header("Content-type: text/html;charset=utf-8");
+
 if($smttpl != ''){
 
 	$data['smttpl'] = $smttpl;
