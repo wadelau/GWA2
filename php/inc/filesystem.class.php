@@ -11,7 +11,7 @@ if(!defined('__ROOT__')){
 
 require_once(__ROOT__."/inc/config.class.php");
 
- class FileSystem{
+class FileSystem{
 	 
  	//- construct
 	function __construct(){
