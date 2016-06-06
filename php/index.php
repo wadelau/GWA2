@@ -39,8 +39,7 @@ else{
 	exit(0);
 }
 
-$smttpl_orig = $smttpl;
-
+# 
 if($mod != 'index'){
   include("./ctrl/index.php"); # here is buggy, any unshared business logic should not be placed in index mod.
 }

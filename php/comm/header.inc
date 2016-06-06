@@ -71,7 +71,7 @@ foreach($_REQUEST as $k=>$v){
     $k = trim($k);
     if($k != ''){
         if(preg_match("/([0-9a-z_]+)/i",$k,$matcharr)){
-            $k_orig = $k = $matcharr[1];
+            $k = $matcharr[1];
 			if(is_string($v)){
 				$v = trim($v);
 				if(stripos($v, "<") > -1){ # <script , <embed, <img, <iframe, etc.  Mon Feb  1 14:48:32 CST 2016
