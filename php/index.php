@@ -38,6 +38,7 @@ else{
 	exit(0);
 }
 
+# 
 if($mod != 'index'){
   include("./ctrl/index.php"); # update in ctrl/index, 09:54 11 June 2016
 }
