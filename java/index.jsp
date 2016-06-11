@@ -1,31 +1,60 @@
-<?php
-# the application entry...
+<%
+//
+// the application entry...
+/* -GWA2 is ported into Java
+ * Wadelau@ufqi.com
+ * v0.1
+ * Thu Jun  9 14:02:51 CST 2016
+ * Method in a class should be limited under 16KB
+ */
+//
+%><%@page import="
+java.util.Date, java.util.HashMap,
+com.ufqi.gwa2.WTool,
+" pageEncoding="utf-8"%><% 
 
-# cli
-if(0){ # in some scenarios, this should be set as 0 to disable this function globally. only if php script is being run from command line, see comm/cmdline.php for details
-	if($argv && $argc > 0){ 
-		# path
-		ini_set('include_path', get_include_path(). PATH_SEPARATOR . dirname($_SERVER['PHP_SELF']));
-		ini_set('max_execution_time', 0);
-		
-		chdir(dirname(__FILE__));
-		include("./comm/cmdline.inc");
-		chdir(dirname(__FILE__));
 
-	}	
+//- header
+%><%
+//@include file="./inc/WTool.java" //?
+%><%
+%><%@include file="./comm/header.inc"%><%
+
+
+//- main logic
+String mod = request.getParameter("mod");
+String act = request.getParameter("act");
+if(mod == null){ mod = ""; }else{ mod = mod.trim(); }
+if(act == null){ act = ""; }else{ act = act.trim(); }
+if(mod.equals("")){
+  mod = "index";    
 }
 
-# routing 
-$mod = $_REQUEST['mod']; # which mod is requested?
-$act = $_REQUEST['act']; # what act needs to do?
-if($mod == ""){
-  $mod = "index";    
+data.put("mod", mod);
+data.put("act", act);
+
+if(mod.equals("index")){
+
+	%><%@include file="./ctrl/index.jsp"%><%
+
+}
+else if(mod.equals("user")){
+	
+	%><%@include file="./ctrl/user.jsp"%><%
+	
+}
+else{
+
+	outx = new StringBuffer("Unknown mod:["+mod+"]. 1606110925.");	
+	out.println(outx);
+	return;
+	//-todo: log
 }
 
-# main logic 
-# header.inc file
-include("./comm/header.inc");
+//- footer
+%><%@include file="./comm/footer.inc"%><%
 
+/*
 $data['mod'] = $mod;
 $data['act'] = $act;
 $data['baseurl'] = $baseurl;
@@ -39,7 +68,8 @@ else{
 	exit(0);
 }
 
-# default or common
+$smttpl_orig = $smttpl;
+
 if($mod != 'index'){
   include("./ctrl/index.php"); # here is buggy, any unshared business logic should not be placed in index mod.
 }
@@ -49,4 +79,5 @@ include("./comm/footer.inc");
 
 # add more ---
 
-?>
+*/
+%>

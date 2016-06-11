@@ -88,13 +88,16 @@ foreach($_REQUEST as $k=>$v){
         }
   	}
 }
+
 # re-init global vars, 09:28 Monday, 29 February, 2016
+# re sort code in index, 09:12 10 June 2016
+/*
 $mod = $_REQUEST['mod']; # which mod is requested?
 $act = $_REQUEST['act']; # what act needs to do?
-
 if($mod == ""){
   $mod = "index";    
 }
+*/
 
 ## RESTful handler
 $entry_tag = $_CONFIG['entry_tag'];;

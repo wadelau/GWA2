@@ -9,13 +9,23 @@ include_once($appdir."/ctrl/include/language.php");
 
 $act = $act == '' ? 'index' : $act;
 
-if($act == 'index'){
-	#
+if($mod == "index"){ # something displayed in homepage only, 09:55 11 June 2016
 	
+	if($act == 'index'){
+		#
+		
+	}
+	else{
+		$data['resp'] = "Unknown act:[$act].";
+		
+	}
+
 }
 else{
-    $data['resp'] = "Unknown act:[$act].";
-    
+	
+	# something shared across the app,
+	# e.g. page header and page footer
+	
 }
 
 $data['time'] = date("H:i", time());

@@ -15,20 +15,19 @@ if(1){ # in some scenarios, this should be set as 0 to disable this function glo
 	}	
 }
 
+# header.inc file
+include("./comm/header.inc");
+
 # main logic
 $mod = $_REQUEST['mod']; # which mod is requested?
 $act = $_REQUEST['act']; # what act needs to do?
-
 if($mod == ""){
   $mod = "index";    
 }
 
-# header.inc file
-include("./comm/header.inc");
-
 $data['mod'] = $mod;
 $data['act'] = $act;
-$data['baseurl'] = $baseurl;
+#$data['baseurl'] = $baseurl;
 
 if(file_exists("./ctrl/".$mod.".php")){
 	include("./ctrl/".$mod.".php");
@@ -42,7 +41,7 @@ else{
 $smttpl_orig = $smttpl;
 
 if($mod != 'index'){
-  include("./ctrl/index.php"); # here is buggy, any unshared business logic should not be placed in index mod.
+  include("./ctrl/index.php"); # update in ctrl/index, 09:54 11 June 2016
 }
 
 # footer.inc file
