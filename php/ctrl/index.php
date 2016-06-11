@@ -21,8 +21,8 @@ if($mod == "index"){ # something displayed in homepage only, 09:55 11 June 2016
 	}
 
 }
-else{
-	
+
+if(true){
 	# something shared across the app,
 	# e.g. page header and page footer
 	

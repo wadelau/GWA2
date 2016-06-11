@@ -38,8 +38,6 @@ else{
 	exit(0);
 }
 
-$smttpl_orig = $smttpl;
-
 if($mod != 'index'){
   include("./ctrl/index.php"); # update in ctrl/index, 09:54 11 June 2016
 }

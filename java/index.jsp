@@ -51,6 +51,13 @@ else{
 	//-todo: log
 }
 
+//- something shared across the app
+if(mod.equals("index")){
+
+     %><%@include file="./ctrl/index.jsp"%><%
+ 
+}
+
 //- footer
 %><%@include file="./comm/footer.inc"%><%
 
