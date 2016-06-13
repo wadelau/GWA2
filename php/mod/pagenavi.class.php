@@ -13,7 +13,7 @@ require_once(__ROOT__.'/inc/webapp.class.php');
 
 class PageNavi extends WebApp{
 
-   public function PageNavi(){
+   public function __construct(){
 
        $this->dba = new DBA(); # added by wadelau@ufqi.com, Wed Jul 11 14:31:52 CST 2012
        $para = array();

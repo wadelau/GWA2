@@ -17,7 +17,7 @@ require(__ROOT__."/inc/webapp.interface.php");
 require_once(__ROOT__."/inc/config.class.php");
 require(__ROOT__."/inc/dba.class.php");
 require(__ROOT__."/inc/session.class.php");
-require(__ROOT__."/inc/cache.class.php");
+require(__ROOT__."/inc/cachea.class.php");
 require(__ROOT__."/inc/filesystem.class.php");
 
 
@@ -29,6 +29,8 @@ class WebApp implements WebAppInterface{
 	var $isdbg = 1;  # Gconf::get('is_debug');
 	var $sep = "|"; # separating tag for self-defined message body
 	var $myId = 'id'; # field name 'id', in case that it can be renamed as nameid, name_id, nameId, nameID, ID, iD, Id, and so on, by wadelau@ufqi.com Mon May  9 13:34:45 CST 2016
+	
+	var $cachea = null;
 
 	//- constructor
 	function __construct($args=null){
@@ -42,6 +44,13 @@ class WebApp implements WebAppInterface{
         }
 		
 		# other services
+		#print_r(__FILE__."enable_cache:[".Gconf::get('enable_cache')."]");
+		if(Gconf::get('enable_cache')){
+			if($this->cachea == null){
+				$this->cachea = new CacheA($args['cacheconf']);
+				#print_r(__FILE__."cachea:[".$this->cachea."]");
+			}
+		}
 		
 		$this->isdbg = Gconf::get('is_debug');
 		
@@ -126,7 +135,7 @@ class WebApp implements WebAppInterface{
 	 */
 	function setBy($fields, $conditions){
 
-		if(strpos($fields, ':') !== false){ # write to  file: or http(s):
+		if(strpos($fields, ':') !== false){ # write to  file: or http(s): or cache
 			$hm = $this->writeObject($type=$fields, $args=$conditions);
 		}
 		else{
@@ -188,7 +197,7 @@ class WebApp implements WebAppInterface{
 	 */
 	function getBy($fields, $conditions){
 
-		if(strpos($fields, ':') !== false){ # read from file: or http(s):
+		if(strpos($fields, ':') !== false){ # read from file: or http(s): or cache
 			$hm = $this->readObject($type=$fields, $args=$conditions);
 		}
 		else{
@@ -407,7 +416,11 @@ class WebApp implements WebAppInterface{
 
 	    $obj = '';
 
-	    if($type == 'file:'){
+	    if($type == 'cache:'){
+			//- cache service
+			$obj = $this->cachea->get($args['key']);
+		}
+		else if($type == 'file:'){
 		    //-- local or network file system
 		    $obj = file_get_contents($args['target']);
 			if($obj !== false){
@@ -485,6 +498,17 @@ class WebApp implements WebAppInterface{
 
 	    $obj = '';
 
+		if($type == 'cache:'){
+			//- cache service
+			if(is_null($args['value'])){
+				$obj = $this->cachea->rm($args['key']);
+			}
+			else{
+				print_r($args);
+				$obj = $this->cachea->set($args['key'], $args['value']);
+			}
+		}
+		else 
 	    if($type == 'file:'){
 		    //-- local or network file system
 			# test dir

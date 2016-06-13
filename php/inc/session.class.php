@@ -10,6 +10,7 @@ if(!defined('__ROOT__')){
 }
 
 require_once(__ROOT__."/inc/config.class.php");
+require_once(__ROOT__."/inc/socket.class.php");
 #require_once(__ROOT__."/inc/class.connectionpool.php");
 
  class Session{

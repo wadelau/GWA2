@@ -7,8 +7,7 @@ date_default_timezone_set("Asia/Chongqing");
 $docroot = $_SERVER['DOCUMENT_ROOT'];
 $rtvdir = dirname(dirname(__FILE__)); # relative dir
 $rtvdir = str_replace($docroot,"", $rtvdir);
-$reqdir = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'));
-#$appdir = $docroot.$rtvdir;
+$reqdir = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/')); # for tpl in footer.inc?
 $appdir = $docroot.$reqdir;
 
 if($appdir == ''){

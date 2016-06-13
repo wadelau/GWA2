@@ -11,7 +11,7 @@ if(!defined('__ROOT__')){
 
 require_once(__ROOT__."/inc/config.class.php");
 
-
+# db master
 class Config_Master{
 	var $mDbHost     = "";	
 	var $mDbUser     = "";
@@ -30,6 +30,7 @@ class Config_Master{
 	} 
 }
 
+# db slave
 class Config_Slave{
 	var $mDbHost     = "";	
 	var $mDbUser     = "";
@@ -47,6 +48,25 @@ class Config_Slave{
 
 	} 
 }
+
+
+# cache master
+class Cache_Master{
+	
+	var $chost = '';
+	var $cport = '';
+	var $expireTime = 30 * 60; 
+	
+	function __construct(){
+		
+		$this->chost = Gconf::get('cachehost');
+		$this->cport = Gconf::get('cacheport');
+		$this->expireTime = Gconf::get('cacheexpire');
+		
+	}
+	
+}
+
 
 //-- Todo
 

@@ -38,8 +38,8 @@ if($smttpl != ''){
 
 		$resrclist = array("images","css","js","pics");
 		foreach($resrclist as $k=>$v){
-			$indexcontent = preg_replace("/\"$v\//", "\"".$rtvdir."/view/".$siteid."/$v/", $indexcontent);
-			$tplcontent = preg_replace("/\"$v\//", "\"".$rtvdir."/view/".$siteid."/$v/", $tplcontent);
+			$indexcontent = preg_replace("/\"$v\//", "\"".$reqdir."/view/".$siteid."/$v/", $indexcontent);
+			$tplcontent = preg_replace("/\"$v\//", "\"".$reqdir."/view/".$siteid."/$v/", $tplcontent);
 		}
 
 		file_put_contents($s_indextpl.".tmp", $indexcontent);
@@ -76,7 +76,9 @@ else{
 		if($fmt == 'json'){
 			header("Content-type: application/json;charset=utf-8");
 			#print_r($data);
-			print json_encode($data['respobj']);		
+			#print json_encode($data['respobj']);
+			$data['out'] = $out;
+			print json_encode($data);
 			#print json_encode($data['respobj'], JSON_UNESCAPED_SLASHES);		
 		}
         else{

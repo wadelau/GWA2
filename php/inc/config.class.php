@@ -41,6 +41,13 @@ if(true){
 	$conf['dbname'] 	= $conf['maindb'];
 	$conf['dbdriver']	= 'MYSQL'; # 'MYSQL', 'MYSQLIX', 'PDOX', 'SQLSERVER', 'ORACLE' in support, UPCASE only
 
+	# cache server
+	$conf['enable_cache'] = 1; # or true for 1, false for 0
+	$conf['cachehost'] = '127.0.0.1'; # '/www/bin/memcached/memcached.sock'; #  ip, domain or .sock
+	$conf['cacheport'] = '11211'; # empty or '0' for linux/unix socket 
+	$conf['cachedriver'] = 'MEMCACHEDX'; # REDISX, XCACHEX
+	$conf['cacheexpire'] = 30 * 60;
+	
 	# misc
 	$conf['is_debug'] = 1;
 	$conf['html_resp'] = '<!DOCTYPE html><html><head><title>RESP_TITLE</title></head><body>RESP_BODY</body></html>';
