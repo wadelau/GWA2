@@ -17,13 +17,12 @@ com.ufqi.gwa2.WTool,
 //- header
 %><%
 //@include file="./inc/WTool.java" //?
-%><%
 %><%@include file="./comm/header.inc"%><%
 
 
 //- main logic
-String mod = request.getParameter("mod");
-String act = request.getParameter("act");
+mod = request.getParameter("mod");
+act = request.getParameter("act");
 if(mod == null){ mod = ""; }else{ mod = mod.trim(); }
 if(act == null){ act = ""; }else{ act = act.trim(); }
 if(mod.equals("")){
@@ -32,6 +31,12 @@ if(mod.equals("")){
 
 data.put("mod", mod);
 data.put("act", act);
+
+
+/*
+ * Due to issues of performance and security of java.lang.reflection,
+ * We do not use it as routing or dynamic module invoking at present.
+ */
 
 if(mod.equals("index")){
 
@@ -52,39 +57,14 @@ else{
 }
 
 //- something shared across the app
-if(mod.equals("index")){
+if(true){
+	
+	%><%@include file="./ctrl/include.jsp"%><%
 
-     %><%@include file="./ctrl/index.jsp"%><%
- 
 }
+
 
 //- footer
 %><%@include file="./comm/footer.inc"%><%
 
-/*
-$data['mod'] = $mod;
-$data['act'] = $act;
-$data['baseurl'] = $baseurl;
-
-if(file_exists("./ctrl/".$mod.".php")){
-	include("./ctrl/".$mod.".php");
-}
-else{
-	print "ERROR.";	
-	error_log(__FILE__.": found error mod:[$mod]");
-	exit(0);
-}
-
-$smttpl_orig = $smttpl;
-
-if($mod != 'index'){
-  include("./ctrl/index.php"); # here is buggy, any unshared business logic should not be placed in index mod.
-}
-
-# footer.inc file
-include("./comm/footer.inc");
-
-# add more ---
-
-*/
 %>
