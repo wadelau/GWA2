@@ -20,12 +20,6 @@ if(true){
 	$conf['uploaddir']	= 'upld';
 	$conf['septag']		= '_J_A_Z_';
 
-	$conf['maindb']		= 'DB_NAME';
-	$conf['maintbl']	= $tblpre.'customertbl';
-	$conf['usertbl']	= $tblpre.'info_usertbl';
-	$conf['welcometbl']	= $tblpre.'info_welcometbl';
-	$conf['operatelogtbl']	= $tblpre.'fin_operatelogtbl';
-
 	$conf['signkey']	= '-rw-r--r-- 1 bangco users 13 Jul 16 16:28 w.txt';
 	$conf['adminemail'] = 'info@ufqi.com';
 
@@ -38,7 +32,7 @@ if(true){
 	$conf['dbport'] 	= 'DB_PORT';
 	$conf['dbuser'] 	= 'DB_USER';
 	$conf['dbpassword'] 	= 'DB_PASSWORD';
-	$conf['dbname'] 	= $conf['maindb'];
+	$conf['dbname'] 	= 'DB_NAME';
 	$conf['dbdriver']	= 'MYSQL'; # 'MYSQL', 'MYSQLIX', 'PDOX', 'SQLSERVER', 'ORACLE' in support, UPCASE only
 
 	# cache server
@@ -57,6 +51,12 @@ if(true){
 	$conf['no_sql_check'] = 'omit_sql_security_check'; # keep original form of sql in some cases, 14:24 Friday, May 20, 2016, refer: http://php.net/manual/en/mysqli-stmt.bind-param.php, "2 asb(.d o,t )han(a t)n i h e i(d.o_t)dk ¶"
 	$conf['allow_run_from_cli'] = 0; # keep 0 for most, only if run php from command line, 21:41 02 June 2016
 
+	$conf['maindb']		= $conf['dbname'];
+	$conf['maintbl']	= $tblpre.'customertbl';
+	$conf['usertbl']	= $tblpre.'info_usertbl';
+	$conf['welcometbl']	= $tblpre.'info_welcometbl';
+	$conf['operatelogtbl']	= $tblpre.'fin_operatelogtbl';
+	
 	# set to global container
 	Gconf::setConf($conf);
 	
