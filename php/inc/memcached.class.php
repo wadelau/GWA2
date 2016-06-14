@@ -46,16 +46,17 @@ class MEMCACHEDX {
 			if(!$isConnected){
 				$this->mcache->addServer($this->chost, $this->cport);
 			}
-			
 		}
 		else{
-			//- open socket, #todo
+			//- open socket, ###todo
 		}
 		
-		print __FILE__;
-		print_r($config);
-		var_dump($this->mcache);
-		print __FILE__;
+		#print __FILE__;
+		#print_r($config);
+		#var_dump($this->mcache);
+		#print __FILE__;
+		
+		# others shared service may be relocated into its parent, webapp.class
 		
 	}
 	
@@ -84,10 +85,9 @@ class MEMCACHEDX {
 		
 		if(!$this->mcache){ $this->_init(); }
 		$rtn = $this->mcache->set($k, $v, $this->expireTime);
+		debug(__FILE__."::set: k:$k, v:$v expire:[".$this->expireTime."] retn_code:[".$this->mcache->getResultCode()."] rtn:[$rtn]\n");
 		
-		print __FILE__.": k:$k, v:$v expire:[".$this->expireTime."] retn_code:[".$this->mcache->getResultCode()."] rtn:[$rtn]\n";
-		
-		return $rtn;
+		return array($this->mcache->getResultCode(),$rtn);
 		
 	}
 	
@@ -95,14 +95,18 @@ class MEMCACHEDX {
 	function get($k){
 		if(!$this->mcache){ $this->_init(); }
 		$rtn = $this->mcache->get($k);
-		print __FILE__.": k:$k, retn_code:[".$this->mcache->getResultCode()."] rtn-v:[$rtn]\n";
-		return $rtn;
+		debug(__FILE__."::get: k:$k, retn_code:[".$this->mcache->getResultCode()."] rtn-v:[$rtn]\n");
+		return array($this->mcache->getResultCode(),$rtn);
 	}
  	
 	//- delete
 	function del($k){
+		
 		if(!$this->mcache){ $this->_init(); }
-		return $this->mcache->delete($k);
+		$rtn = $this->mcache->delete($k);
+		
+		return array($this->mcache->getResultCode(), $rtn);
+		
 	}
 	
 	

@@ -43,7 +43,7 @@ class WebApp implements WebAppInterface{
 		  $this->dba = new DBA($dbconf);
         }
 		
-		# other services
+		# cache
 		#print_r(__FILE__."enable_cache:[".Gconf::get('enable_cache')."]");
 		if(Gconf::get('enable_cache')){
 			if($this->cachea == null){
@@ -51,6 +51,8 @@ class WebApp implements WebAppInterface{
 				#print_r(__FILE__."cachea:[".$this->cachea."]");
 			}
 		}
+		
+		# others should be invoked by its subclasses
 		
 		$this->isdbg = Gconf::get('is_debug');
 		
@@ -419,6 +421,12 @@ class WebApp implements WebAppInterface{
 	    if($type == 'cache:'){
 			//- cache service
 			$obj = $this->cachea->get($args['key']);
+			if(!$obj[0]){
+				$obj = array(true, $obj[1]);
+			}
+			else{
+				$obj = array(false, array('errorcode'=>1606140931, 'errordesc'=>$this->toString($obj)));
+			}
 		}
 		else if($type == 'file:'){
 		    //-- local or network file system
@@ -504,12 +512,17 @@ class WebApp implements WebAppInterface{
 				$obj = $this->cachea->rm($args['key']);
 			}
 			else{
-				print_r($args);
+				#print_r($args);
 				$obj = $this->cachea->set($args['key'], $args['value']);
 			}
+			if(!$obj[0]){
+				$obj = array(true, $obj[1]);
+			}
+			else{
+				$obj = array(false, array('errorcode'=>1606140930, 'errordesc'=>$this->toString($obj)));
+			}
 		}
-		else 
-	    if($type == 'file:'){
+		else if($type == 'file:'){
 		    //-- local or network file system
 			# test dir
 			$dirfile = $args['target'];

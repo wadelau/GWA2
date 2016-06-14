@@ -32,6 +32,7 @@ class CacheA {
 	# get
 	public function get($k){
 		
+		$k = $this->_md5k($k);
 		return $this->cacheconn->get($k);
 				
 	}
@@ -39,7 +40,7 @@ class CacheA {
 	# set
 	public function set($k, $v){
 		
-		print __FILE__.": k:$k, v:$v\n";
+		$k = $this->_md5k($k);
 		$rtn = $this->cacheconn->set($k, $v);
 		
 		return $rtn;
@@ -49,12 +50,17 @@ class CacheA {
 	# delete
 	public function rm($k){
 		
+		$k = $this->_md5k($k);
 		$rtn = $this->cacheconn->del($k);
 		
 		return $rtn;
 		
 	}
 	
+	# shorten key
+	private function _md5k($k){
+		return strlen($k)>32 ? md5($k) : $k;
+	}
  	
  }
 ?>
