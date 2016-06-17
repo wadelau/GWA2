@@ -513,7 +513,12 @@ class WebApp implements WebAppInterface{
 			}
 			else{
 				#print_r($args);
-				$obj = $this->cachea->set($args['key'], $args['value']);
+				if($args['expire']){
+					$obj = $this->cachea->set($args['key'], $args['value'], $args['expire']);
+				}
+				else {
+					$obj = $this->cachea->set($args['key'], $args['value']);
+				}
 			}
 			if(!$obj[0]){
 				$obj = array(true, $obj[1]);

@@ -19,7 +19,7 @@ class MEMCACHEDX {
 	var $chost = '';
 	var $mcache = null;
 	var $persistConnId = 'GWA2_BUILD_IN_MC';
-	var $expireTime = 30 * 60; # 30 minutes
+	var $expireTime = 1800; # 30 * 60; # 30 minutes
 	
  	//- construct
 	function __construct($config=null){
@@ -29,7 +29,7 @@ class MEMCACHEDX {
 		$this->expireTime = $config->expireTime;
 		
 		if(true){
-			//- use built-in memcache functions
+			//- use built-in memcached functions
 			$this->mcache = new Memcached($this->persistConnId);
 			$servers = $this->mcache->getServerList(); 
 			$isConnected = 0;
@@ -49,6 +49,7 @@ class MEMCACHEDX {
 		}
 		else{
 			//- open socket, ###todo
+			
 		}
 		
 		#print __FILE__;
@@ -80,12 +81,12 @@ class MEMCACHEDX {
 	}
 
 	//- set
-	function set($k, $v){
+	function set($k, $v, $expr){
 		$rtn = '';
 		
 		if(!$this->mcache){ $this->_init(); }
-		$rtn = $this->mcache->set($k, $v, $this->expireTime);
-		debug(__FILE__."::set: k:$k, v:$v expire:[".$this->expireTime."] retn_code:[".$this->mcache->getResultCode()."] rtn:[$rtn]\n");
+		$rtn = $this->mcache->set($k, $v, ($expr>0?$expr:$this->expireTime));
+		#debug(__FILE__."::set: k:$k, v:$v expire:[".$this->expireTime."] retn_code:[".$this->mcache->getResultCode()."] rtn:[$rtn]\n");
 		
 		return array($this->mcache->getResultCode(),$rtn);
 		
@@ -95,7 +96,7 @@ class MEMCACHEDX {
 	function get($k){
 		if(!$this->mcache){ $this->_init(); }
 		$rtn = $this->mcache->get($k);
-		debug(__FILE__."::get: k:$k, retn_code:[".$this->mcache->getResultCode()."] rtn-v:[$rtn]\n");
+		#debug(__FILE__."::get: k:$k, retn_code:[".$this->mcache->getResultCode()."] rtn-v:[$rtn]\n");
 		return array($this->mcache->getResultCode(),$rtn);
 	}
  	

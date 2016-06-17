@@ -47,7 +47,10 @@ class MYSQL {
 				or die($this->sayErr("mysql connect")); 
 			if("" != $this->m_name){
 				mysql_select_db($this->m_name, $this->m_link) or die($this->sayErr("use ".$this->m_name));
-			}             
+			}
+			if(Gconf::get('enable_db_utf8_affirm')){
+				$this->query("SET NAMES 'utf8'");
+			}
 		}
 		return $this->m_link;
 	}

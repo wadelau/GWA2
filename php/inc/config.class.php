@@ -34,6 +34,7 @@ if(true){
 	$conf['dbpassword'] 	= 'DB_PASSWORD';
 	$conf['dbname'] 	= 'DB_NAME';
 	$conf['dbdriver']	= 'MYSQL'; # 'MYSQL', 'MYSQLIX', 'PDOX', 'SQLSERVER', 'ORACLE' in support, UPCASE only
+	$conf['db_enable_utf8_affirm'] = false; # append utf-8 affirm after db connection established, should be false in a all-utf-8 env.
 
 	# cache server
 	$conf['enable_cache'] = 1; # or true for 1, false for 0

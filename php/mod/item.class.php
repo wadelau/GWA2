@@ -23,6 +23,27 @@ public class Item extends WebApp{
             $this->setTbl(Gconf::get('tblpre').'itemtbl');
         }
     }
+			
+	//- @overide, 
+	//- remedy by Xenxin, 10:26 16 June 2016
+	public function set($k, $v){
+		
+		if($k != 'ou_desc'){
+			parent::set($k, $v);
+		}
+		else{
+			//- shorten desc by DESC_MAX_LENGTH
+			$olen = strlen($v);
+			$v = shortenStr($v, $this->get('desc_max_length'));
+			$nlen = strlen($v);
+			if($nlen < $olen){
+				debug(__FILE__.": content afr:[$v] shortened by [".($olen-$nlen)."]");	
+			}
+			parent::set($k, $v);
+		}
+	}
+	
+	
 }
 
 ?>

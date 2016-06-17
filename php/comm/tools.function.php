@@ -346,96 +346,39 @@ function debug($obj, $tag='', $output=null){
 	
 }
 
-# resize image by GD functions
-# wadelau@ufqi.com, Thu Jan 28 22:04:14 CST 2016
-# return resized image
-# $toWidth: int, 10~10000 ?
-# $percentNum: float, 0~1
-# e.g. $destFile = resizeImage($srcFile, 1024);
-# e.g. $destFile = resizeImage($srcFile, 0, 0.55);
-function resizeImage($srcFile, $toWidth, $percentNum=1, $destQuality=85){
+//- client ip read
+function getIp() {
+	
+	$ip = '';
+	
+	if (@$_SERVER["REMOTE_ADDR"]){ $ip = $_SERVER["REMOTE_ADDR"]; }
+	elseif (@$_SERVER["HTTP_X_FORWARDED_FOR"]){ $ip = $_SERVER["HTTP_X_FORWARDED_FOR"]; }
+	else if (@$_SERVER["HTTP_CLIENT_IP"]){ $ip = $_SERVER["HTTP_CLIENT_IP"]; }
+	else if (@getenv( "HTTP_X_FORWARDED_FOR" )){ $ip = getenv( "HTTP_X_FORWARDED_FOR" ); }
+	else if (@getenv( "HTTP_CLIENT_IP" )){ $ip = getenv( "HTTP_CLIENT_IP" ); }
+	else if (@getenv( "REMOTE_ADDR" )){ $ip = getenv( "REMOTE_ADDR" ); }
+	else{ $ip = "Unknown";}
 
-	$keepSame = 1; # 0 for cutting edges, 1 for not cutting
-	$edgeCutRate = 7; # 2~10, 10 for least edge-cutting...  
-	$centerRate = 1.5; # 1~5, 5 for largest leaving center...
-
-	$srcInfo = getimagesize($srcFile); # http://www.php.net/getimagesize
-	$srcWidth = $srcInfo[0];
-	$srcHeight = $srcInfo[1];
-	$srcType = $srcInfo[2];
-
-	if($toWidth == 0){
-		if($percentNum == 1 || $percentNum == 0){
-			debug($toWidth, "toWidth-percentNum-eRror");
+	if (($ip == "Unknown" or $ip == "127.0.0.1" 
+			or strpos( $ip, "172.31." ) === 0) 
+		and @$_SERVER["HTTP_X_REAL_IP"]){
+		
+		$ip = $_SERVER["HTTP_X_REAL_IP"];
+	}
+	if (($ip == "Unknown" or $ip == "127.0.0.1" or strpos( $ip, "172.31." ) === 0) 
+			and @$_SERVER["HTTP_X_FORWARDED_FOR"]) {
+		
+		$ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
+		if (($tmppos=strrpos($ip," "))>0){
+			$ip=substr($ip,$tmppos+1);
 		}
-		else{ $toWidth = $srcWidth * $percentNum; }	
-	}
-	else if($percentNum == 1){
-		$percentNum = $toWidth / $srcWidth;
-	}
-	$toHeight = (int)$srcHeight * ($toWidth/$srcWidth);
-
-	$src_x_pos = 0;
-	if(1 && $srcWidth > $toWidth){
-		$src_x_pos = ($srcWidth - $toWidth) / $edgeCutRate;
-		$srcWidth -= $src_x_pos * $centerRate;
-	}
-	else{
-		#$toWidth = $srcWidth; # for enlarge /scale up
-	}
-	$src_y_pos = 0;
-	if(1 && $srcHeight > $toHeight){
-		$src_y_pos = ($srcHeight - $toHeight) / $edgeCutRate;
-		$srcHeight -= $src_y_pos * $centerRate;
-	}
-	else{
-		#$toHeight = $srcHeight; 
-	}
-	$dest_x_pos = 0; $dest_y_pos = 0;
-	#debug($src_x_pos.",".$src_y_pos.",".$percentNum);
-
-	$srcImage = null;
-	if($srcType == 1){ # 'image/gif')
-		$srcImage = imagecreatefromgif($srcFile);
-	}
-	else if($srcType == 2){ # 'image/jpeg'
-		$srcImage = imagecreatefromjpeg($srcFile);
-	}
-	elseif($srcType == 3){ # 'image/png'
-		$srcImage = imagecreatefrompng($srcFile);
-	}
-	elseif($srcType == 17){ # 'image/webp', still unavailable
-		$srcImage = imagecreatefrompng($srcFile);
-	}
-
-	$lastDot = strrpos($srcFile, '.');
-	$destFile = substr($srcFile, 0, $lastDot).'_rs_'.$toWidth.'_'.$percentNum.'.'.substr($srcFile, $lastDot+1, strlen($srcFile));				
-	if($keepSame == 0){
-		$destImage = imagecreatetruecolor($toWidth, $toHeight);
-		imagecopyresampled($destImage, $srcImage, 
-			$dest_x_pos, $dest_y_pos, $src_x_pos, $src_y_pos, 
-				$toWidth, $toHeight, $srcWidth, $srcHeight);
-	}
-	else{
-		$destImage = imagescale($srcImage, $toWidth, $toHeight);
-	}
-
-	$destQuality = $destQuality * $percentNum;
-	$destQuality = $destQuality > 100 ? 100 : $destQuality;
-	if($srcType == 1){
-		imagegif($destImage, $destFile, $destQuality);
-	}
-	else if($srcType == 2){ 
-		imagejpeg($destImage, $destFile, $destQuality);
-	}
-	elseif($srcType == 3){ 
-		imagepng($destImage, $destFile, $destQuality);
-	}
-	elseif($srcType == 17){ 
-		imagewebp($destImage, $destFile, $destQuality);
+		if (($tmppos=strrpos($ip,","))>0){
+			$ip=substr($ip,$tmppos+1);
+		}
 	}
 	
-	return $destFile;
+	return $ip;
 	
-}
-
+ }
+ 
+ 

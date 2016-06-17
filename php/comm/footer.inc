@@ -78,8 +78,24 @@ else{
 			#print_r($data);
 			#print json_encode($data['respobj']);
 			$data['out'] = $out;
-			print json_encode($data);
-			#print json_encode($data['respobj'], JSON_UNESCAPED_SLASHES);		
+			$output = json_encode($data);
+			$jsonerr = json_last_error();
+			if($jsonerr == JSON_ERROR_NONE){
+				print $output;
+			}
+			else{
+				$dataX = array('errorcode'=>1606141649, 
+					'errordesc'=>'Error found in json_encode for output. json_err_code:['
+						.$jsonerr.'] json_err_message:['
+						.(function_exists('json_last_error_msg')?json_last_error_msg():'null')
+						.'] raw data attached as below.');
+					
+				print json_encode($dataX);
+				print ' '.chr(10).chr(13);
+				print "\n\n/*\n\n";
+				print_r($data);
+				print "\n\n*/";
+			}		
 		}
         else{
             print "Unknown fmt:[$fmt] in output.";

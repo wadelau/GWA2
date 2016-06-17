@@ -29,7 +29,7 @@ class DBA {
 		#$this->dbconn = new MySQLDB($this->conf);
 		$dbDriver = Gconf::get('dbdriver');
 		$this->dbconn = new $dbDriver($this->conf);
-		
+			
 	}	
 
 	/* 

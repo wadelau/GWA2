@@ -38,10 +38,10 @@ class CacheA {
 	}
 	
 	# set
-	public function set($k, $v){
+	public function set($k, $v, $expr=0){
 		
 		$k = $this->_md5k($k);
-		$rtn = $this->cacheconn->set($k, $v);
+		$rtn = $this->cacheconn->set($k, $v, $expr);
 		
 		return $rtn;
 		
