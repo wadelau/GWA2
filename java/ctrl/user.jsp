@@ -1,34 +1,33 @@
-<%!
+<%
 /* controller of user mod
+ * v2
  */
-//- define
-public void userCtrl(){
+%><%@include file="./ctrlheader.inc"%><%
 
-	 //- something to do
+//- main busi logic
 
-	if(act.equals("signin")){
-		//--
-		outx.append("outx "+act+" in ctr/user");
+if(act.equals("signin")){
+	//--
+	outx.append("outx "+act+" in ctr/user\n");
 
-	}
-	else if(act.equals("dosignin")){
-		 
-		outx.append("outx "+act+" in ctr/user");
+}
+else if(act.equals("dosignin")){
+	 
+	outx.append("outx "+act+" in ctr/user\n");
 
-	}
-	else{
-		
-		outx.append("outx unknown act:["+act+"] in ctr/user");
-
-	}
-
-
-	//- tpl
+}
+else{
+	
+	outx.append("outx unknown act:["+act+"] in ctr/user\n");
 
 }
 
+
+//- tpl
+
+
 %><%
-//- exex
-userCtrl();
+
+%><%@include file="./ctrlfooter.inc"%><%
 
 %>

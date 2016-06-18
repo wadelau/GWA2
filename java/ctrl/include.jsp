@@ -1,6 +1,10 @@
-<%!
+<%
 //- something included in all modes across the app
-//- define
+//- exec, 2/2
+includeCtrl();
+
+%><%!
+//- define, 1/2
 public void includeCtrl(){
 	
 	if(true){ //-  something shared across the app
@@ -10,17 +14,12 @@ public void includeCtrl(){
 
 		sid = "" + (new java.util.Random()).nextInt();
 
-		outx.append("sid:["+sid+"]");
+		outx.append("/ctrl/include: sid:["+sid+"]");
 
 
 	}
 
 
 }
-
-%><%
-
-//- exec
-includeCtrl();
 
 %>

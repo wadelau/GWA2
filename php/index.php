@@ -38,9 +38,9 @@ else{
 	exit(0);
 }
 
-# 
-if($mod != 'index'){
-  include("./ctrl/index.php"); # update in ctrl/index, 09:54 11 June 2016
+# something shared across the app
+if(true){
+  include("./ctrl/include.php"); 
 }
 
 # footer.inc file

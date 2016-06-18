@@ -1,40 +1,32 @@
-<%!
-//- controller of homepage
-//- define
-public void indexCtrl(){
+<%
+/* By this way, a request will trigger the second instance,
+ * which may be an overheat on performace, but can be extended to a large scale
+ * noted by wadelau @ Fri Jun 17 06:46:42 CST 2016
+ */
 
+%><%@include file="./ctrlheader.inc"%><%
 
-	//- something to do
-	act = act.equals("") ? "index" : act;
+//- main busi logic
 
-	//- actions
-	if(mod.equals("index")){ //- something displayed in homepage only
+out.println("\nbgn: output in /ctrl/index. @"+(new java.util.Date())+"\n");
 
-		if(act.equals("index")){
-			
-			outx.append("outxi act:["+act+"] in ctrl/index.");
+act = act.equals("") ? "index" : act;
 
-		}
-		else{
+if(act.equals("index")){
 
-			outx.append("outx in ctrl/index, unknown act:["+act+"].");
+	outx.append("/ctrl/index: succ. get act:["+act+"] with mod:["+mod+"]\n");
 
-		}
+}
+else{
 
-	}
-
-	//- shared funcs relocated into ctrl/include.jsp
-
-	//- tpl
-	if(fmt.equals("")){
-		smttpl = "homepage.html";
-	}
+	outx.append("/ctrl/index: fail. reach Unknown act:["+act+"] with mod:["+mod+"]\n");
 
 }
 
+outx.append("\nend: appending to outx in /ctrl/index."+(new java.util.Date()) + "\n");
+
 %><%
 
-//- exec
-indexCtrl();
+%><%@include file="./ctrlfooter.inc"%><%
 
 %>
