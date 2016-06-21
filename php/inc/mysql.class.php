@@ -45,11 +45,13 @@ class MYSQL {
 			$real_host = $this->m_host.":".$this->m_port;
 			$this->m_link = mysql_connect($real_host,$this->m_user,$this->m_password) 
 				or die($this->sayErr("mysql connect")); 
+			
 			if("" != $this->m_name){
 				mysql_select_db($this->m_name, $this->m_link) or die($this->sayErr("use ".$this->m_name));
 			}
-			if(Gconf::get('enable_db_utf8_affirm')){
-				$this->query("SET NAMES 'utf8'");
+			
+			if(Gconf::get('db_enable_utf8_affirm')){
+				$this->query("SET NAMES 'utf8'", null, null);
 			}
 		}
 		return $this->m_link;

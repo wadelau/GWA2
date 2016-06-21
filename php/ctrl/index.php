@@ -28,7 +28,7 @@ if(true){
 	
 }
 
-$data['time'] = date("H:i", time());
+$data['time'] = date("Y-m-d-H:i:s", time());
 
 
 # tpl

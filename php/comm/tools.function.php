@@ -326,6 +326,8 @@ function debug($obj, $tag='', $output=null){
 	$callidx = count($caller) - 2; 
 	$s .= ' func:['.$caller[$callidx]['function'].'] file:['.$caller[$callidx]['file'].'] line:['.$caller[$callidx]['line'].']';
 
+	$s = "[".date("Y-m-d-H:i:s")."] ".$s."\n";
+	
 	if($output != null){
 		if($output == 0){ # in backend only
 			error_log($s); 
@@ -352,7 +354,7 @@ function getIp() {
 	$ip = '';
 	
 	if (@$_SERVER["REMOTE_ADDR"]){ $ip = $_SERVER["REMOTE_ADDR"]; }
-	elseif (@$_SERVER["HTTP_X_FORWARDED_FOR"]){ $ip = $_SERVER["HTTP_X_FORWARDED_FOR"]; }
+	else if (@$_SERVER["HTTP_X_FORWARDED_FOR"]){ $ip = $_SERVER["HTTP_X_FORWARDED_FOR"]; }
 	else if (@$_SERVER["HTTP_CLIENT_IP"]){ $ip = $_SERVER["HTTP_CLIENT_IP"]; }
 	else if (@getenv( "HTTP_X_FORWARDED_FOR" )){ $ip = getenv( "HTTP_X_FORWARDED_FOR" ); }
 	else if (@getenv( "HTTP_CLIENT_IP" )){ $ip = getenv( "HTTP_CLIENT_IP" ); }
@@ -380,5 +382,38 @@ function getIp() {
 	return $ip;
 	
  }
+ 
+# get data from input and filter as expected
+# added by wadelau@ufqi.com
+# 18:11 20 June 2016
+function getInput($src, $k=null, $defaultValue=null){ # src=$_RQUEST, $_SERVER, $_COOKIE, $_SESSION, php://input
+	
+	$rtn = '';
+	
+	if(!$src){
+		$src = $_REQUEST;
+	}
+	if(!$k){
+		$k = 'all';
+	}
+	
+	if($k == 'all'){
+		$rtn = serialize($src);
+	}
+	else{
+		$rtn = $src[$k];
+	}
+	
+	if(!$rtn && $defaultValue != null){
+		$rtn = $defaultValue;
+	}
+	
+	$rtn = str_replace('<', '&lt;', $rtn);
+	$rtn = str_replace('"', '&quot;', $rtn);
+	
+	
+	return $rtn;
+	
+}
  
  

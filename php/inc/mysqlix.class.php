@@ -39,8 +39,8 @@ class MYSQLIX {
 			$this->m_link = new mysqli($this->m_host, $this->m_user, 
 				$this->m_password, $this->m_name, $this->m_port);
 			
-			if(Gconf::get('enable_db_utf8_affirm')){
-				$this->query("SET NAMES 'utf8'");
+			if(Gconf::get('db_enable_utf8_affirm')){
+				$this->query("SET NAMES 'utf8'", null, null);
 			}
 			
 		}

@@ -35,6 +35,13 @@ if(1){ # in some scenarios, this should be set as 0 to disable this function glo
 		}
 		print_r($_REQUEST);
 		
+		# set utf-8 for environment
+		$myCharset = 'UTF-8';
+		mb_internal_encoding($myCharset);
+		mb_http_output($myCharset); 
+		mb_http_input($myCharset); 
+		mb_regex_encoding($myCharset); 
+		
 		# $_SERVER
 		empty( $_SERVER['HTTP_HOST'] ) && $_SERVER['HTTP_HOST'] = 'localhost';
 		empty( $_SERVER['REQUEST_URI'] ) && $_SERVER['REQUEST_URI'] = '/';
