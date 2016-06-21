@@ -1,20 +1,45 @@
 <%
-//- embedded in ./index
+//- app header
+%><%@include file="./preheader.inc"%><%
+%><%@page import="
+java.io.File,
+"%><%
 
-//- global variables across the app
-//- need to init before manipulate
-%><%!String sid, appdir, siteid, fmt, smttpl, mod, act;
-HashMap data; StringBuffer outx;%><%
+outx.append("comm/header: Outx in header@"+(new java.util.Date())+", appdir:["+appdir+"]"); // $out in PHP
+
+outx.append("\n\tcomm/header: contextPath:["+request.getContextPath()+"] pathinfo:["+request.getPathInfo()+"]");
+
+appdir = request.getServletPath();
+appdir = appdir.substring(0, appdir.lastIndexOf('/')); 
+
+outx.append("\n\tcomm/header: requestURL:["+request.getRequestURL()+"] servletPath:["+request.getServletPath()+"] appdir:["+appdir+"]\n");
 
 //- tpl engine
 //- todo: smarty4java
+fmt = WTool.get(request, "fmt");
 
-data = new HashMap();
+//- request headers
+if(false){
+	java.util.Enumeration eNames = request.getHeaderNames();
+	while (eNames.hasMoreElements()) {
+		String name = (String) eNames.nextElement();
+		String value = (String)(request.getHeader(name));
 
-outx = new StringBuffer("Outx in index@"+(new java.util.Date())); // $out in PHP
+		outx.append("header: k:["+name+"] v:["+value+"]\n");
 
-outx.append("\ncontextPath:["+request.getContextPath()+"] pathinfo:["+request.getPathInfo()+"]");
-outx.append("\nrequestURL:["+request.getRequestURL()+"] servletPath:["+request.getServletPath()+"]");
+	}
+}
+
+//- system env
+if(false){
+	java.util.Properties p = new java.util.Properties();
+	p = System.getProperties();
+	HashMap m = new HashMap(p);
+	outx.append("\n\n" + m.keySet() +"=" +m.values()+"\n\n");
+	//- jdk 8
+	//m.keySet().forEach(k, v) -> out.println("system: k:["+k+"] v:["+v+"]");
+}
+
 
 
 %><%!

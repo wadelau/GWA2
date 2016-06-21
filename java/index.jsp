@@ -1,22 +1,13 @@
 <%
-//
-// the application entry...
 /* -GWA2 is ported into Java
  * Wadelau@ufqi.com
  * v0.1
  * Thu Jun  9 14:02:51 CST 2016
- * Method in a class should be limited under 16KB
  */
-//
-%><%@page import="
-java.util.Date, java.util.HashMap,
-com.ufqi.gwa2.WTool,
-" pageEncoding="utf-8"%><% 
 
+// the application entry...
 
-//- header
-%><%
-//@include file="./inc/WTool.java" //?
+//-  entry header
 %><%@include file="./comm/header.inc"%><%
 
 
@@ -34,29 +25,50 @@ data.put("act", act);
 
 
 /*
- * Due to issues of performance and security of java.lang.reflection,
- * We do not use it as routing or dynamic module invoking at present.
+ * Due to 
+ * 1) issues of performance and security of java.lang.reflection,
+ * 		We do not use it as routing or dynamic module invoking at present.
+ * 2) issues of performance and seperated runtime environment of dispatcher forward,
+ * 		we do not use it as page embedded for routing at present.
+ * Though dynamic dispatcher include, similiar to the 2nd one,
+ *  it will trigger two instances of a single request, it still is better than
+ *		wrap all entries in a single jsp servlet.
  */
 
-if(mod.equals("index")){
+//- some logic loading 
+StringBuffer modf = new StringBuffer(appdir).append("/ctrl/").append(mod).append(".jsp");
+String modfs = modf.toString();
+outx.append("/index: ctrl:["+modfs+"]\n");
+String realModfs = application.getRealPath(modfs);
+outx.append("/index: realpath:["+realModfs+"]\n");
 
-	%><%@include file="./ctrl/index.jsp"%><%
+if((new File(realModfs)).exists()){
 
-}
-else if(mod.equals("user")){
-	
-	%><%@include file="./ctrl/user.jsp"%><%
+	//- collect runtime data into request
+	HashMap prtPage = new HashMap();
+	prtPage.put("data", data);
+	prtPage.put("outx", outx);
+	prtPage.put("mod", mod);
+	prtPage.put("act", act);
+
+	request.setAttribute("prtPage", prtPage);
+
+	//- process of another instance	
+	request.getRequestDispatcher(modfs).include(request, response);
+
+	//- restore runtime data into response
+	prtPage = (HashMap)request.getAttribute("prtPage");
 	
 }
 else{
 
-	outx = new StringBuffer("Unknown mod:["+mod+"]. 1606110925.");	
-	out.println(outx);
-	return;
-	//-todo: log
+	//- no exist//- continue this
+	outx = new StringBuffer("\n/index: Unknown mod:["+mod+"] with act:["+act+"] modfs:["+modfs+"]. 1606110925.\n");	
+	//- #todo: log
+
 }
 
-//- something shared across the app
+//- something shared across the app, out of comm/header
 if(true){
 	
 	%><%@include file="./ctrl/include.jsp"%><%
