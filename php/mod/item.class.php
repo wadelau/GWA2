@@ -1,15 +1,15 @@
 <?php
 
-# 
+#
 # Mon Jan 19 21:13:50 CST 2015
 # wadelau@ufqi.com
 
 if(!defined('__ROOT__')){
     define('__ROOT__', dirname(dirname(__FILE__)));
 }
-require_once(__ROOT__.'/inc/webapp.class.php'); 
+require_once(__ROOT__.'/inc/webapp.class.php');
 
-public class Item extends WebApp{
+class Item extends WebApp{
 
     var $iname = "";
 
@@ -24,7 +24,7 @@ public class Item extends WebApp{
         }
     }
 			
-	//- @overide, 
+	//- @overide,
 	//- remedy by Xenxin, 10:26 16 June 2016
 	public function set($k, $v){
 		
@@ -37,7 +37,7 @@ public class Item extends WebApp{
 			$v = shortenStr($v, $this->get('desc_max_length'));
 			$nlen = strlen($v);
 			if($nlen < $olen){
-				debug(__FILE__.": content afr:[$v] shortened by [".($olen-$nlen)."]");	
+				debug(__FILE__.": content afr:[$v] shortened by [".($olen-$nlen)."]");
 			}
 			parent::set($k, $v);
 		}

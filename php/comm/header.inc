@@ -1,7 +1,8 @@
-<?php 
+<?php
 
-global $sid, $appdir, $siteid, $user, $userid,$isdbg=1;
+global $sid, $appdir, $siteid, $user, $userid,$isdbg;
 date_default_timezone_set("Asia/Chongqing");
+session_start(); # in developping stage, using php built-in session manager
 
 # dir manipulate
 $docroot = $_SERVER['DOCUMENT_ROOT'];
@@ -23,9 +24,8 @@ require($appdir."/comm/tools.function.php");
 $siteid = $_CONFIG['siteid']; $isdbg = $_CONFIG['is_debug'];
 
 # user info
-session_start(); # in developping stage, using php built-in session manager
 define('UID',$_CONFIG['agentalias'].'_user_id');
-global $data=array(); # variables container for template file
+global $data; $data=array(); # variables container for template file
 
 $HTTP_REFERER = parse_url($_SERVER['HTTP_REFERER']);
 if (! isset($_SESSION['ref']) || $HTTP_REFERER['path'] != $_SERVER['REDIRECT_URL']){
@@ -36,8 +36,8 @@ if (! isset($_SESSION['ref']) || $HTTP_REFERER['path'] != $_SERVER['REDIRECT_URL
 }
 
 if(!isset($user)){
-    $user = new User(); 
-} 
+    $user = new User();
+}
 $userid = '';
 if(array_key_exists(UID,$_SESSION) && $_SESSION[UID] != ''){
 	$userid = $_SESSION[UID];
@@ -62,8 +62,8 @@ $smt->setConfigDir($viewdir.'/config');
 $smt->setCacheDir($viewdir.'/cache');
 $smttpl = '';
 
-global $display_style;  
-$display_style = $_CONFIG['display_style_index']; 
+global $display_style;
+$display_style = $_CONFIG['display_style_index'];
 
 # convert user input data to variables, tag#userdatatovar
 foreach($_REQUEST as $k=>$v){
@@ -76,7 +76,7 @@ foreach($_REQUEST as $k=>$v){
 				if(stripos($v, "<") > -1){ # <script , <embed, <img, <iframe, etc.  Mon Feb  1 14:48:32 CST 2016
 					$v = str_ireplace("<", "&lt;", $v);
 					$_REQUEST[$k] = $v;
-				}   
+				}
 			}
             $data[$k] = $v;
             if(preg_match('/[^\x20-\x7e]/', $k)){
@@ -94,7 +94,7 @@ foreach($_REQUEST as $k=>$v){
 $mod = $_REQUEST['mod']; # which mod is requested?
 $act = $_REQUEST['act']; # what act needs to do?
 if($mod == ""){
-  $mod = "index";    
+  $mod = "index";
 }
 */
 
@@ -106,16 +106,16 @@ $paraCount = count($paraArr);
 for($i=0; $i<$paraCount; $i++){
 	if($paraArr[$i] == $entry_tag){
 		$found_entry = 1;
-	}	
+	}
 	else{
 		if($found_entry == 1 && $paraArr[$i] != ''){
-			$_REQUEST[$paraArr[$i]] = $paraArr[++$i];		
+			$_REQUEST[$paraArr[$i]] = $paraArr[++$i];
 			$query_string .= $paraArr[$i-1]."=".$paraArr[$i].'&';
 		}
 	}
 }
 if($query_string != ''){ $query_string = substr($query_string, 0, strlen($query_string)-1); }
-$_SERVER['REQUEST_URI'] = $_SERVER['SCRIPT_NAME']; 
+$_SERVER['REQUEST_URI'] = $_SERVER['SCRIPT_NAME'];
 $_SERVER['QUERY_STRING'] = $query_string;
 
 $url = $rtvdir.'/'.$entry_tag;
@@ -131,7 +131,7 @@ if($isdbg){
       }
     }
 	else{
-		$sid = str_replace('<', '&lt;', $sid);	
+		$sid = str_replace('<', '&lt;', $sid);
 	}
     $url .= "/sid/".$sid;
 }

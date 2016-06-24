@@ -412,205 +412,191 @@ class WebApp implements WebAppInterface{
 
     //- read an object of file or http post|get
     //- by wadelau, Fri May  6 18:57:17 CST 2016
-	//- $args: 'target', 'method', 'parameter', and so on....
-	//- http://ufqi.com/blog/gwa2-add-read-write-object-201605/
+    //- $args: 'target', 'method', 'parameter', and so on....
+    //- http://ufqi.com/blog/gwa2-add-read-write-object-201605/
     public function readObject($type, $args){
-
-	    $obj = '';
-
-	    if($type == 'cache:'){
-			//- cache service
-			$obj = $this->cachea->get($args['key']);
-			if(!$obj[0]){
-				$obj = array(true, $obj[1]);
-			}
-			else{
-				$obj = array(false, array('errorcode'=>1606140931, 'errordesc'=>$this->toString($obj)));
-			}
-		}
-		else if($type == 'file:'){
-		    //-- local or network file system
-		    $obj = file_get_contents($args['target']);
-			if($obj !== false){
-				$obj = array(true, array('content'=>$obj));	
-			}
-			else{
-				$obj = array(false, 
-					array('errorcode'=>'1605071131', 
-						'errordesc'=>'file:['.$args['target'].'] read failed.'
-					)
-				);
-			}
-	    }
-	    else if($type == 'url:'){
-
-		    //-- http(s) request
-		    if($args['method'] == 'post'){
-			    //- curl or fsockopen, todo
-			    //- or file_get_contents with  stream_context_create() 
-				$header = '';
-				if(is_array($args['header'])){
-					foreach($args['header'] as $k=>$v){
-						$header .= "$k: $v\r\n";	
-					}	
-				}
-			    $reqContext = stream_context_create(array('http'=>array('method'=>'POST', 
-								'header'=>$header,
-								'content'=>http_build_query($args['parameters'])
-							)
-						)
-					); # $args: 'method', 'header', 'content'...
-				$obj = file_get_contents($args['target'], false, $reqContext);
-				if($obj !== false){
-			    	$obj = array(true, array('content'=>$obj, 'headers'=>$http_response_header));
-				}
-				else{
-					$obj = array(false, 
-						array('errorcode'=>'1605071139', 
-							'errordesc'=>'file:['.$args['target'].'] read failed. response header:['.$http_response_header.']'
-						)
-					);	
-				}
-		    }
-		    else{
-			    //- http(s) get or not specified
-			    $obj = file_get_contents($args['target'].'?'.http_build_query($args['parameter']));
-				if($obj !== false){
-			    	$obj = array(true, array('content'=>$obj, 'headers'=>$http_response_header));
-				}
-				else{
-					$obj = array(false, 
-						array('errorcode'=>'1605071140', 
-							'errordesc'=>'file:['.$args['target'].'] read failed. response header:['.$http_response_header.']'
-						)
-					);	
-				}
-		    }
-	    }
-	    else{
-		    $obj = array(false, 
-			    	array('errorcode'=>'1605071049', 
-			    	'errordesc'=>'Unsupported objecttype:['.$type.']'
-		    	)
-	    	);
-	    }
-
-	    return $obj;
-
-    } 
-
-	//- write to an object of file or http post
+    
+        $obj = '';
+    
+        if($type == 'file:'){
+            //-- local or network file system
+            $obj = file_get_contents($args['target']);
+            if($obj !== false){
+                $obj = array(true, array('content'=>$obj));
+            }
+            else{
+                $obj = array(false,
+                        array('errorcode'=>'1605071131',
+                                'errordesc'=>'file:['.$args['target'].'] read failed.'
+                        )
+                );
+            }
+        }
+        else if($type == 'url:'){
+            //-- http(s) request
+            if($args['method'] == 'post'){
+                //- curl or fsockopen, todo
+                //- or file_get_contents with  stream_context_create()
+                $header = '';
+                if(is_array($args['header'])){
+                    foreach($args['header'] as $k=>$v){
+                        $header .= "$k: $v\r\n";
+                    }
+                }
+                $paraStr = '';
+                if($args['parameter']){
+                    $paraStr = http_build_query($args['parameter']);
+                }
+                $header .= "Content-Length: ".strlen($paraStr)."\n";
+                #debug(__FILE__.": header:[$header]");
+                $reqContext = stream_context_create(array('http'=>array('method'=>'POST',
+                                                                'header'=>$header,
+                                                                'content'=> $paraStr ))
+                        ); # $args: 'method', 'header', 'content'...
+                $obj = file_get_contents($args['target'], false, $reqContext);
+                if($obj !== false){
+                    $obj = array(true, array('content'=>$obj, 'header'=>$http_response_header));
+                }
+                else{
+                    $obj = array(false,
+                            array('errorcode'=>'1605071139',
+                                    'errordesc'=>'file:['.$args['target'].'] read failed. response header:['.$http_response_header.']'
+                            )
+                    );
+                }
+            }
+            else{
+                //- http(s) get or not specified
+                if($args['parameter']){
+                    $args['target'] .= (inString('?', $args['target']) ? '&' : '?');
+                    $args['target'] .= http_build_query($args['parameter']);
+                }
+                $obj = file_get_contents($args['target']);
+                if($obj !== false){
+                    $obj = array(true, array('content'=>$obj, 'header'=>$http_response_header));
+                }
+                else{
+                    $obj = array(false,
+                            array('errorcode'=>'1605071140',
+                                    'errordesc'=>'file:['.$args['target'].'] read failed. response header:['.$http_response_header.']'
+                            )
+                    );
+                }
+            }
+        }
+        else{
+            $obj = array(false,
+                    array('errorcode'=>'1605071049',
+                            'errordesc'=>'Unsupported objecttype:['.$type.']'
+                    )
+            );
+        }
+    
+        return $obj;
+    
+    }
+    
+    //- write to an object of file or http post
     //- by wadelau, Sat May  7 11:14:47 CST 2016
-	# $args, 'target', 'method', 'content'.... 
+    # $args, 'target', 'method', 'content'....
     public function writeObject($type, $args){
-
-	    $obj = '';
-
-		if($type == 'cache:'){
-			//- cache service
-			if(is_null($args['value'])){
-				$obj = $this->cachea->rm($args['key']);
-			}
-			else{
-				#print_r($args);
-				if($args['expire']){
-					$obj = $this->cachea->set($args['key'], $args['value'], $args['expire']);
-				}
-				else {
-					$obj = $this->cachea->set($args['key'], $args['value']);
-				}
-			}
-			if(!$obj[0]){
-				$obj = array(true, $obj[1]);
-			}
-			else{
-				$obj = array(false, array('errorcode'=>1606140930, 'errordesc'=>$this->toString($obj)));
-			}
-		}
-		else if($type == 'file:'){
-		    //-- local or network file system
-			# test dir
-			$dirfile = $args['target'];
-			$parts = explode('/', $dirfile);
-			$file = array_pop($parts);
-			$dir = '';
-			foreach($parts as $part){
-				if(!is_dir($dir .= "/$part")){ mkdir($dir); }
-			}
-
-			# write data
-			debug($dir.'/'.$file);
-			$flags = 0;
-			if($args['islock']){ $flags = $flags |  LOCK_EX; }
-			if($args['isappend']){ $flags = $flags | FILE_APPEND; }
-			$obj = file_put_contents($dir.'/'.$file, $args['content'], $flags);
-			if($obj !== false){
-				$obj = array(true, $obj);	
-			}
-			else{
-				$obj = array(false, 
-					array('errorcode'=>'1605071211', 
-						'errordesc'=>'file:['.$args['target'].'] write failed. response header:['.$http_response_header.']'
-						)
-					);
-			}
-
-	    }
-	    else if($type == 'url:'){
-		    //-- http(s) request
-		    if($args['method'] == 'post'){
-			    //- curl or fsockopen, todo
-			    //- or file_get_contents with  stream_context_create() 
-				$header = '';
-				if(is_array($args['header'])){
-					foreach($args['header'] as $k=>$v){
-						$header .= "$k: $v\r\n";	
-					}	
-				}
-			    $reqContext = stream_context_create(array('http'=>array('method'=>'POST', 
-								'header'=>$header,
-								'content'=>http_build_query($args['parameters'])
-							)
-						)
-					); # $args: 'method', 'header', 'content'...
-				$obj = file_get_contents($args['target'], false, $reqContext);
-				if($obj !== false){
-			    	$obj = array(true, array('content'=>$obj, 'headers'=>$http_response_header));
-				}
-				else{
-					$obj = array(false, 
-						array('errorcode'=>'1605071212', 
-							'errordesc'=>'url:['.$args['target'].'] write failed. response header:['.$http_response_header.']'
-						)
-					);	
-				}
-		    }
-		    else{
-			    //- http(s) get or not specified
-			    $obj = file_get_contents($args['target'].'?'.http_build_query($args['parameter']));
-				if($obj !== false){
-			    	$obj = array(true, array('content'=>$obj, 'headers'=>$http_response_header));
-				}
-				else{
-					$obj = array(false, 
-						array('errorcode'=>'1605071213', 
-							'errordesc'=>'url:['.$args['target'].'] write failed. response header:['.$http_response_header.']'
-						)
-					);	
-				}
-		    }
-	    }
-	    else{
-		    $obj = array(false, 
-			    	array('errorcode'=>'1605071215', 
-			    	'errordesc'=>'Unsupported objecttype:['.$type.']'
-		    	)
-	    	);
-	    }
-
-	    return $obj;
-
-    } 
+    
+        $obj = '';
+    
+        if($type == 'file:'){
+            //-- local or network file system
+            # test dir
+            $dirfile = $args['target'];
+            $parts = explode('/', $dirfile);
+            $file = array_pop($parts);
+            $dir = '';
+            foreach($parts as $part){
+                if(!is_dir($dir .= "/$part")){ mkdir($dir); }
+            }
+    
+            # write data
+            debug($dir.'/'.$file);
+            $flags = 0;
+            if($args['islock']){ $flags = $flags |  LOCK_EX; }
+            if($args['isappend']){ $flags = $flags | FILE_APPEND; }
+            $obj = file_put_contents($dir.'/'.$file, $args['content'], $flags);
+            if($obj !== false){
+                $obj = array(true, $obj);
+            }
+            else{
+                $obj = array(false,
+                        array('errorcode'=>'1605071211',
+                                'errordesc'=>'file:['.$args['target'].'] write failed. response header:['.$http_response_header.']'
+                        )
+                );
+            }
+    
+        }
+        else if($type == 'url:'){
+            //-- http(s) request
+            if($args['method'] == 'post'){
+                //- curl or fsockopen, todo
+                //- or file_get_contents with  stream_context_create()
+                $header = '';
+                if(is_array($args['header'])){
+                    foreach($args['header'] as $k=>$v){
+                        $header .= "$k: $v\r\n";
+                    }
+                }
+                $paraStr = '';
+                if($args['parameter']){
+                    $paraStr = http_build_query($args['parameter']);
+                }
+                $header .= "Content-Length: ".strlen($paraStr)."\n";
+                #debug(__FILE__.": header:[$header]");
+                $reqContext = stream_context_create(array('http'=>array('method'=>'POST',
+                        'header'=>$header,
+                        'content'=>http_build_query($args['parameter'])
+                )
+                )
+                        ); # $args: 'method', 'header', 'content'...
+                        $obj = file_get_contents($args['target'], false, $reqContext);
+                        if($obj !== false){
+                            $obj = array(true, array('content'=>$obj, 'header'=>$http_response_header));
+                        }
+                        else{
+                            $obj = array(false,
+                                    array('errorcode'=>'1605071212',
+                                            'errordesc'=>'url:['.$args['target'].'] write failed. response header:['.$http_response_header.']'
+                                    )
+                            );
+                        }
+            }
+            else{
+                //- http(s) get or not specified
+                if($args['parameter']){
+                    $args['target'] .= (inString('?', $args['target']) ? '&' : '?');
+                    $args['target'] .= http_build_query($args['parameter']);
+                }
+                $obj = file_get_contents($args['target']);
+                if($obj !== false){
+                    $obj = array(true, array('content'=>$obj, 'header'=>$http_response_header));
+                }
+                else{
+                    $obj = array(false,
+                            array('errorcode'=>'1605071213',
+                                    'errordesc'=>'url:['.$args['target'].'] write failed. response header:['.$http_response_header.']'
+                            )
+                    );
+                }
+            }
+        }
+        else{
+            $obj = array(false,
+                    array('errorcode'=>'1605071215',
+                            'errordesc'=>'Unsupported objecttype:['.$type.']'
+                    )
+            );
+        }
+    
+        return $obj;
+    
+    }
 
 	//-
 	public function setMyId($myId){

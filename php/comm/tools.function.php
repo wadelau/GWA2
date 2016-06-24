@@ -16,36 +16,36 @@ function getSmtTpl($file, $act){
     return $smttpl = $scriptname.'_'.($act==''?'main':$act).'.html';
 }
 
-/** 
- * Send a POST requst using cURL, refer to http://www.php.net/manual/en/function.curl-exec.php 
- * @param string $url to request 
- * @param array $post values to send 
- * @param array $options for cURL 
- * @return string 
+/**
+ * Send a POST requst using cURL, refer to http://www.php.net/manual/en/function.curl-exec.php
+ * @param string $url to request
+ * @param array $post values to send
+ * @param array $options for cURL
+ * @return string
   !!! This can be replaced with $WebApp->setBy('url:', array('target'=>$url, 'parameter'=>$post)); !!!
  ! since Sat May  7 13:11:15 CST 2016, by wadelau
- */ 
-function curlPost($url, array $post = NULL, array $options = array()){ 
-    $defaults = array( 
-            CURLOPT_POST => 1, 
-            CURLOPT_HEADER => 0, 
-            CURLOPT_URL => $url, 
-            CURLOPT_FRESH_CONNECT => 1, 
-            CURLOPT_RETURNTRANSFER => 1, 
-            CURLOPT_FORBID_REUSE => 1, 
-            CURLOPT_TIMEOUT => 4, 
-            CURLOPT_POSTFIELDS => http_build_query($post) 
-            ); 
+ */
+function curlPost($url, array $post = NULL, array $options = array()){
+    $defaults = array(
+            CURLOPT_POST => 1,
+            CURLOPT_HEADER => 0,
+            CURLOPT_URL => $url,
+            CURLOPT_FRESH_CONNECT => 1,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_FORBID_REUSE => 1,
+            CURLOPT_TIMEOUT => 4,
+            CURLOPT_POSTFIELDS => http_build_query($post)
+            );
 
-    $ch = curl_init(); 
-    curl_setopt_array($ch, ($options + $defaults)); 
-    if( ! $result = curl_exec($ch)) 
+    $ch = curl_init();
+    curl_setopt_array($ch, ($options + $defaults));
+    if( ! $result = curl_exec($ch))
     {
-        trigger_error(curl_error($ch)); 
-    } 
-    curl_close($ch); 
-    return $result; 
-} 
+        trigger_error(curl_error($ch));
+    }
+    curl_close($ch);
+    return $result;
+}
 
 /**
  * send mail by system built-in sendmail commands
@@ -68,8 +68,8 @@ function sendMail($to,$subject,$body, $from='', $local=0){
 		$mailstr .= $body.'\n';
 
 		$tmpfile = "/tmp/".GConf::get('agentalias').".user.reg.mail.tmp";
-		system('/bin/echo -e "'.$mailstr.'" > '.$tmpfile);  
-		system('/bin/cat '.$tmpfile.' | /usr/sbin/sendmail -t &');  
+		system('/bin/echo -e "'.$mailstr.'" > '.$tmpfile);
+		system('/bin/cat '.$tmpfile.' | /usr/sbin/sendmail -t &');
 
 		$rtnarr[0] = true;
     
@@ -96,7 +96,7 @@ function sendMail($to,$subject,$body, $from='', $local=0){
         
         $rtnarr[0] = $mail->sendMail($to, $from, $subject, $body, 'HTML');
 
-    } 
+    }
 
     return $rtnarr;
 }
@@ -142,7 +142,7 @@ function mkUrl($file, $_REQU){
     }
 
     $url = substr($url, 0, strlen($url)-1);
-    #print __FILE__.": url:[$url]\n"; 
+    #print __FILE__.": url:[$url]\n";
     return $url;
 
 }
@@ -225,7 +225,7 @@ function alert($str,$type="back",$topWindow="",$timeout=100){
 	exit();
 }
 
-/** 
+/**
  * URL redirect, remedy by wadelau@ufqi.com 09:52 Tuesday, November 24, 2015
  */
 function redirect($url, $time=0, $msg='') {
@@ -252,12 +252,12 @@ function redirect($url, $time=0, $msg='') {
         if (0 === $time) {
             header("Location: " . $url);
 			print $hideMsg;
-        } 
-        else {  
+        }
+        else {
 			print $hideMsg;
         }
         exit();
-    } 
+    }
     else{
         print $hideMsg;
         exit();
@@ -270,12 +270,12 @@ function isImg($file){
 	if($file != ''){
 		$tmpfileext = substr($file, strlen($file)-4);
 		if(in_array($tmpfileext,array("jpeg",".jpg",".png",".gif",".bmp"))){
-			$isimg = 1;    
-		}   
-	}       
+			$isimg = 1;
+		}
+	}
 	return $isimg;
 
-}  
+}
 
 function isEmail($email){
     if(!preg_match('|^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]{2,})+$|i', $email)){
@@ -302,12 +302,12 @@ function getIdList($iarray, $ikey){
 
 # write log in a simple approach
 # by wadelau@ufqi.com, Sat Oct 17 17:38:26 CST 2015
-# e.g. 
-# debug($user); 
+# e.g.
+# debug($user);
 # debug($user, 'userinfo');  # with tag 'userinfo'
 # debug($user, 'userinfo', 1); # with tag 'userinfo' and in backend and frontend
 function debug($obj, $tag='', $output=null){
-	$caller = debug_backtrace();	
+	$caller = debug_backtrace();
 	if(is_array($obj) || is_object($obj)){
 		if(isset($user)){
 			$s .= $user->toString($obj);
@@ -323,14 +323,14 @@ function debug($obj, $tag='', $output=null){
 	if($tag != ''){
 		$s = " $tag:[$s]";
 	}
-	$callidx = count($caller) - 2; 
+	$callidx = count($caller) - 2;
 	$s .= ' func:['.$caller[$callidx]['function'].'] file:['.$caller[$callidx]['file'].'] line:['.$caller[$callidx]['line'].']';
 
 	$s = "[".date("Y-m-d-H:i:s")."] ".$s."\n";
 	
 	if($output != null){
 		if($output == 0){ # in backend only
-			error_log($s); 
+			error_log($s);
 		}
 		else if($output == 1){ # in backend and frontend
 			error_log($s);
@@ -339,10 +339,10 @@ function debug($obj, $tag='', $output=null){
 		else if($output == 2){ # in backend and frontend with backtrace
 			$s .= " backtrace:[".serialize($caller)."]";
 			error_log($s);
-			print $s;	
+			print $s;
 		}
 	}
-	else{ 
+	else{
 		error_log($s); # default mode
 	}
 	
@@ -361,13 +361,13 @@ function getIp() {
 	else if (@getenv( "REMOTE_ADDR" )){ $ip = getenv( "REMOTE_ADDR" ); }
 	else{ $ip = "Unknown";}
 
-	if (($ip == "Unknown" or $ip == "127.0.0.1" 
-			or strpos( $ip, "172.31." ) === 0) 
+	if (($ip == "Unknown" or $ip == "127.0.0.1"
+			or strpos( $ip, "172.31." ) === 0)
 		and @$_SERVER["HTTP_X_REAL_IP"]){
 		
 		$ip = $_SERVER["HTTP_X_REAL_IP"];
 	}
-	if (($ip == "Unknown" or $ip == "127.0.0.1" or strpos( $ip, "172.31." ) === 0) 
+	if (($ip == "Unknown" or $ip == "127.0.0.1" or strpos( $ip, "172.31." ) === 0)
 			and @$_SERVER["HTTP_X_FORWARDED_FOR"]) {
 		
 		$ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
@@ -383,37 +383,75 @@ function getIp() {
 	
  }
  
-# get data from input and filter as expected
-# added by wadelau@ufqi.com
-# 18:11 20 June 2016
-function getInput($src, $k=null, $defaultValue=null){ # src=$_RQUEST, $_SERVER, $_COOKIE, $_SESSION, php://input
-	
-	$rtn = '';
-	
-	if(!$src){
-		$src = $_REQUEST;
-	}
-	if(!$k){
-		$k = 'all';
-	}
-	
-	if($k == 'all'){
-		$rtn = serialize($src);
-	}
-	else{
-		$rtn = $src[$k];
-	}
-	
-	if(!$rtn && $defaultValue != null){
-		$rtn = $defaultValue;
-	}
-	
-	$rtn = str_replace('<', '&lt;', $rtn);
-	$rtn = str_replace('"', '&quot;', $rtn);
-	
-	
-	return $rtn;
-	
-}
+ // Wht: Web and/or HTTP Tools
+ // get/set data from input and/or out and filter as expected
+ // added by wadelau@ufqi.com
+ // 19:11 20 June 2016
+ class Wht {
+ 
+ 	private  static $hmt = array(); # container of variables for set
+ 
+ 	# get input from src
+ 	public static function get($src, $k = null, $defaultValue = null) {
+ 		// src=$_RQUEST, $_SERVER, $_COOKIE, $_SESSION, php://input, ...
+ 		$rtn = '';
+ 
+ 		if (! $src) {
+ 			$src = $_REQUEST;
+ 		}
+ 		if (! $k) {
+ 			$k = 'all';
+ 		}
+ 
+ 		if ($k == 'all') {
+ 			$rtn = serialize ( $src );
+ 		}
+ 		else {
+ 			$rtn = $src [$k];
+ 		}
+ 
+ 		if (! $rtn && $defaultValue != null) {
+ 			$rtn = $defaultValue;
+ 		}
+ 
+ 		$rtn = str_replace ( '<', '&lt;', $rtn );
+ 		$rtn = str_replace ( '"', '&quot;', $rtn );
+ 
+ 		return $rtn;
+ 
+ 	}
+ 
+ 	# set output to dest
+ 	public static function set($dest, $k, $v) {
+ 		// dest=setHeader, setStatus, setCookie ...
+ 
+ 		self::$hmt['set'][$dest] = array($k, $v);
+ 
+ 	}
+ 
+ 	# flush set, usually at the end of a request handler
+ 	public static function flushSet(){
+ 
+ 		foreach (self::$hmt['set'] as $tk=>$tv){
+ 				
+ 			$dest = $tk; $k = $tv[0]; $v = $tv[1];
+ 			if($dest == 'setheader'){
+ 				header($k, $v);
+ 			}
+ 			else if($dest == 'setstatus'){
+ 				http_response_code($v);
+ 			}
+ 			else if($dest == 'setcookie'){
+ 				setcookie($k, $v['value'], $v['expire']);
+ 			}
+ 			else{
+ 				debug(__FILE__.": Unknown set:[$dest]");
+ 			}
+ 
+ 		}
+ 
+ 	}
+ 
+ }
  
  
