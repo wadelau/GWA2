@@ -1,0 +1,9 @@
+
+####
+-GWA2 Updates @16:45 17 June 2016
+
++ methods override examples
+	1) offers, set-> shorten one of fields to a limited length;
+	2) -gMIS, set-> test tbl whether its starts with a tbl prefix or not
+	
+	

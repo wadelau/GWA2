@@ -1,6 +1,6 @@
 <?php
 
-# Run php script from cmd line support without web server 
+# Run php script from cmd line support without web server
 # By wadelau, 20:07 26 May 2016
 # This func is a PHP-specified, if deploy -GWA2 in other programming languages, e.g. Java, Python, Perl, the module should also be rewrited according to new requirements.
 
@@ -28,12 +28,19 @@ if(1){ # in some scenarios, this should be set as 0 to disable this function glo
 				if(count($e)==2){
 					$_REQUEST[$e[0]]=$e[1];
 				}
-				else{    
+				else{
 					$_REQUEST[$e[0]]=0;
 				}
 			}
 		}
-		print_r($_REQUEST);
+		#print_r($_REQUEST);
+		
+		# set utf-8 for environment
+		$myCharset = 'UTF-8';
+		mb_internal_encoding($myCharset);
+		mb_http_output($myCharset);
+		mb_http_input($myCharset);
+		mb_regex_encoding($myCharset);
 		
 		# $_SERVER
 		empty( $_SERVER['HTTP_HOST'] ) && $_SERVER['HTTP_HOST'] = 'localhost';

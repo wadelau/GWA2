@@ -16,11 +16,14 @@ if(true){ # something displayed in homepage only, 09:55 11 June 2016
 		
 	}
 	else{
+		
 		$data['resp'] = "Unknown act:[$act].";
 		
 	}
 
 }
+
+$data['time'] = date("Y-m-d-H:i:s", time());
 
 # tpl
 
