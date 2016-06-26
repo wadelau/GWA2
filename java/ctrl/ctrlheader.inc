@@ -9,5 +9,7 @@ outx = (StringBuffer)prtPage.get("outx");
 data = (HashMap)prtPage.get("data");
 mod = (String)prtPage.get("mod");
 act = (String)prtPage.get("act");
+smttpl = (String)prtPage.get("smttpl");
+fmt = (String)prtPage.get("fmt");
 
 %>

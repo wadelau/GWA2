@@ -16,7 +16,10 @@ outx.append("\n\tcomm/header: requestURL:["+request.getRequestURL()+"] servletPa
 
 //- tpl engine
 //- todo: smarty4java
-fmt = WTool.get(request, "fmt");
+
+smttpl = "";
+
+fmt = Wht.get(request, "fmt");
 
 //- request headers
 if(false){

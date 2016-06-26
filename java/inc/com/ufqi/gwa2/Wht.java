@@ -1,5 +1,5 @@
 /*
- * @abstract: HTTPTools.java, some utils in common in the sys
+ * @abstract: Web and/or HTTP Tools, some utils in common in the sys
  * @author: wadelau@hotmail.com
  * @since: 2009-01-09 09:21
  * @update: Fri Jun 10 10:57:21 CST 2016, revised for -GWA2
@@ -12,7 +12,7 @@ package com.ufqi.gwa2;
 import javax.servlet.http.HttpServletRequest;
 
 
-public final class WTool{
+public final class Wht{
 
 	/*
 	 * get,stead of request.getParameter 
@@ -22,7 +22,7 @@ public final class WTool{
 	 */
 	public static String get(HttpServletRequest request, String field){
 		
-		return WTool._enSafe(request.getParameter(field));
+		return Wht._enSafe(request.getParameter(field));
 
 	}
 
@@ -34,7 +34,7 @@ public final class WTool{
 	 */
 	public static String getHeader(HttpServletRequest request, String field){
 
-		return WTool._enSafe(request.getHeader(field));	
+		return Wht._enSafe(request.getHeader(field));	
 
 	}
 
@@ -56,7 +56,7 @@ public final class WTool{
 	 */
 	public static String getQuery(HttpServletRequest request){
 
-		return WTool._enSafe(request.getQueryString());	
+		return Wht._enSafe(request.getQueryString());	
 
 	}
 
@@ -67,6 +67,7 @@ public final class WTool{
 	
 		s = s==null ? "" : s;
 		s = s.replaceAll("<", "&lt;");
+		s = s.replaceAll("\"", "&quot;");
 
 		return s;
 
@@ -104,7 +105,7 @@ public final class WTool{
 
 		boolean matched=false;
 		String sep = ",";
-		matched = WTool.inString(needle, haystack, sep);
+		matched = Wht.inString(needle, haystack, sep);
 
 		return matched;
 
@@ -122,8 +123,8 @@ public final class WTool{
 			return matched; 
 		}
 		else{
-			if(sep == null || sep.equals("")){
-				sep = ",";	
+			if(sep == null){
+				sep = ""; //- String.indexOf	
 			}	
 			if(!haystack.startsWith(sep)){
 				haystack = sep + haystack;

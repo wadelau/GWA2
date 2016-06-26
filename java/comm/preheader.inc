@@ -2,7 +2,7 @@
 //-  preheader, embedded in all
 %><%@page import="
 java.util.Date, java.util.HashMap,
-com.ufqi.gwa2.WTool,
+com.ufqi.gwa2.Wht,
 " pageEncoding="utf-8"%><% 
 
 

@@ -28,5 +28,6 @@ interface WebAppInterface{
 	function getLang();
 	function checkDB();
 	*/
+	
 }
 ?>

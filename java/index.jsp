@@ -10,6 +10,9 @@
 //-  entry header
 %><%@include file="./comm/header.inc"%><%
 
+%><%@page import="
+java.util.Map, java.util.Iterator
+"%><%
 
 //- main logic
 mod = request.getParameter("mod");
@@ -50,6 +53,8 @@ if((new File(realModfs)).exists()){
 	prtPage.put("outx", outx);
 	prtPage.put("mod", mod);
 	prtPage.put("act", act);
+	prtPage.put("smttpl", smttpl);
+	prtPage.put("fmt", fmt);
 
 	request.setAttribute("prtPage", prtPage);
 
@@ -58,6 +63,49 @@ if((new File(realModfs)).exists()){
 
 	//- restore runtime data into response
 	prtPage = (HashMap)request.getAttribute("prtPage");
+
+	//- response headers from child page
+	if(true){
+		Iterator entries = prtPage.entrySet().iterator();
+		while (entries.hasNext()) {
+			Map.Entry entry = (Map.Entry) entries.next();
+			String key = (String)entry.getKey();
+			if(key.indexOf("response") >= 0){
+				Object value = entry.getValue();
+				outx.append("Key = " + key + ", Value = " + value);
+				String[] setArr = key.split("::"); 
+				if(setArr[1].equals("setHeader")){ // prtPage.put("response::setHeader::Location", "/?mod=user&act=signin");
+					response.setHeader(setArr[2], (String)value);
+				}
+				else if(setArr[1].equals("addCookie")){ // prtPage.put("response::addCookie::", "COOKIE_BODY");
+					response.addCookie((javax.servlet.http.Cookie)value);
+				}
+				else if(setArr[1].equals("sendError")){ // prtPage.put("response::sendError::", "HTTP_Error_CODE");
+					response.sendError((int)value);
+				}
+				else if(setArr[1].equals("setStatus")){ // prtPage.put("response::setStatus::", "HTTP_Error_CODE");
+					response.sendError((int)value);
+				}
+			}
+			else{
+				//out.println("not resp Key = " + key );
+			}
+		}
+	}
+
+	//-- test for extra validator
+	if(false){
+		java.util.Collection eNames = response.getHeaderNames();
+		java.util.Iterator ei = eNames.iterator();
+		while (ei.hasNext()) {
+			String name = (String) ei.next();
+			String value = (String)(response.getHeader(name));
+
+			outx.append("\nresponse: k:["+name+"] v:["+value+"]\n");
+
+		}
+	}
+
 	
 }
 else{
