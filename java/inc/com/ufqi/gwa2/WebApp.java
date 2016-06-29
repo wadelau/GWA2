@@ -16,6 +16,11 @@ import java.util.HashMap;
 
 
 import com.ufqi.gwa2.WebAppInterface;
+import com.ufqi.gwa2.Config;
+import com.ufqi.gwa2.Dba; //- db admin
+import com.ufqi.gwa2.Sessiona; //- session admin
+import com.ufqi.gwa2.Cachea; //- cache admin
+import com.ufqi.gwa2.Filea;
 
 
 public class WebApp implements WebAppInterface{
