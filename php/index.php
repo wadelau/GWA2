@@ -3,20 +3,21 @@
 
 # cli
 if(1){ # in some scenarios, this should be set as 0 to disable this function globally.
+	error_reporting(E_ALL & ~E_NOTICE);
 	if($argv && $argc > 0){ 
 		# path
 		ini_set('include_path', get_include_path(). PATH_SEPARATOR . dirname($_SERVER['PHP_SELF']));
 		ini_set('max_execution_time', 0);
 		
 		chdir(dirname(__FILE__));
-		include("./comm/cli.inc");
+		include("./comm/cmdline.inc.php");
 		chdir(dirname(__FILE__));
 
 	}	
 }
 
 # header.inc file
-include("./comm/header.inc");
+include("./comm/header.inc.php");
 
 # main logic
 $mod = $_REQUEST['mod']; # which mod is requested?
@@ -44,7 +45,7 @@ if(true){
 }
 
 # footer.inc file
-include("./comm/footer.inc");
+include("./comm/footer.inc.php");
 
 # add more ---
 

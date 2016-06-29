@@ -15,7 +15,7 @@ if(true){
 	$conf['rtvdir'] 	= $rtvdir;
 	$conf['agentname'] 	= 'AGENT_NAME';
 	$conf['agentalias']	= 'AGENT_ALIAS';
-	$conf['smarty']		= $appdir.'/mod/Smarty-3.1.7/libs';
+	$conf['smarty']		= $appdir.'/mod/Smarty';
 
 	$conf['uploaddir']	= 'upld';
 	$conf['septag']		= '_J_A_Z_';
