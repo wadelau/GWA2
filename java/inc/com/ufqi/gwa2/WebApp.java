@@ -14,7 +14,6 @@ package com.ufqi.gwa2;
 
 import java.util.HashMap;
 
-
 import com.ufqi.gwa2.WebAppInterface;
 import com.ufqi.gwa2.Config;
 import com.ufqi.gwa2.Dba; //- db admin

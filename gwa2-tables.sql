@@ -17,7 +17,7 @@ CREATE TABLE `gwa2_fin_operatelogtbl` (
   `parenttype` char(32) NOT NULL DEFAULT '',
   `userid` int(11) NOT NULL DEFAULT '0',
   `actionstr` char(255) NOT NULL DEFAULT '',
-  `inserttime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `inserttime` datetime NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=386 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -34,7 +34,7 @@ CREATE TABLE `gwa2_info_grouptbl` (
   `groupname` char(32) NOT NULL DEFAULT '',
   `groupcode` char(32) NOT NULL DEFAULT '',
   `grouplevel` tinyint(1) NOT NULL DEFAULT '0',
-  `inserttime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `inserttime` datetime NOT NULL default CURRENT_TIMESTAMP,
   `operator` char(32) NOT NULL DEFAULT '',
   `state` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
@@ -57,8 +57,8 @@ CREATE TABLE `gwa2_info_usertbl` (
   `usergroup` tinyint(1) NOT NULL DEFAULT '0',
   `branchoffice` char(16) NOT NULL default '',
   `operatearea` char(255) NOT NULL DEFAULT '',
-  `inserttime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `updatetime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `inserttime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatetime` datetime NOT NULL on update CURRENT_TIMESTAMP,
   `status` tinyint(1) NOT NULL DEFAULT '1',
   `operator` char(32) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
@@ -83,7 +83,7 @@ CREATE TABLE `gwa2_useraccesstbl` (
   `accesstype` tinyint(1) NOT NULL DEFAULT '0',
   `operatelog` char(64) NOT NULL,
   `state` tinyint(1) NOT NULL DEFAULT '1',
-  `inserttime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `inserttime` datetime NOT NULL default CURRENT_TIMESTAMP,
   `memo` char(15) NOT NULL,
   `operator` char(6) NOT NULL,
   PRIMARY KEY (`id`),

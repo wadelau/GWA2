@@ -8,11 +8,8 @@
 // the application entry...
 
 //-  entry header
-%><%@include file="./comm/header.inc"%><%
+%><%@include file="./comm/header.inc.jsp"%><%
 
-%><%@page import="
-java.util.Map, java.util.Iterator
-"%><%
 
 //- main logic
 mod = request.getParameter("mod");
@@ -110,7 +107,7 @@ if((new File(realModfs)).exists()){
 }
 else{
 
-	//- no exist//- continue this
+	//- no exist//- continue this way
 	outx = new StringBuffer("\n/index: Unknown mod:["+mod+"] with act:["+act+"] modfs:["+modfs+"]. 1606110925.\n");	
 	//- #todo: log
 
@@ -119,12 +116,12 @@ else{
 //- something shared across the app, out of comm/header
 if(true){
 	
-	%><%@include file="./ctrl/include.jsp"%><%
+	%><%@include file="./ctrl/ctrl.inc.jsp"%><%
 
 }
 
 
 //- footer
-%><%@include file="./comm/footer.inc"%><%
+%><%@include file="./comm/footer.inc.jsp"%><%
 
 %>

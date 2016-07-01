@@ -4,12 +4,14 @@
  * noted by wadelau @ Fri Jun 17 06:46:42 CST 2016
  */
 
-%><%@include file="./ctrlheader.inc"%><%
+%><%@include file="./ctrlheader.inc.jsp"%><%
+
 
 //- main busi logic
 
 //- outx and data should added up and should not out print in the child pages
 outx.append("\nbgn: output in /ctrl/index. @"+(new java.util.Date())+"\n");
+
 
 act = act.equals("") ? "index" : act;
 
@@ -62,6 +64,6 @@ if(smttpl.equals("")){
 
 %><%
 
-%><%@include file="./ctrlfooter.inc"%><%
+%><%@include file="./ctrlfooter.inc.jsp"%><%
 
 %>
