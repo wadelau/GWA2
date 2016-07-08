@@ -19,11 +19,28 @@ public class User extends WebApp{
 	
 
 	//- constructor ?
+	public User(){
+	
+		dba = new Dba("");
+		this.setTbl("gwa2_info_usertbl");
+
+
+	}
 
 
 	public String hiUser(){
 	
-		return (String)this.get("iname") + ", Welcome!";
+		this.set("pagesize", 10);
+		this.set("email", "%lzx%");
+		this.set("email.2", "%163%");
+		this.set("realname", "%");
+		this.set("orderby", "id desc");
+		
+		HashMap userInfo = this.getBy("id, email, realname, updatetime", "(email like ?  or email like ?) and realname like ?");
+
+		userInfo.put("read-in-User", (new Date()));	
+
+		return (String)this.get("iname") + ", Welcome! "+ userInfo.toString();
 
 	}
 	

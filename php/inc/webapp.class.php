@@ -137,15 +137,15 @@ class WebApp implements WebAppInterface{
 	 */
 	function setBy($fields, $conditions){
 
+		$hm = array();
 		if(strpos($fields, ':') !== false){ # write to  file: or http(s): or cache
 			$hm = $this->writeObject($type=$fields, $args=$conditions);
 		}
 		else{
 			# write to db
 			$sql = "";
-			$hm = array();
 			$isupdate = 0;
-			if($this->getId() == ''){
+			if($this->getId() == '' && ($conditions == null || $args == '')){
 				$sql = "insert into ".$this->getTbl()." set ";
 			}
 			else{

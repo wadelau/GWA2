@@ -34,7 +34,7 @@ if(false){
 }
 
 //- system env
-if(true){
+if(false){
 	java.util.Properties p = new java.util.Properties();
 	p = System.getProperties();
 	HashMap m = new HashMap(p);

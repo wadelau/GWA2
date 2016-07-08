@@ -15,14 +15,29 @@
 HashMap hmconf = new HashMap();
 
 //- db info
+hmconf.put("dbhost", "localhost");
+hmconf.put("dbport", 3306);
+hmconf.put("dbuser", "bizsft");
+
+hmconf.put("dbpassword", "bizsftJan102016");
+hmconf.put("dbname", "bizsftdb");
+hmconf.put("dbdriver", "MYSQL"); //- MYSQL, SQLSERVER, ORACLE, INFORMIX, SYBASE
+hmconf.put("db_enable_utf8_affirm", false);
+
 hmconf.put("dbhost", "192.168.0.241");
 hmconf.put("dbport", 3306);
 hmconf.put("dbuser", "gwa2dbuser");
 
 hmconf.put("dbpassword", "gwa2dbpwd");
 hmconf.put("dbname", "gwa2");
-hmconf.put("dbdriver", "mysql");
+hmconf.put("dbdriver", "MYSQL"); //- MYSQL, SQLSERVER, ORACLE, INFORMIX, SYBASE
 hmconf.put("db_enable_utf8_affirm", false);
+
+hmconf.put("enable_cache", false);
+hmconf.put("cachehost", "");
+hmconf.put("cacheport", "");
+hmconf.put("cachedriver", "MEMCACHEX"); //- REDISX, XCACHEX
+hmconf.put("cacheexpire", 30*60);
 
 
 //- init config

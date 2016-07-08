@@ -12,7 +12,7 @@
 
 
 //- main logic
-mod = request.getParameter("mod");
+mod = Wht.get(request, "mod");
 act = request.getParameter("act");
 if(mod == null){ mod = ""; }else{ mod = mod.trim(); }
 if(act == null){ act = ""; }else{ act = act.trim(); }

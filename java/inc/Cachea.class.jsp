@@ -26,6 +26,11 @@ public final class Cachea { //- cache administrator
 	
 	//-
 	//- @todo
+	public Cachea(String conf){
+		
+		//- @todo
+		
+	}
 	
 	
 	

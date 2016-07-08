@@ -108,7 +108,7 @@ public final static class Wht{
 		boolean matched=false;
 		String sep = ",";
 		matched = Wht.inString(needle, haystack, sep);
-
+		//System.out.println("Wht.inString: needle:["+needle+"] hays:["+haystack+"] sep:["+sep+"] matched:["+matched+"]");
 		return matched;
 
 	}
