@@ -1,8 +1,7 @@
 <%
 /**
  #
- # This class, mysql.class, and all of db drivers' classes are working with dba.class, 
- #  which is coordinator between db and objects.
+ # This class, Config.class, holding all configures across the app, 
  # Rewrited by Wadelau@ufqi.com, 18:35 21 May 2016
  * Ported into Java by wadelau@ufqi.com on June 28, 2016
  # 
@@ -12,37 +11,47 @@
 
 //- exec
 
-HashMap hmconf = new HashMap();
+if(true){
 
-//- db info
-hmconf.put("dbhost", "localhost");
-hmconf.put("dbport", 3306);
-hmconf.put("dbuser", "bizsft");
+	HashMap hmconf = new HashMap();
 
-hmconf.put("dbpassword", "bizsftJan102016");
-hmconf.put("dbname", "bizsftdb");
-hmconf.put("dbdriver", "MYSQL"); //- MYSQL, SQLSERVER, ORACLE, INFORMIX, SYBASE
-hmconf.put("db_enable_utf8_affirm", false);
+	//- db info
+	hmconf.put("dbhost", "localhost");
+	hmconf.put("dbport", 3306);
+	hmconf.put("dbuser", "");
 
-hmconf.put("dbhost", "192.168.0.241");
-hmconf.put("dbport", 3306);
-hmconf.put("dbuser", "gwa2dbuser");
+	hmconf.put("dbpassword", "");
+	hmconf.put("dbname", "");
+	hmconf.put("dbdriver", "MYSQL"); //- MYSQL, SQLSERVER, ORACLE, INFORMIX, SYBASE
+	hmconf.put("db_enable_utf8_affirm", false);
 
-hmconf.put("dbpassword", "gwa2dbpwd");
-hmconf.put("dbname", "gwa2");
-hmconf.put("dbdriver", "MYSQL"); //- MYSQL, SQLSERVER, ORACLE, INFORMIX, SYBASE
-hmconf.put("db_enable_utf8_affirm", false);
+	/*
+	hmconf.put("dbhost", "192.168.0.241");
+	hmconf.put("dbport", 3306);
+	hmconf.put("dbuser", "");
 
-hmconf.put("enable_cache", false);
-hmconf.put("cachehost", "");
-hmconf.put("cacheport", "");
-hmconf.put("cachedriver", "MEMCACHEX"); //- REDISX, XCACHEX
-hmconf.put("cacheexpire", 30*60);
+	hmconf.put("dbpassword", "");
+	hmconf.put("dbname", "");
+	hmconf.put("dbdriver", "MYSQL"); //- MYSQL, SQLSERVER, ORACLE, INFORMIX, SYBASE
+	hmconf.put("db_enable_utf8_affirm", false);
+	*/
+
+	//- cache
+	hmconf.put("enable_cache", false);
+	hmconf.put("cachehost", "");
+	hmconf.put("cacheport", "");
+	hmconf.put("cachedriver", "MEMCACHEX"); //- REDISX, XCACHEX
+	hmconf.put("cacheexpire", 30*60);
+
+	//- tpl
+	hmconf.put("template_display_index", true); //- true for embedded, false for standalone 
 
 
-//- init config
+	//- init config
 
-Config.setConf(hmconf);
+	Config.setConf(hmconf);
+
+}
 
 %><%!
 

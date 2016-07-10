@@ -14,7 +14,11 @@ public void includeCtrl(){
 
 		sid = "" + (new java.util.Random()).nextInt();
 
-		outx.append("/ctrl/include: sid:["+sid+"]");
+		//outx.append("\t/ctrl/include: sid:["+sid+"]\n");
+
+		data.put("sid", sid);
+
+		data.put("time", (new Date()));
 
 
 	}

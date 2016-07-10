@@ -13,7 +13,7 @@ User user = new User();
 user.set("iname", "Wadelau");
 user.set("email", "%par%");
 
-outx.append("ctrl/user: iname:["+user.get("iname")+"] dbname-from-conf:["
+outx.append("\n\tctrl/user: iname:["+user.get("iname")+"] dbname-from-conf:["
 		+ Config.get("dbname")+"] hiuser:["+user.hiUser()+"]\n");
 
 
@@ -21,12 +21,12 @@ outx.append("ctrl/user: iname:["+user.get("iname")+"] dbname-from-conf:["
 
 if(act.equals("signin")){
 	//--
-	outx.append("outx "+act+" in ctr/user\n");
+	outx.append("\toutx "+act+" in ctr/user\n");
 
 }
 else if(act.equals("dosignin")){
 	 
-	outx.append("outx "+act+" in ctr/user\n");
+	outx.append("\toutx "+act+" in ctr/user\n");
 	
 	String email = "lzx"+(new java.util.Random()).nextInt();
 	
@@ -34,13 +34,15 @@ else if(act.equals("dosignin")){
 	user.set("realname", "Zhenxing Liu");
 	HashMap hm = user.setBy("email,realname, updatetime", null);
 
-	outx.append("write-in-ctrl/user-insert: return hm:["+hm.toString()+"]\n\n");
+	outx.append("\twrite-in-ctrl/user-insert: return hm:["+hm.toString()+"]\n\n");
 	
 	user.set("email", email);
 	user.set("realname", "--#-\"--'\'"+(new java.util.Random()).nextInt());
 	hm = user.setBy("realname, updatetime", "email=?");
 
-	outx.append("write-in-ctrl/user-update: return hm:["+hm.toString()+"]");
+	outx.append("\twrite-in-ctrl/user-update: return hm:["+hm.toString()+"]");
+
+	smttpl = "index.html";
 	
 }
 else{
@@ -51,7 +53,7 @@ else{
 
 
 //- tpl
-if(fmt.equals("")){
+if(fmt.equals("") && smttpl.equals("")){
 	
 	smttpl = "user.html";
 	

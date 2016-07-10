@@ -28,6 +28,17 @@ if($smttpl != ''){
 		$smt->assign($k, $v);
 	}
 	
+	# moved in 22:04 10 July 2016 from comm/header
+	require($_CONFIG['smarty']."/Smarty.class.php");
+	$smt = new Smarty();
+	$rtvviewdir = $rtvdir."/view/".$siteid;
+	$viewdir = $appdir.'/view/'.$siteid;
+	#`print "viewdir:[$viewdir]\n";
+	$smt->setTemplateDir($viewdir);
+	$smt->setCompileDir($viewdir.'/compile');
+	$smt->setConfigDir($viewdir.'/config');
+	$smt->setCacheDir($viewdir.'/cache');
+	
 	if(1){
 		$markfile = $appdir."/tmp/tpl_last_modified.tmp"; # todo: cache the modified tpl file
 		$s_indextpl = $viewdir."/index.html";

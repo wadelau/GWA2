@@ -40,19 +40,21 @@ public class WebApp implements WebAppInterface{
 		
 	}
 	
+	
 	//-
 	public WebApp(){
 		// @todo
 	}
 
 	
+	//-
 	public void set(String k, Object v){
 		
 		this.hmf.put(k, v);
 		
 	}
 
-
+	//-
 	public String get(String k){
 	
 		String tmp = (String)this.hmf.get(k);

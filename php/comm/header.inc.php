@@ -52,16 +52,7 @@ if(array_key_exists(UID,$_SESSION) && $_SESSION[UID] != ''){
 # main content container if no template file
 $out = '';
 
-# smarty template engine
-require($_CONFIG['smarty']."/Smarty.class.php");
-$smt = new Smarty();
-$rtvviewdir = $rtvdir."/view/".$siteid;
-$viewdir = $appdir.'/view/'.$siteid;
-#`print "viewdir:[$viewdir]\n";
-$smt->setTemplateDir($viewdir);
-$smt->setCompileDir($viewdir.'/compile');
-$smt->setConfigDir($viewdir.'/config');
-$smt->setCacheDir($viewdir.'/cache');
+# smarty template engine, relocated into comm/footer
 $smttpl = '';
 
 global $display_style;

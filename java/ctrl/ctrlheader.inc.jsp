@@ -2,14 +2,16 @@
 //- embedded in all ctrls
 %><%@include file="../comm/preheader.inc.jsp"%><%
 
-//- inherit from caller
-HashMap prtPage = (HashMap)request.getAttribute("prtPage");
+//- inherit crsPage from caller
+HashMap crsPage = (HashMap)request.getAttribute("crsPage");
 
-outx = (StringBuffer)prtPage.get("outx");
-data = (HashMap)prtPage.get("data");
-mod = (String)prtPage.get("mod");
-act = (String)prtPage.get("act");
-smttpl = (String)prtPage.get("smttpl");
-fmt = (String)prtPage.get("fmt");
+outx = (StringBuffer)crsPage.get("outx");
+data = (HashMap)crsPage.get("data");
+
+mod = (String)crsPage.get("mod");
+act = (String)crsPage.get("act");
+smttpl = (String)crsPage.get("smttpl");
+fmt = (String)crsPage.get("fmt");
+url = (String)crsPage.get("url");
 
 %>
