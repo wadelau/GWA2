@@ -69,7 +69,7 @@ class WebApp implements WebAppInterface{
 			}
 			else{
 				$this->hmf[$field] = '';
-				error_log(__FILE__.": Error! field:[$field] set a null value.");
+				error_log(__FILE__.": Warning! field:[$field] set a null value.");
 			}
 		}
 		else{
