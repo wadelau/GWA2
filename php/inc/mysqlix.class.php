@@ -130,7 +130,7 @@ class MYSQLIX {
 		
 		#debug($sql);
 		$rtnarr = array();	
-		$result = $this->m_link->query($sql) or $this->sayErr('[$sql] query failed. 201605220717.');
+		$result = $this->m_link->query($sql) or $this->sayErr("[$sql] query failed. 201605220717.");
 		
    		if($result && !is_bool($result)){
 			$i = 0;
