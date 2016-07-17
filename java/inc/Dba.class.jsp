@@ -307,7 +307,9 @@ public final class Dba { //- db administrator
 			HashMap hmtmp = new HashMap() ;
 			for(int i=1; i<=icc; i++ ){
 				fieldname = rsmd.getColumnName(i) ;
-				fieldvalue = rs.getString(fieldname);
+				
+				fieldvalue = rs.getString(i); // rs.getString(fieldname); remedy by wadelau, Sun Jul 17 22:51:13 CST 2016
+
 				fieldname = fieldname.toLowerCase() ;
 				hmtmp.put(fieldname, fieldvalue);
 			}

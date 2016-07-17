@@ -42,7 +42,7 @@ else if(act.equals("dosignin")){
 
 	outx.append("\twrite-in-ctrl/user-update: return hm:["+hm.toString()+"]");
 
-	smttpl = "index.html";
+	smttpl = "user.html";
 	
 }
 else{

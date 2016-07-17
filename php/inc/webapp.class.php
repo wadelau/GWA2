@@ -253,18 +253,18 @@ class WebApp implements WebAppInterface{
         if($conditions == null){
             $conditions = '';
         }
-        $pos = stripos($sql, "select");
+        $pos = stripos($sql, "select ");
 		
         if($pos === 0){
 			#
 		}
 		else{
-            $pos = stripos($sql, "desc");
+            $pos = stripos($sql, "desc ");
             if($pos === 0){
 				#
 			}
 			else{
-                $pos = stripos($sql, "show");
+                $pos = stripos($sql, "show ");
             }
         }
 		#error_log(__FILE__.": select!! sql:$pos");

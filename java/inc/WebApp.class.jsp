@@ -44,6 +44,16 @@ public class WebApp implements WebAppInterface{
 	//-
 	public WebApp(){
 		// @todo
+		//- dba
+		if(this.dba == null){
+			this.dba = new Dba("");
+		}
+		
+		//- cachea
+		if((boolean)Config.get("enable_cache")){
+			this.cachea = new Cachea("");
+		}
+
 	}
 
 	
@@ -63,6 +73,11 @@ public class WebApp implements WebAppInterface{
 	}
 	
 	//-
+	/* 
+	 * mandatory return $hm = (0 => true|false, 1 => string|array); in GWA2 PHP
+	 * Thu Jul 21 11:31:47 UTC 2011, wadelau@gmail.com
+	 * update by extending to readObject by wadelau, Sat May  7 11:06:37 CST 2016
+	 */
 	public HashMap getBy(String fields, String args){
 	
 		HashMap hm = new HashMap();
@@ -114,7 +129,7 @@ public class WebApp implements WebAppInterface{
 
 		System.out.println("WebApp.getBy: sql:["+sqls.toString()+"]");
 		
-		sqls = null;
+		sqls = null; fields = null; args = null;
 		
 		return hm;
 
@@ -122,6 +137,11 @@ public class WebApp implements WebAppInterface{
 
 
 	//-
+	/* 
+	 * mandatory return $hm = (0 => true|false, 1 => string|array); in GWA2 PHP
+	 * Thu Jul 21 11:31:47 UTC 2011, wadelau@gmail.com
+	 * update by extending to writeObject by wadelau, Sat May  7 11:06:37 CST 2016
+	 */
 	public HashMap setBy(String fields, String args){
 	
 		HashMap hm = new HashMap();
@@ -184,8 +204,107 @@ public class WebApp implements WebAppInterface{
 
 		System.out.println("WebApp.setBy: sql:["+sqls.toString()+"]");
 		
-		sqls = null;
+		sqls = null; args = null; fields = null;
 		
+		return hm;
+
+	}
+
+
+	//- initial added on Mon Jan 23 12:20:24 GMT 2012 by wadelau@ufqi.com
+	//- reported from GWA2PHP by wadelau, Sun Jul 17 22:13:39 CST 2016
+	public HashMap execBy(String sql, String args){
+	
+		HashMap hm = new HashMap();
+
+		args = args==null ? "" : args;
+		String sqlx = null;
+		int pos = -1;
+		if(sql == null){
+			hm.put("0", false);
+			hm.put("1", (new HashMap()).put("error", "sql:["+sql+"] is null. 1607172158.")); 
+		}
+		else{
+			sqlx = sql.trim().toUpperCase();
+			pos = sqlx.indexOf("SELECT ");
+			if(pos == 0){
+				//- normal	
+			}
+			else{
+				pos = sqlx.indexOf("DESC ");
+				if(pos == 0){
+					//-normal
+				}
+				else{
+					pos = sqlx.indexOf("SHOW ");	
+				}
+			}
+		}
+		
+		if(!args.equals("")){
+			if(sqlx.indexOf(" WHERE") > -1){
+				sql += args;	
+			}
+			else{
+				sql += " where " + args;	
+			}
+		}
+
+		if(pos == 0){
+			//- read mode
+			hm = this.dba.select(sql, this.hmf);	
+		}
+		else{
+			//- write mode
+			hm = this.dba.update(sql, this.hmf);
+		}
+		System.out.println("WebApp.execBy: sql:["+sql+"]");
+
+		sql = null; sqlx = null; args = null;
+
+		return hm;
+
+	} 
+
+
+	/*
+	 * mandatory return $hm = (0 => true|false, 1 => string|array);
+	 * Thu Jul 21 11:31:47 UTC 2011, wadelau@gmail.com
+	 * reported by wadelau@ufqi.com, Sun Jul 17 22:15:17 CST 2016
+	 */
+	public HashMap rmBy(String args){
+		
+		HashMap hm = new HashMap();
+		args = args==null ? "" : args;
+
+		boolean isSqlReady = false;
+		StringBuffer sqlb = new StringBuffer("delete from ");
+		sqlb.append(this.getTbl()).append(" where ");
+
+		if(!args.equals("")){
+			if(this.getId().equals("")){
+				hm.put("0", false);
+				hm.put("1", (new HashMap()).put("error", "unconditional deletion is strictly forbidden. stop it. sql:["+
+					sqlb.toString()+"] conditions:["+ args + "]"));
+			}
+			else{
+				sqlb.append(this.myId).append("=?");
+				isSqlReady = true;
+				
+			}
+		}
+		else{
+			sqlb.append(args);
+			isSqlReady = true;
+		}
+		
+		if(isSqlReady){
+			System.out.println("WebApp.rmBy: sql:["+sqlb.toString()+"]");
+			hm = this.dba.update(sqlb.toString(), this.hmf);	
+		}
+
+		sqlb = null; args = null;
+
 		return hm;
 
 	}

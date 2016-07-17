@@ -38,7 +38,15 @@ public class User extends WebApp{
 		
 		HashMap userInfo = this.getBy("id, email, realname, updatetime", "(email like ?  or email like ?) and realname like ?");
 
-		userInfo.put("read-in-User", (new Date()));	
+		userInfo.put("read-in-User-timestamp", (new Date()) + "userinfo:["+userInfo.toString()+"]");	
+
+		HashMap userInfo2 = this.execBy("desc "+this.getTbl(), null);
+		userInfo.put("read-in-User-by-execBy", userInfo2);
+
+		this.setId("122");
+		userInfo2 = this.rmBy("id=?");
+		userInfo.put("delete-in-User-by-rmBy", userInfo2);
+
 
 		return (String)this.get("iname") + ", Welcome! "+ userInfo.toString();
 
