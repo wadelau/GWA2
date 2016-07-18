@@ -281,7 +281,7 @@ public final class Dba { //- db administrator
 			String fieldvalue = null  ;
 			for(int i=1; i<=cci;i++){
 				fieldname = rsmd.getColumnName(i) ;
-				fieldvalue = rs.getString(fieldname) ;
+				fieldvalue = rs.getString(i) ; //- fieldname, remedy by wadelau, 13:01 18 July 2016
 				fieldname = fieldname.toLowerCase() ;
 				hm.put( fieldname,fieldvalue ) ;
 			}

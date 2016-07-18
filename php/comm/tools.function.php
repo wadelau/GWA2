@@ -362,41 +362,7 @@ function debug($obj, $tag='', $output=null){
 	
 }
 
-//- client ip read
-function getIp() {
-	
-	$ip = '';
-	
-	if (@$_SERVER["REMOTE_ADDR"]){ $ip = $_SERVER["REMOTE_ADDR"]; }
-	else if (@$_SERVER["HTTP_X_FORWARDED_FOR"]){ $ip = $_SERVER["HTTP_X_FORWARDED_FOR"]; }
-	else if (@$_SERVER["HTTP_CLIENT_IP"]){ $ip = $_SERVER["HTTP_CLIENT_IP"]; }
-	else if (@getenv( "HTTP_X_FORWARDED_FOR" )){ $ip = getenv( "HTTP_X_FORWARDED_FOR" ); }
-	else if (@getenv( "HTTP_CLIENT_IP" )){ $ip = getenv( "HTTP_CLIENT_IP" ); }
-	else if (@getenv( "REMOTE_ADDR" )){ $ip = getenv( "REMOTE_ADDR" ); }
-	else{ $ip = "Unknown";}
 
-	if (($ip == "Unknown" or $ip == "127.0.0.1"
-			or strpos( $ip, "172.31." ) === 0)
-		and @$_SERVER["HTTP_X_REAL_IP"]){
-		
-		$ip = $_SERVER["HTTP_X_REAL_IP"];
-	}
-	if (($ip == "Unknown" or $ip == "127.0.0.1" or strpos( $ip, "172.31." ) === 0)
-			and @$_SERVER["HTTP_X_FORWARDED_FOR"]) {
-		
-		$ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
-		if (($tmppos=strrpos($ip," "))>0){
-			$ip=substr($ip,$tmppos+1);
-		}
-		if (($tmppos=strrpos($ip,","))>0){
-			$ip=substr($ip,$tmppos+1);
-		}
-	}
-	
-	return $ip;
-	
- }
- 
  // Wht: Web and/or HTTP Tools
  // get/set data from input and/or out and filter as expected
  // added by wadelau@ufqi.com
@@ -465,6 +431,42 @@ function getIp() {
  		}
  
  	}
+	
+	//- client ip read
+	public static function getIp() {
+	
+		$ip = '';
+		
+		if (@$_SERVER["REMOTE_ADDR"]){ $ip = $_SERVER["REMOTE_ADDR"]; }
+		else if (@$_SERVER["HTTP_X_FORWARDED_FOR"]){ $ip = $_SERVER["HTTP_X_FORWARDED_FOR"]; }
+		else if (@$_SERVER["HTTP_CLIENT_IP"]){ $ip = $_SERVER["HTTP_CLIENT_IP"]; }
+		else if (@getenv( "HTTP_X_FORWARDED_FOR" )){ $ip = getenv( "HTTP_X_FORWARDED_FOR" ); }
+		else if (@getenv( "HTTP_CLIENT_IP" )){ $ip = getenv( "HTTP_CLIENT_IP" ); }
+		else if (@getenv( "REMOTE_ADDR" )){ $ip = getenv( "REMOTE_ADDR" ); }
+		else{ $ip = "Unknown";}
+
+		if (($ip == "Unknown" or $ip == "127.0.0.1"
+				or strpos( $ip, "172.31." ) === 0)
+			and @$_SERVER["HTTP_X_REAL_IP"]){
+			
+			$ip = $_SERVER["HTTP_X_REAL_IP"];
+		}
+		if (($ip == "Unknown" or $ip == "127.0.0.1" or strpos( $ip, "172.31." ) === 0)
+				and @$_SERVER["HTTP_X_FORWARDED_FOR"]) {
+			
+			$ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
+			if (($tmppos=strrpos($ip," "))>0){
+				$ip=substr($ip,$tmppos+1);
+			}
+			if (($tmppos=strrpos($ip,","))>0){
+				$ip=substr($ip,$tmppos+1);
+			}
+		}
+		
+		return $ip;
+		
+	 }
+ 
  
  }
  

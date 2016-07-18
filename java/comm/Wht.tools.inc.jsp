@@ -262,6 +262,20 @@ public final static class Wht{
 		return matched;
 
 	}
+	
+	//-
+	//- check whether a class has been loaded
+	public boolean isClass(String className){
+	
+		try{
+			Class.forName(className);
+			return true;
+		}
+		catch (final ClassNotFoundException e){
+			return false;
+		}
+		
+}
 
 }
 

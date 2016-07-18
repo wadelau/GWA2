@@ -129,7 +129,7 @@ public final class MySql implements DbDriver {
 			//System.out.println("err@DBACT.execSQLSafe():"+e);
 		}
 		finally{
-			//free( pstmt ) ; @todo
+			free( pstmt ) ; //@todo
 			//freeConn(); //--- has been moved into the upper method, 20071220
 		}
 		
@@ -182,7 +182,7 @@ public final class MySql implements DbDriver {
 			//System.out.println("DBACT.getExistSafe():"+e+" sql:["+sqlstr+"]");
 		}
 		finally{
-			//free(pstmt); // @todo
+			free(pstmt); // @todo
 		}
 		
 		return hm;
@@ -226,7 +226,7 @@ public final class MySql implements DbDriver {
 			System.out.println(e);
 		}
 		finally{
-			//free(pstmt); // @todo
+			free(pstmt); // @todo
 		}
 		
 		return hm;
@@ -255,6 +255,35 @@ public final class MySql implements DbDriver {
 	public int getAffectedRows(){
 		
 		return 0;
+		
+	}
+	
+	//-
+	protected void free(Statement stmt){
+		
+		try{
+			if(stmt != null){
+				stmt.close();
+			}
+		} 
+		catch (SQLException ex){
+			ex.printStackTrace();
+		}
+		freeConn();
+		
+	}
+
+	//-
+	protected void freeConn(){
+		
+		try{
+			if (dbConn != null){
+				dbConn.close(); //- back to connection pool for re use?
+			}
+		}
+		catch (SQLException ex){
+			ex.printStackTrace();
+		}
 		
 	}
 	
