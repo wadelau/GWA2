@@ -23,7 +23,7 @@ if(fmt.equals("")){
 		//- tpl engine
 		Engine smartyEngine = new Engine();
 
-		smartyEngine.setTemplatePath(appdir);
+		smartyEngine.setTemplatePath(appdir); 
 		smartyEngine.setEncoding("utf-8");
 		smartyEngine.setDebug(true);
 		Template mytpl = null;
@@ -58,9 +58,8 @@ if(fmt.equals("")){
 		}
 
 		//- @todo cache replaced tpl ?
-
-		out.println("<!--" + outx +"  -->" + tplcont);
-
+		out.println("<!--" + outx +" \n -->" + tplcont);
+	
 	}
 }
 else{

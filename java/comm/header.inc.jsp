@@ -10,10 +10,19 @@
 rtvdir = request.getServletPath();
 appdir = application.getRealPath(rtvdir);
 
-rtvdir = rtvdir.substring(0, rtvdir.lastIndexOf('/')); 
-appdir = appdir.substring(0, appdir.lastIndexOf('/'));
-
-outx.append("\n\tcomm/header: requestURL:["+request.getRequestURL()+"] servletPath:["+request.getServletPath()+"] rtvdir:["+rtvdir+"] 1607100803.\n"); //- appdir:["+appdir+"] 
+if(true){
+	rtvdir = rtvdir.substring(0, rtvdir.lastIndexOf('/')); 
+	int ipos = appdir.lastIndexOf('/');
+	appdir = appdir.substring(0, (ipos==-1 ? 0 : ipos));
+	if(appdir.equals("")){ //- in case of Windows
+		appdir = (getServletContext().getRealPath("/"));
+		appdir = appdir.replaceAll("\\\\", "/");
+		appdir = appdir.substring(0, appdir.length()-1);
+		appdir += "" + rtvdir;
+	}
+}
+outx.append("\n\tcomm/header: requestURL:["+request.getRequestURL()+"] servletPath:["+request.getServletPath()+"] rtvdir:["
+		+rtvdir+"] appdir:["+appdir+"] 1607100803.\n"); //- appdir:["+appdir+"] 
 
 url = rtvdir + "?sid=" + (new java.util.Random()).nextInt(999999); 
 
@@ -47,7 +56,7 @@ public static void debug(Object obj, String tag, String output){
 		s.append("");
 	}
 	else{
-		s.append(obj.toString();
+		s.append(obj.toString());
 	}
 	
 	if(!tag.equals("")){
@@ -56,12 +65,12 @@ public static void debug(Object obj, String tag, String output){
 	
 	output = output==null ? "" : output;
 	if(output.equals("") || output.equals("0")){
-		System.out.println(s.toString);
+		System.out.println(s.toString());
 	}
 	else if(output.equals("1")){
 		String ss = s.toString();
 		System.out.println(ss);
-		out.println(ss);
+		//((new javax.servlet.http.HttpServletResponse()).getWriter()).println(ss); //write(ss);
 	}
 	else{
 		//-
