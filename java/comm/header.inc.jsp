@@ -81,4 +81,10 @@ public static void debug(Object obj, String tag, String output){
     
 }
 
+public static void debug(Object obj){
+	
+	debug(obj, null, null);
+	
+}
+
 %>
