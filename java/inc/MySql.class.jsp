@@ -55,8 +55,9 @@ public final class MySql implements DbDriver {
 				
 				Class.forName("com.mysql.jdbc.Driver"); //- need prior to JDBC 4.0
 			    //System.out.println("Driver loaded!");
-				this.dbConn = DriverManager.getConnection("jdbc:mysql://" + this.myHost + ":" + this.myPort + "/" + this.myDb + "?" 
-						+ "user=" + this.myUser + "&password=" + this.myPwd + "&useSSL=false");
+				this.dbConn = DriverManager.getConnection("jdbc:mysql://" + this.myHost + ":" 
+					+ this.myPort + "/" + this.myDb + "?" + "user=" + this.myUser 
+					+ "&password=" + this.myPwd + "&useSSL=false&characterEncoding=utf8");
 				//this.dbConn = DriverManager.getConnection("jdbc:mysql://"+this.myHost+":"+this.myPort+"/"
 				//	+this.myDb, this.myUser, ""+this.myPort);
 				
@@ -118,13 +119,13 @@ public final class MySql implements DbDriver {
 				}
 			}
 			
-			hm.put("0", true);
-			hm.put("1", affectrows);
+			hm.put(0, true);
+			hm.put(1, affectrows);
 		
 		}
 		catch (Exception ex){
-			hm.put("0", false);
-			hm.put("1", 0);
+			hm.put(0, false);
+			hm.put(1, 0);
 			ex.printStackTrace();
 			//System.out.println("err@DBACT.execSQLSafe():"+e);
 		}
@@ -172,12 +173,31 @@ public final class MySql implements DbDriver {
 				}
 			}
 
-			hm.put("0", true);
-			hm.put("1", pstmt.executeQuery() );
+			hm.put(0, true);
+			//hm.put("1", pstmt.executeQuery() );
+			ResultSet rs = pstmt.executeQuery();
+			HashMap hm = null ;		
+			ResultSetMetaData rsmd = rs.getMetaData();
+			if( rs.next() ){
+				hm = new HashMap();
+				int cci = rsmd.getColumnCount() ;
+				String fieldname = null  ;
+				String fieldvalue = null  ;
+				for(int i=1; i<=cci;i++){
+					fieldname = rsmd.getColumnName(i) ;
+					fieldvalue = rs.getString(i) ; //- fieldname, remedy by wadelau, 13:01 18 July 2016
+					fieldname = fieldname.toLowerCase() ;
+					hm.put( fieldname,fieldvalue ) ;
+				}
+			}
+			hm.put(1, hm);
+			hm = null;
+			rs.close();
+			rsmd = null;
 			
 		}
 		catch (Exception ex){
-			hm.put("0", false);
+			hm.put(0, false);
 			ex.printStackTrace();
 			//System.out.println("DBACT.getExistSafe():"+e+" sql:["+sqlstr+"]");
 		}
@@ -216,12 +236,37 @@ public final class MySql implements DbDriver {
 				}
 			}
 
-			hm.put("0", true);
-			hm.put("1", pstmt.executeQuery() );
-		
+			hm.put(0, true);
+			//hm.put("1", pstmt.executeQuery() );
+			ResultSet rs = pstmt.executeQuery();
+			HashMap hm = new HashMap();
+			int count = 0 ;
+			ResultSetMetaData rsmd = rs.getMetaData() ;
+			int icc = rsmd.getColumnCount() ;
+			String fieldname = null ;
+			String fieldvalue = null ;
+			while ( rs.next() ){
+				HashMap hmtmp = new HashMap() ;
+				for(int i=1; i<=icc; i++ ){
+					fieldname = rsmd.getColumnName(i) ;
+					
+					fieldvalue = rs.getString(i); // rs.getString(fieldname); remedy by wadelau, Sun Jul 17 22:51:13 CST 2016
+
+					fieldname = fieldname.toLowerCase() ;
+					hmtmp.put(fieldname, fieldvalue);
+				}
+				hm.put(""+count,hmtmp);
+				count++;
+			}
+			hm.put("count",""+count);
+			hm.put(1, hm);
+			hm = null;
+			rs.close();
+			rsmd = null;
+			
 		}
 		catch (Exception e){
-			hm.put("0", false);
+			hm.put(0, false);
 			e.printStackTrace();
 			System.out.println(e);
 		}
@@ -273,7 +318,7 @@ public final class MySql implements DbDriver {
 		
 	}
 
-	//-
+	//- @todo
 	protected void freeConn(){
 		
 		try{

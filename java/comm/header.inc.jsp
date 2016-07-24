@@ -81,9 +81,16 @@ public static void debug(Object obj, String tag, String output){
     
 }
 
-public static void debug(Object obj){
+public static void debug(HashMap obj){
 	
-	debug(obj, null, null);
+	debug((Object)obj, null, null);
+	
+}
+
+
+public static void debug(String obj){
+	
+	debug((Object)obj, null, null);
 	
 }
 

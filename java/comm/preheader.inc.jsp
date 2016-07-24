@@ -12,6 +12,10 @@ pageEncoding="UTF-8"%><%
 
 //-  preheader, embedded in all
 
+System.setProperty("sun.jnu.encoding", "UTF-8");
+System.setProperty("file.encoding", "UTF-8"); //- set " -Dfile.encoding=utf8 " in jvm start script
+request.setCharacterEncoding("UTF-8");
+
 %><%@include file="./Wht.tools.inc.jsp"%><%
 
 //- global variables across the app, embedded in two types of files: /index, /ctrl/xxx

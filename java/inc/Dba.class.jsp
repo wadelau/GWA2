@@ -9,14 +9,7 @@
  * Thu Sep 11 16:34:20 CST 2014
  * Ported into Java by wadelau@ufqi.com, June 28, 2016s
  */
-
-//package com.ufqi.gwa2;
-
-
-//import java.util.HashMap;
-
-//import com.ufqi.gwa2.Conn;
-//import com.ufqi.gwa2.MySql;
+ 
 
 %><%@page import="java.sql.Connection,java.sql.SQLException,java.sql.Statement,java.sql.ResultSetMetaData"%><%
 %><%@include file="./MySql.class.jsp"%><%
@@ -270,6 +263,7 @@ public final class Dba { //- db administrator
 	
 	
 	//--- added on 20071124 by wadelau, read single record and save in an hashmap
+	/*
 	public HashMap getInfo( ResultSet rs ) throws SQLException {
 		HashMap hm = null ;
 		
@@ -292,9 +286,11 @@ public final class Dba { //- db administrator
 		return hm ;
 	
 	}
-	
+	*/
 
 	//--- added on 20071124 by wadelau, read records and save in an hashmap
+	//- disabled since 21:49 24 July 2016
+	/*
 	public HashMap getRs( ResultSet rs ) throws SQLException{
 		HashMap hm = new HashMap();
 		int count = 0 ;
@@ -323,7 +319,7 @@ public final class Dba { //- db administrator
 		return hm ;
 	
 	}
-	
+	*/
 	
 }
 

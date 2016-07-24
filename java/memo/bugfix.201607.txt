@@ -1,0 +1,23 @@
+
+comm/preheader.inc.jsp
+
+	System.setProperty(“sun…coding”, “utf-8”);
+	request.setCharacterEncoding(“UTF-8”);
+	
+	db_utf8_affirm
+		set names ‘utf8’
+		setCharacterEncoding=utf8
+
+
+inc/MySql.class
+	free(pstmt);  ?
+
+
+comm/header.inc.jsp
+	debug(String);
+	debug(HashMap);
+
+
+ctrl/user.jsp
+	
+	duplicate WebApp.interface ?
