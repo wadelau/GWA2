@@ -4,11 +4,19 @@
  */
 %><%@include file="./ctrlheader.inc.jsp"%><%
 
-%><%@include file="../mod/User.class.jsp"%><%
+%><% // @include file="../mod/User.class.jsp" //- relocated to comm/preheader.inc
+
+%><%
+
+%><%@include file="../mod/News.class.jsp"%><%
 
 
+//- objects
 
-User user = new User();
+News news = new News();
+
+
+//- actions
 
 user.set("iname", "Wadelau");
 user.set("email", "%par%");
@@ -22,6 +30,7 @@ outx.append("\n\tctrl/user: iname:["+user.get("iname")+"] dbname-from-conf:["
 if(act.equals("signin")){
 	//--
 	outx.append("\toutx "+act+" in ctr/user\n");
+	crsPage.put("response::setHeader::Location", url + "&mod=user&act=dosignin");
 
 }
 else if(act.equals("dosignin")){
@@ -32,6 +41,8 @@ else if(act.equals("dosignin")){
 	
 	user.set("email", email);
 	user.set("realname", "Zhenxing Liu");
+	user.set("orderby", "id desc");
+	user.set("pagesize", 5);
 	HashMap hm = user.setBy("email,realname, updatetime", null);
 
 	outx.append("\twrite-in-ctrl/user-insert: return hm:["+hm.toString()+"]\n\n");

@@ -58,14 +58,14 @@ public final class Dba { //- db administrator
 			tmpHm = this.dbDrv.readBatch(sql, args, idxArr);
 		}
 		
-		if((boolean)tmpHm.get("0")){ //- what's for?
-			hm.put("0", true);
+		if((boolean)tmpHm.get(0)){ //- what's for?
+			hm.put(0, true);
 			try{
 				if(hasLimitOne){
-					hm.put("1", getInfo((ResultSet)tmpHm.get("1")));	
+					hm.put(1, tmpHm.get(1));	
 				}
 				else{
-					hm.put("1", getRs((ResultSet)tmpHm.get("1")));
+					hm.put(1, tmpHm.get(1));
 				}
 			}
 			catch(Exception ex){
@@ -73,8 +73,8 @@ public final class Dba { //- db administrator
 			}
 		}
 		else{
-			hm.put("0", false);
-			hm.put("1", tmpHm.get("1"));
+			hm.put(0, false);
+			hm.put(1, tmpHm.get(1));
 		}
 		tmpHm = null; idxArr = null;
 		hm.put("read-in-Dba", (new Date()));	
@@ -93,16 +93,16 @@ public final class Dba { //- db administrator
 		
 		HashMap tmpHm = this.dbDrv.query(sql, args, idxArr);
 		
-		if((boolean)tmpHm.get("0")){
-			hm.put("0", true);
+		if((boolean)tmpHm.get(0)){
+			hm.put(0, true);
 			HashMap inHm = new HashMap();
-			inHm.put("insertid", tmpHm.get("1"));
-			inHm.put("affectedrows", tmpHm.get("1"));
-			hm.put("1", inHm);
+			inHm.put("insertid", tmpHm.get(1));
+			inHm.put("affectedrows", tmpHm.get(1));
+			hm.put(1, inHm);
 		}
 		else{
-			hm.put("0", false);
-			hm.put("1", tmpHm.get("1"));
+			hm.put(0, false);
+			hm.put(1, tmpHm.get(1));
 		}
 
 		tmpHm = null; idxArr = null;
@@ -145,8 +145,10 @@ public final class Dba { //- db administrator
 			while(itr.hasNext()){
 				k=(String)itr.next();
 				k = k==null ? "" : k;
-				if(k.equals("") || k.equals("orderby") || k.equals("pagesize") 
-					|| k.equals("pagenum") || k.equals("groupby")){
+				int tmpKpos = sqlstr.indexOf(k);
+				if(k.equals("") || "oderby,groupby,pagesize,pagenum,".indexOf(k+",") > -1 
+					|| tmpKpos < 0 ){
+					//System.out.println("Dba.sortObj: ki:["+ki+"] k:["+k+"] skip.");
 					continue;
 				}
 				else{
@@ -246,7 +248,7 @@ public final class Dba { //- db administrator
 				if(tmpobj[ki] != null){
 					obj[tmpindex]=tmpobj[ki];
 					//System.out.println("Dba.sortObj: ki:["+ki+"] idx:["+tmpindex+"] obj-i:["+obj[tmpindex]
-					//		+"] hmvar:["+hmvar.toString()+"]");
+					//		+"] hmvar:["+hmvar.toString()+"] sqlstr:["+sqlstr+"]");
 					tmpindex++;
 				}
 				

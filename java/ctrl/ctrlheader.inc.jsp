@@ -8,6 +8,9 @@ HashMap crsPage = (HashMap)request.getAttribute("crsPage");
 outx = (StringBuffer)crsPage.get("outx");
 data = (HashMap)crsPage.get("data");
 
+user = new User((HashMap)crsPage.get("user"));
+	outx.append("ctrl/ctrlheader: time-from-index: ["+user.get("time-in-index")+"]");
+
 mod = (String)crsPage.get("mod");
 act = (String)crsPage.get("act");
 smttpl = (String)crsPage.get("smttpl");

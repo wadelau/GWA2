@@ -18,10 +18,10 @@ if(true){
 	//- db info
 	hmconf.put("dbhost", "localhost");
 	hmconf.put("dbport", 3306);
-	hmconf.put("dbuser", "");
+	hmconf.put("dbuser", "bizsft");
 
-	hmconf.put("dbpassword", "");
-	hmconf.put("dbname", "");
+	hmconf.put("dbpassword", "bizsftJan102016");
+	hmconf.put("dbname", "bizsftdb");
 	hmconf.put("dbdriver", "MYSQL"); //- MYSQL, SQLSERVER, ORACLE, INFORMIX, SYBASE
 	hmconf.put("db_enable_utf8_affirm", false);
 
