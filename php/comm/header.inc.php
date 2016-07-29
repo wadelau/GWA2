@@ -49,6 +49,23 @@ if(array_key_exists(UID,$_SESSION) && $_SESSION[UID] != ''){
 	$data['username'] = $user->getUserName();
 }
 
+# page header format
+$fmt = Wht::get($_REQUEST, 'fmt');
+if(isset($fmt)){
+    if($fmt == 'json'){
+        header("Content-type: application/json;charset=utf-8");
+    }
+    else if($fmt == 'xml'){
+        header("Content-type: text/xml;charset=utf-8");
+    }
+    else{
+        //- @todo
+    }
+}
+else{
+    header("Content-type: text/html;charset=utf-8");
+}
+
 # main content container if no template file
 $out = '';
 
@@ -138,7 +155,5 @@ function exception_handler($exception) {
 	echo '</div>';
 }
 set_exception_handler('exception_handler');
-
-$fmt = $_REQUEST['fmt'];
 
 ?>

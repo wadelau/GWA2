@@ -65,8 +65,12 @@ class MYSQL {
 			$this->_initConnection();
 		}
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
-		$result = mysql_query($sql,$this->m_link) or $this->sayErr($sql); 
-		
+		try {
+		  $result = mysql_query($sql,$this->m_link) or $this->sayErr($sql); 
+		}
+		catch(Exception $e){
+		    debug(__FILE__.": $sql, exec failed. ".$e->getMessage());
+		}
 		if($result){
 			$hm[0] = true;
 			$hm[1] = $result;
@@ -387,7 +391,7 @@ class MYSQL {
 		$html = GConf::get('html_resp'); $html = str_replace("RESP_TITLE","sayError!", $html); 
 		$html = str_replace("RESP_BODY", $str, $html);
 		print $html;
-		exit(1);
+		#exit(1);
 		
 	} 
 	
