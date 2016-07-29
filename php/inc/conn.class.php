@@ -55,7 +55,7 @@ class Cache_Master{
 	
 	var $chost = '';
 	var $cport = '';
-	var $expireTime = 30 * 60; 
+	var $expireTime = 1800; # 30 * 60; 
 	
 	function __construct(){
 		

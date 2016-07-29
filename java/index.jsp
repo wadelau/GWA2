@@ -1,8 +1,8 @@
 <%@page language="java" pageEncoding="UTF-8" autoFlush="true"%><%
 /* -GWA2 is ported into Java
  * Wadelau@ufqi.com
- * v0.1
- * Thu Jun  9 14:02:51 CST 2016
+ * v0.1, Thu Jun  9 14:02:51 CST 2016
+ * v0.2, Thu Jul 28 04:19:21 CST 2016
  */
 
 // the application entry...
@@ -19,7 +19,6 @@ if(act == null){ act = ""; }else{ act = act.trim(); }
 if(mod.equals("")){
   mod = "index";    
 }
-
 data.put("mod", mod);
 data.put("act", act);
 
@@ -40,10 +39,9 @@ StringBuffer modf = new StringBuffer(rtvdir).append("/ctrl/").append(mod).append
 String modfs = modf.toString();
 String realModfs = application.getRealPath(modfs);
 
-
 if((new File(realModfs)).exists()){
 
-	//- collect runtime data into request
+	//- collect runtime data into request for cross page
 	HashMap crsPage = new HashMap();
 	crsPage.put("data", data);
 	crsPage.put("outx", outx);
@@ -52,7 +50,10 @@ if((new File(realModfs)).exists()){
 	crsPage.put("smttpl", smttpl);
 	crsPage.put("fmt", fmt);
 	crsPage.put("url", url);
+		user.set("time-in-index", ""+(new Date()));
+	crsPage.put("user", user.toHash()); //- save an object properties to a hashmap, then restore the instance in another page
 
+	//- append to request to cross page
 	request.setAttribute("crsPage", crsPage);
 
 	//- process of another instance	
@@ -60,45 +61,19 @@ if((new File(realModfs)).exists()){
 
 	//- restore runtime data into response
 	crsPage = (HashMap)request.getAttribute("crsPage");
+	
+	//- response headers from child/crs page, defined in ctrl/ctrl
+	setCrsPageResponse(crsPage, response);
 
-	//- response headers from child/crs page
-	if(true){
-		Iterator entries = crsPage.entrySet().iterator();
-		while (entries.hasNext()) {
-			Map.Entry entry = (Map.Entry) entries.next();
-			String key = (String)entry.getKey();
-			if(key.indexOf("response") >= 0){
-				Object value = entry.getValue();
-				outx.append("Key = " + key + ", Value = " + value);
-				String[] setArr = key.split("::"); 
-				if(setArr[1].equals("setHeader")){ // crsPage.put("response::setHeader::Location", "/?mod=user&act=signin");
-					response.setHeader(setArr[2], (String)value);
-					if(setArr[2].indexOf("Location") > -1){
-						response.setStatus(302);	
-					}
-				}
-				else if(setArr[1].equals("addCookie")){ // crsPage.put("response::addCookie::", "COOKIE_BODY");
-					response.addCookie((javax.servlet.http.Cookie)value);
-				}
-				else if(setArr[1].equals("sendError")){ // crsPage.put("response::sendError::", "HTTP_Error_CODE");
-					response.sendError((int)value);
-				}
-				else if(setArr[1].equals("setStatus")){ // crsPage.put("response::setStatus::", "HTTP_Error_CODE");
-					response.sendError((int)value);
-				}
-			}
-			else{
-				//out.println("not resp Key = " + key );
-			}
-		}
-	}
-
-	// strings needs to be retrieved explictly 
+	// variables needs to be retrieved explictly 
 	mod = (String)crsPage.get("mod");
 	act = (String)crsPage.get("act");
 	smttpl = (String)crsPage.get("smttpl");
 	fmt = (String)crsPage.get("fmt");
 	url = (String)crsPage.get("url");
+
+	user = new User((HashMap)crsPage.get("user")); //- wadelau@ufqi.com on Wed Jul 27 00:02:08 CST 2016
+	outx.append("/index: time-in-index-restore: ["+user.get("time-in-index")+"]");
 	
 }
 else{
@@ -115,7 +90,6 @@ if(true){
 	%><%@include file="./ctrl/ctrl.inc.jsp"%><%
 
 }
-
 
 //- footer
 %><%@include file="./comm/footer.inc.jsp"%><%

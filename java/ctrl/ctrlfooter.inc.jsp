@@ -9,6 +9,8 @@ crsPage.put("smttpl", smttpl);
 crsPage.put("fmt", fmt);
 crsPage.put("url", url);
 
+crsPage.put("user", user.toHash());
+
 outx.append("\n\t output in ctrl/ctrlfooter.inc.jsp, smttpl:["+smttpl+"]\n\n");
 
 

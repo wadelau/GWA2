@@ -1,5 +1,4 @@
 <%
-//import java.util.HashMap;
 
 %><%@include file="./WebApp.interface.jsp"%><%
 %><%@include file="./Config.class.jsp"%><%!
@@ -10,9 +9,10 @@
 public class WebApp implements WebAppInterface{
 	
 
-	private HashMap hm = new HashMap(); //- runtime container
-	protected HashMap hmf = new HashMap(); //- persistent storage
+	private HashMap hm = new HashMap(); //- runtime container, local, regional
+	public HashMap hmf = new HashMap(); //- persistent storage, global
 	private String myId = "id";
+	private String myIdName = "myId";
 
 	Dba dba = null;
 	Cachea cachea = null;
@@ -25,6 +25,7 @@ public class WebApp implements WebAppInterface{
 			String dbconf = "";
 			if(cfg != null && cfg.indexOf("dbconf") > -1){
 				dbconf = ""; // @todo
+				this.set("dbconf", dbconf);
 			}
 			this.dba = new Dba(dbconf);
 		}
@@ -34,6 +35,7 @@ public class WebApp implements WebAppInterface{
 			if(this.cachea == null){
 				String cacheconf = "";
 				//@todo cfg.cacheconf
+				this.set("cacheconf", cacheconf);
 				this.cachea = new Cachea(cacheconf);
 			}
 		}
@@ -55,7 +57,6 @@ public class WebApp implements WebAppInterface{
 		}
 
 	}
-
 	
 	//-
 	public void set(String k, Object v){
@@ -283,8 +284,8 @@ public class WebApp implements WebAppInterface{
 
 		if(!args.equals("")){
 			if(this.getId().equals("")){
-				hm.put("0", false);
-				hm.put("1", (new HashMap()).put("error", "unconditional deletion is strictly forbidden. stop it. sql:["+
+				hm.put(0, false);
+				hm.put(1, (new HashMap()).put("error", "unconditional deletion is strictly forbidden. stop it. sql:["+
 					sqlb.toString()+"] conditions:["+ args + "]"));
 			}
 			else{
@@ -301,6 +302,9 @@ public class WebApp implements WebAppInterface{
 		if(isSqlReady){
 			System.out.println("WebApp.rmBy: sql:["+sqlb.toString()+"]");
 			hm = this.dba.update(sqlb.toString(), this.hmf);	
+			if(!this.getId().equals("")){
+				this.setId("");		
+			}
 		}
 
 		sqlb = null; args = null;
@@ -330,9 +334,23 @@ public class WebApp implements WebAppInterface{
 	
 	//-
 	public String getId(){
-		
-		return this.get(this.myId);
-		
+
+		String xId = this.get(this.myId);
+		if(!xId.equals("")){
+			return xId;
+		}
+		else{
+			String xIdName = this.get(this.myIdName);
+			if(!xIdName.equals("")){
+				xId = this.get(xIdName);
+				this.setMyId(xIdName);
+				return xId;
+			}
+			else{
+				return "";
+			}
+		}
+
 	}
 	
 	//-
@@ -346,8 +364,20 @@ public class WebApp implements WebAppInterface{
 	public void setMyId(String myId){
 		
 		this.myId = myId;
+		this.set(this.myIdName, myId);
 		
 	}
+
+	//-
+	//- export properties to hashmap
+	//- for cross-page object, refer to mod/User fromHm
+	//- wadelau@ufqi.com, Tue Jul 26 22:56:54 CST 2016
+	public HashMap toHash(){
+	
+		return this.hmf;
+
+	}
+
 	
 }
 

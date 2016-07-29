@@ -3,8 +3,6 @@
 
 %><%@include file="./preheader.inc.jsp"%><%
 
-%><%@include file="../mod/User.class.jsp"%><%
-
 //outx.append("\n\tcomm/header: contextPath:["+request.getContextPath()+"] pathinfo:["+request.getPathInfo()+"]");
 
 rtvdir = request.getServletPath();
@@ -24,8 +22,11 @@ if(true){
 outx.append("\n\tcomm/header: requestURL:["+request.getRequestURL()+"] servletPath:["+request.getServletPath()+"] rtvdir:["
 		+rtvdir+"] appdir:["+appdir+"] 1607100803.\n"); //- appdir:["+appdir+"] 
 
-url = rtvdir + "?sid=" + (new java.util.Random()).nextInt(999999); 
+rtvdir = rtvdir.equals("") ? "." : rtvdir;
 
+url = rtvdir + "/?sid=" + (new java.util.Random()).nextInt(999999); 
+
+user = new User();
 
 smttpl = "";
 
@@ -81,9 +82,16 @@ public static void debug(Object obj, String tag, String output){
     
 }
 
-public static void debug(Object obj){
+public static void debug(HashMap obj){
 	
-	debug(obj, null, null);
+	debug((Object)obj, null, null);
+	
+}
+
+
+public static void debug(String obj){
+	
+	debug((Object)obj, null, null);
 	
 }
 

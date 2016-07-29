@@ -41,7 +41,7 @@ if(true){
 	$conf['cachehost'] = '127.0.0.1'; # '/www/bin/memcached/memcached.sock'; #  ip, domain or .sock
 	$conf['cacheport'] = '11211'; # empty or '0' for linux/unix socket 
 	$conf['cachedriver'] = 'MEMCACHEDX'; # REDISX, XCACHEX
-	$conf['cacheexpire'] = 30 * 60;
+	$conf['cacheexpire'] = 1800; # 30 * 60;
 	
 	# misc
 	$conf['is_debug'] = 1;

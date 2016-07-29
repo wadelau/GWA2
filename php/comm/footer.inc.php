@@ -16,15 +16,6 @@ if($smttpl != ''){
 	$data['ses'] = $_SESSION;
 	$data['viewdir'] = $rtvviewdir; # where and why?
 	$data['rtvdir'] = $rtvdir; # refer view/default/include/sitefeedback.html
-	# Fri Jul 10 22:17:09 CST 2015
-	foreach($_REQUEST as $k=>$v){
-		if(!array_key_exists($k, $data)){
-			$data[$k] = $v;	
-		}	
-	}
-	foreach($data as $k=>$v){
-		$smt->assign($k, $v);
-	}
 	
 	# moved in 22:04 10 July 2016 from comm/header
 	require($_CONFIG['smarty']."/Smarty.class.php");
@@ -36,6 +27,16 @@ if($smttpl != ''){
 	$smt->setCompileDir($viewdir.'/compile');
 	$smt->setConfigDir($viewdir.'/config');
 	$smt->setCacheDir($viewdir.'/cache');
+	
+	# Fri Jul 10 22:17:09 CST 2015
+	foreach($_REQUEST as $k=>$v){
+		if(!array_key_exists($k, $data)){
+			$data[$k] = $v;	
+		}	
+	}
+	foreach($data as $k=>$v){
+		$smt->assign($k, $v);
+	}
 	
 	if(1){
 		$markfile = $appdir."/tmp/tpl_last_modified.tmp"; # todo: cache the modified tpl file
