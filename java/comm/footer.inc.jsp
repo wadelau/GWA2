@@ -7,7 +7,6 @@ outx.append("\n\toutput in comm/footer: "+(new Date())+" smttpl:["+smttpl+"]\n")
 
 if(fmt.equals("")){
 
-	//- set header
 	//- #todo
 
 	if(smttpl.equals("")){

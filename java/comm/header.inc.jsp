@@ -31,7 +31,22 @@ user = new User();
 smttpl = "";
 
 fmt = Wht.get(request, "fmt");
-
+//- set header according to fmt
+response.setCharacterEncoding("utf-8");
+if(fmt.equals("")){
+	response.setContentType("text/html;charset=utf-8");
+}
+else{
+	if(fmt.equals("xml")){
+		response.setContentType("text/xml;charset=utf-8");
+	}
+	else if(fmt.equals("json")){
+		response.setContentType("application/json;charset=utf-8");
+	}
+	else{
+		debug("comm/header: unsupported fmt:["+fmt+"]");
+	}
+}
 
 %><%!
 /*
