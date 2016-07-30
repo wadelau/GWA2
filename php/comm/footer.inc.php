@@ -7,9 +7,7 @@ if($isoput){
 	$out .= "</body></html>";
 }
 
-# page header
-header("Content-type: text/html;charset=utf-8");
-
+//- content output
 if($smttpl != ''){
 
 	$data['smttpl'] = $smttpl;
@@ -86,7 +84,7 @@ else{
 	}
 	if(isset($fmt)){
 		if($fmt == 'json'){
-			header("Content-type: application/json;charset=utf-8");
+			#header("Content-type: application/json;charset=utf-8");
 			#print_r($data);
 			#print json_encode($data['respobj']);
 			$data['out'] = $out;

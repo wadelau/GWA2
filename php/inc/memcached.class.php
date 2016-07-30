@@ -28,7 +28,7 @@ class MEMCACHEDX {
 		$this->chost = $config->chost;
 		$this->expireTime = $config->expireTime;
 		
-		if(true){
+		if(class_exists('Memcached')){ # set true/false in production
 			//- use built-in memcached functions
 			$this->mcache = new Memcached($this->persistConnId);
 			$servers = $this->mcache->getServerList(); 
@@ -49,6 +49,7 @@ class MEMCACHEDX {
 		}
 		else{
 			//- open socket, ###todo
+			#$this->mcache 
 			
 		}
 		

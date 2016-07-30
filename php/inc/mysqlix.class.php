@@ -58,8 +58,12 @@ class MYSQLIX {
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
 		
 		#debug($sql);
-		$result = $this->m_link->query($sql) or $this->sayErr("[$sql] 201605240944.");		
-		
+		try{
+		  $result = $this->m_link->query($sql) or $this->sayErr("[$sql] 201605240944.");		
+		}
+		catch(Exception $e){
+		    debug(__FILE__.": $sql, exec failed. ".$e->getMessage());
+		}
 		if($result){
 			$hm[0] = true;
 			$hm[1] = $result;
@@ -322,7 +326,7 @@ class MYSQLIX {
 		debug($sql);
 		$html = GConf::get('html_resp'); $html = str_replace("RESP_TITLE","sayError!", $html); $html = str_replace("RESP_BODY", $str, $html);
 		print $html;
-		exit(1);
+		#exit(1);
 		
 	} 
 	

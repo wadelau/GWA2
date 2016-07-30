@@ -54,6 +54,9 @@ public void setCrsPageResponse(HashMap crsPage, javax.servlet.http.HttpServletRe
 			else if(setArr[1].equals("setStatus")){ // crsPage.put("response::setStatus::", "HTTP_Error_CODE");
 				response.sendError((int)value);
 			}
+			else{
+				debug("Unsupported setResponse:["+setArr[1]+"]. 1607290748.");
+			}
 		}
 		else{
 			//out.println("not resp Key = " + key );
