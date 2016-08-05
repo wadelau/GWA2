@@ -7,7 +7,7 @@ outx.append("\n\toutput in comm/footer: "+(new Date())+" smttpl:["+smttpl+"]\n")
 
 if(fmt.equals("")){
 
-	//- #todo
+	//- @todo
 
 	if(smttpl.equals("")){
 		
@@ -64,21 +64,16 @@ if(fmt.equals("")){
 else{
 
 	if(fmt.equals("json")){
-	
-		//- set header
-		//- #todo
-
 		data.put("outx", outx);
 		//- out put json
-
+		
 
 	}
 	else{
-		outx.append("Unknown fmt:["+fmt+"]. 1606261946.");	
+		outx.append("<!-- Unknown fmt:["+fmt+"]. 1606261946. -->");
+		out.println(outx.toString());
 	}
 
 }
-
-
 
 %><%@include file="./aftfooter.inc.jsp"%>

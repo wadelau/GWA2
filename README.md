@@ -1,7 +1,7 @@
 # GWA2
 GWA2 is General Web Application Architecture.  
 ----
--NatureDNS: -GWA2 , -吉娃
+-NatureDNS: -GWA2 , -吉娃兔
 
 *From Interface to Interactions*
 

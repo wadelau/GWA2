@@ -82,7 +82,7 @@ else{
 	else if(ob_start()){ 
 		$isOB = 1; 
 	}
-	if(isset($fmt)){
+	if(isset($fmt) && $fmt != ''){
 		if($fmt == 'json'){
 			#header("Content-type: application/json;charset=utf-8");
 			#print_r($data);
@@ -108,7 +108,7 @@ else{
 			}		
 		}
         else{
-            print "Unknown fmt:[$fmt] in output.";
+            print $out.="<!-- Unknown fmt:[$fmt] in output, using text/plain as default. 1608032158. -->";
         }
 	}
 	else{
