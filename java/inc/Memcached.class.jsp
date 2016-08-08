@@ -7,13 +7,6 @@
  * Ported into Java by wadelau@ufqi.com, June 28, 2016s
  */
 
-//package com.ufqi.gwa2;
-
-
-//import java.util.HashMap;
-
-//import com.ufqi.gwa2.Conn;
-//import com.ufqi.gwa2.MySql;
 
 %><%!
 

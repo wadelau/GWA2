@@ -35,7 +35,7 @@ if(file_exists("./ctrl/".$mod.".php")){
 }
 else{
 	print "ERROR.";	
-	error_log(__FILE__.": found error mod:[$mod]");
+	error_log(__FILE__.": found error mod:[$mod] 201107080706.");
 	exit(0);
 }
 

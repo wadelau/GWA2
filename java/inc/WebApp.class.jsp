@@ -8,7 +8,6 @@
 
 public class WebApp implements WebAppInterface{
 	
-
 	private HashMap hm = new HashMap(); //- runtime container, local, regional
 	public HashMap hmf = new HashMap(); //- persistent storage, global
 	private String myId = "id";

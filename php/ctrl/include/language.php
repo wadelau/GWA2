@@ -35,15 +35,16 @@ else{
 }
 
 $language=str_replace('/','',$language);
-$page='index';
-$module=file2mod($page);
+$defaultpage='index';
+$langmodule=file2mod($defaultpage);
 
 $langupdate = false;
 if(empty($_SESSION['langprops']) || empty($_SESSION['language']) || $language!=$_SESSION['language']){
 	$langupdate = true;
-	$_SESSION['language']=$language;
+	$_SESSION['language'] = $language;
 }
 
+//- load language properties
 if($langupdate){
 	if(isset($_SESSION['language']) && $_SESSION['language']=="en_US"){
 		$fprop=fopen('lang/en_US_Messages.properties','r');
@@ -66,47 +67,49 @@ if($langupdate){
 		$taglen=count($tags);
 		if ($taglen>2&&$tags[0]=='v'){
 			if($taglen==4){
-			  $props[$tags[1]][$tags[2]][$tags[3]]=str_replace('\\\\','\\',trim($list[1]));
+			  $langprops[$tags[1]][$tags[2]][$tags[3]]=str_replace('\\\\','\\',trim($list[1]));
 			}
 			else{
-			  $props[$tags[1]][$tags[2]]=str_replace('\\\\','\\',trim($list[1]));
+			  $langprops[$tags[1]][$tags[2]]=str_replace('\\\\','\\',trim($list[1]));
 			}
 		}
 	  }
 	}
 
 	if ($fprop!=NULL){ fclose($fprop); }
-	$_SESSION['langprops'] = $props;
+	$_SESSION['langprops'] = $langprops;
 	
 }
 
-$props = $_SESSION['langprops'];
+$langprops = $_SESSION['langprops'];
 
 # 
 # refined by wadelau@ufqi
 #
-function gprop($tag,$group=null){
-
-	global $props,$module;
+#function gprop($tag,$group=null){
+function lclang($tag, $group=null){ 
+	# local language, output in this app, will be called in html tpl as
+	# <li><a {if $mod eq "index"} class="active"{/if} href="{$url}">{lclang("home")}</a></li> 
+	
+	global $langprops,$langmodule;
 
 	if(empty($group)) {
-		if (isset($props[$module][$tag])){
-		  //print_r($props[$module][$tag]);
-		  return $props[$module][$tag];
+		if (isset($langprops[$module][$tag])){
+		  return $langprops[$module][$tag];
 		}
-		else if (isset($props['common'][$tag])){
-		  return $props['common'][$tag];
+		else if (isset($langprops['common'][$tag])){
+		  return $langprops['common'][$tag];
 		}
 		else{ 
 		  return NULL;
 		}
 	}
 	else {
-		if (isset($props[$module][$group][$tag])){
-		  return $props[$module][$group][$tag];
+		if (isset($langprops[$module][$group][$tag])){
+		  return $langprops[$module][$group][$tag];
 		}
-		else if (isset($props['common'][$group][$tag])){
-		  return $props['common'][$group][$tag];
+		else if (isset($langprops['common'][$group][$tag])){
+		  return $langprops['common'][$group][$tag];
 		}
 		else{
 			return NULL;
@@ -120,7 +123,7 @@ if(!headers_sent()){
 	setcookie('language',$language,time()+15552000);
 }
 else{
-	debug('lang set fail for cannot modify header information.');
+	#debug('lang set fail for cannot modify header information.');
 }
 
 ?>

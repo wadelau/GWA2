@@ -2,22 +2,20 @@
 /* controller of user mod
  * v2
  */
-%><%@include file="./ctrlheader.inc.jsp"%><%
+//- shared comm in /ctrl
+ %><%@include file="./ctrlheader.inc.jsp"%><%
 
+//- modules
 %><% // @include file="../mod/User.class.jsp" //- relocated to comm/preheader.inc
-
 %><%
-
 %><%@include file="../mod/News.class.jsp"%><%
 
 
 //- objects
-
 News news = new News();
 
 
 //- actions
-
 user.set("iname", "Wadelau");
 user.set("email", "%par%");
 
@@ -62,8 +60,7 @@ else{
 
 }
 
-
-//- tpl
+//- tpl & output
 if(fmt.equals("") && smttpl.equals("")){
 	
 	smttpl = "user.html";

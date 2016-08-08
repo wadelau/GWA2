@@ -7,7 +7,6 @@
  # 
  */
 
-//package com.ufqi.gwa2;
 
 //- exec
 

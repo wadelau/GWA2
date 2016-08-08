@@ -7,11 +7,6 @@
  * @ver: 0.2
  */
 
-//package com.ufqi.gwa2;
-
-
-//import javax.servlet.http.HttpServletRequest;
-
 %><%!
 
 public final static class Wht{

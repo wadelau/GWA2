@@ -51,7 +51,7 @@ if(array_key_exists(UID,$_SESSION) && $_SESSION[UID] != ''){
 
 # page header format
 $fmt = Wht::get($_REQUEST, 'fmt');
-if(isset($fmt)){
+if(isset($fmt) && $fmt != ''){
     if($fmt == 'json'){
         header("Content-type: application/json;charset=utf-8");
     }

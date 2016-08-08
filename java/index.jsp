@@ -10,7 +10,6 @@
 //-  entry header
 %><%@include file="./comm/header.inc.jsp"%><%
 
-
 //- main logic
 mod = Wht.get(request, "mod");
 act = Wht.get(request, "act");
@@ -21,7 +20,6 @@ if(mod.equals("")){
 }
 data.put("mod", mod);
 data.put("act", act);
-
 
 /*
  * Due to 
@@ -79,7 +77,7 @@ if((new File(realModfs)).exists()){
 else{
 
 	//- no exist//- continue this way
-	outx = new StringBuffer("\n/index: Unknown mod:["+mod+"] with act:["+act+"] modfs:["+modfs+"]. 1606110925.\n");	
+	outx = new StringBuffer("\n/index: Unknown mod:["+mod+"] with act:["+act+"] modfs:["+modfs+"]. 201107080706.\n");	
 	//- #todo: log
 
 }
@@ -88,7 +86,7 @@ else{
 if(true){
 	
 	%><%@include file="./ctrl/ctrl.inc.jsp"%><%
-
+	
 }
 
 //- footer

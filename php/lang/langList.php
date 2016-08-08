@@ -10,14 +10,15 @@
  * All Rights Reserved
  ******************************************************************************/
 
-function file2mod($filename)
-{
+function file2mod($filename){
+	
 	switch($filename) {
 		case 'header':
 		case 'index':
 			return 'common';
-	return false;
+		return false;
 	}
+	
 }
 
 ?>
