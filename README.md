@@ -97,7 +97,7 @@ ctrl/user.php
 ###3. 创建视图页面
 view/default/signin.html
 
-其中 view是模块目录， default 是默认风格
+其中 view 是模块目录， default 是默认风格
 
   view/default/signup.html
 
