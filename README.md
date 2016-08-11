@@ -50,7 +50,7 @@ GWA2 is General Web Application Architecture.
 
 ##user module, 用户模块
 
-###0. 建表
+###0. create table, 建表
 ```sql
 create table gmis_usertbl(
   id int(11) not null auto_increment,
@@ -67,7 +67,7 @@ create table gmis_usertbl(
 );
 ```
 
-###1. 创建对象类
+###1. create module class, 创建对象类
 mod/user.class.php
 
 继承  inc/webapp.class.php 
@@ -75,7 +75,7 @@ mod/user.class.php
 实现   inc/webapp.interface.php 
 
 
-###2. 创建控制器
+###2. create controller, 创建控制器
 ctrl/user.php
 
 引入 mod/user.class 并实例化
@@ -94,7 +94,7 @@ ctrl/user.php
 
 在控制器中处理逻辑，然后指定要加载的模板，引入 smarty
 
-###3. 创建视图页面
+###3. create view, 创建视图页面
 view/default/signin.html
 
 其中 view 是模块目录， default 是默认风格
@@ -107,6 +107,6 @@ view/default/signin.html
 
   view/default/my.html
 
-###4. 在入口定义模板
+###4. define routing, 在入口定义模板
 /index.php?mod=user&act=xxxx
 
