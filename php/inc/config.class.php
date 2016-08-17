@@ -1,6 +1,9 @@
 <?php
 ############
 # global constant configurations
+
+ini_set("memory_limit","256M"); # memory limit avoding crush
+
 if(true){
 	
 	$conf = array();
