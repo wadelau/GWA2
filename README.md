@@ -46,6 +46,34 @@ GWA2 is General Web Application Architecture.
 
 ----
 
+***[GWA2 Updates](http://ufqi.com/blog/category/computer-tech/%E9%80%9A%E7%94%A8%E7%BD%91%E7%BB%9C%E5%BA%94%E7%94%A8%E6%9E%B6%E6%9E%84/)***
+
+GWA2写日志的两种方法setBy和debug
+
+-GWA2 Java版本的i18n/中文编码/乱码问题
+
+-GWA2新增命令行运行及NO_SQL_CHECK支持
+
+gwa2更新多数据库驱动支持
+
+-gwa2 vs -thinkphp
+
+-GWA2更新：扩展增加read/writeObject to setBy/getBy
+
+-gMIS/-GWA2更新：自动安装程序和MySQLi
+
+-GWA2 core updates: 容错处理,孤儿占位符
+
+-gwa2 安全更新及域名绑定到模块
+
+-gwa2安全更新
+
+-gMIS更新兼容Strict SQL Mode
+
+
+
+----
+
 # An Example Module (User)
 
 ##user module, 用户模块
