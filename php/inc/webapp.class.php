@@ -61,19 +61,24 @@ class WebApp implements WebAppInterface{
 	//-
 	function set($field,$value=null){ # update, Sat May 16 08:54:54 CST 2015
 		
-		if($value === null){
-			if(is_array($field)){
-				foreach($field as $k=>$v){
-					$this->hmf[$k] = $v;	
-				}		
-			}
-			else{
-				$this->hmf[$field] = '';
-				error_log(__FILE__.": Warning! field:[$field] set a null value.");
-			}
+		if($field == null || $field == ''){
+		    # @todo ?
 		}
 		else{
-			$this->hmf[$field] = $value;
+    	    if($value === null){
+    			if(is_array($field)){
+    				foreach($field as $k=>$v){
+    					$this->hmf[$k] = $v;	
+    				}		
+    			}
+    			else{
+    				$this->hmf[$field] = '';
+    				error_log(__FILE__.": Warning! field:[$field] set a null value.");
+    			}
+    		}
+    		else{
+    			$this->hmf[$field] = $value;
+    		}
 		}
 	}
 	

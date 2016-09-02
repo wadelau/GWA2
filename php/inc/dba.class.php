@@ -97,6 +97,10 @@ class DBA {
         #print_r($hmvars);
 		if(is_array($hmvars)){
 			foreach($hmvars as $k => $v){
+			    if($k == ''){
+			        debug(__FILE__.": found empty k:[$k], skip.");
+			        continue;
+			    }
 				$hasK = strpos($sql, $k."="); 
 				if($hasK === false){ $hasK = strpos($sql, $k." "); }
 				if($hasK !== false ){
@@ -135,7 +139,7 @@ class DBA {
 							 *  !!!Need space before > or < in this case, Thu Sep 11 16:29:03 CST 2014
 							 */
 							$nextpos = strpos($sql,$spacek,$nextpos+1);
-							$tmpiposarr[$k]++;
+							$tmpposarr[$k]++;
 						}
 					}
 					else
