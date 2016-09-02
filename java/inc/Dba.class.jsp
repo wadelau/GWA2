@@ -145,6 +145,10 @@ public final class Dba { //- db administrator
 			while(itr.hasNext()){
 				k=(String)itr.next();
 				k = k==null ? "" : k;
+				if(k.equals(""){ 
+					
+					continue; 
+				}
 				int tmpKpos = sqlstr.indexOf(k);
 				if(k.equals("") || "oderby,groupby,pagesize,pagenum,".indexOf(k+",") > -1 
 					|| tmpKpos < 0 ){
@@ -347,4 +351,5 @@ public interface DbDriver{
 	
 
 }
+
 %>
