@@ -60,7 +60,12 @@ public class WebApp implements WebAppInterface{
 	//-
 	public void set(String k, Object v){
 		
-		this.hmf.put(k, v);
+		if(k == null || k.equals("")){
+			//- @todo ?
+		}
+		else{
+			this.hmf.put(k, v);	
+		}
 		
 	}
 
