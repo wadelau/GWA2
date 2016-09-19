@@ -258,7 +258,7 @@ else if($step == 'env'){
 # part-2, main source
 else if($step == 'getsrc'){
 	# retrieve source
-	$testf = "$d/memo/gwa2-dev-readme.txt";
+	$testf = "$d/README.md";
 
 	if($istep == ''){
 		$cmd = "rm -f ./$f; rm -rf ./$d";
@@ -270,7 +270,7 @@ else if($step == 'getsrc'){
 	if(is_file($f)){
 		$out .= "<br/>Source retrieved.";
 		if(1 || $istep != 'waitdir'){
-			$cmd = "unzip '$f'";
+			$cmd = "unzip -u -o '$f'";
 			execInBackground($cmd);
 		}
 		if(!is_dir($d) || !is_file($testf)){
@@ -278,7 +278,7 @@ else if($step == 'getsrc'){
 			redirect($file."&step=getsrc&istep=waitdir", 6 , $header.$out.$footer);
 		}
 		else{
-			$cmd = "mv -fu $d/* ./";
+			$cmd = "mv -fu $d/php/* ./";
 			execInBackground($cmd);
 
 			if(is_file($testf)){
