@@ -79,8 +79,8 @@ function sendMail($to,$subject,$body, $from='', $local=0){
         include($_CONFIG['appdir']."/mod/mailer.class.php");
 
         $_CONFIG['mail_smtp_server'] = "smtp.163.com";
-        $_CONFIG['mail_smtp_username'] = "wadelau@163.com";
-        $_CONFIG['mail_smtp_password'] = "my.minina.123456";
+        $_CONFIG['mail_smtp_username'] = "";
+        $_CONFIG['mail_smtp_password'] = "";
         $_CONFIG['isauth'] = true;
         $_CONFIG['mail_smtp_fromuser'] = $_CONFIG['mail_smtp_username'];
 

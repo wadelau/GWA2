@@ -97,7 +97,7 @@ class MYSQLIX {
 			$sql .= " limit 1 ";
 		} 
 		#debug($sql);
-        $result = $this->m_link->query($sql) or $this->sayErr('[$sql] query failed. 201605220716.');
+        $result = $this->m_link->query($sql) or $this->sayErr("[$sql] query failed. 201605220716.");
         		
 		if($result){
 			if($row = $result->fetch_array(MYSQLI_ASSOC) ){
