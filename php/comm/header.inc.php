@@ -10,7 +10,7 @@ error_reporting(E_ALL & ~E_NOTICE);
 $docroot = $_SERVER['DOCUMENT_ROOT'];
 $rtvdir = dirname(dirname(__FILE__)); # relative dir
 $rtvdir = str_replace($docroot,"", $rtvdir);
-$reqdir = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/')); # for tpl in footer.inc?
+$reqdir = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['SCRIPT_NAME'], '/')); # for tpl in footer.inc?
 $appdir = $docroot.$reqdir;
 
 if($appdir == ''){
