@@ -17,13 +17,11 @@ class ADS extends WebApp{
 		function __construct() {
 				$this->dba = new DBA();
 				
-				if($_SESSION['language'] && $_SESSION['language'] == "en_US")
-				{
-				    $this->setTbl(Gconf::get('tblpre').'en_info_ads');
+				if($_SESSION['language'] && $_SESSION['language'] == "en_US"){
+				    $this->setTbl(GConf::get('tblpre').'en_info_ads');
 				}
-				else
-				{
-				    $this->setTbl(Gconf::get('tblpre').'ch_info_ads');
+				else{
+				    $this->setTbl(GConf::get('tblpre').'ch_info_ads');
 				}
 		}
 }

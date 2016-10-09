@@ -4,7 +4,7 @@ global $sid, $appdir, $siteid, $user, $userid,$isdbg;
 date_default_timezone_set("Asia/Chongqing");
 session_start(); # in developping stage, using php built-in session manager
 
-error_reporting(E_ALL & ~E_NOTICE);
+error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 
 # dir manipulate
 $docroot = $_SERVER['DOCUMENT_ROOT'];

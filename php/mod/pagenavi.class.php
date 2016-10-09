@@ -113,13 +113,14 @@ class PageNavi extends WebApp{
             if($i>0){
 
                 if($i == $para['pnpn']){
-                    $pageArr['currentpage'] = $i;
+                    $pageArr['pnpn'] = $i;
                 }
                 $pageArr['pages'][] = $i;
 
             }
             #print "$i: [$str] totalpage:[$totalpage]\n";
         }
+		$pageArr['pnps'] = $para['pnps'];
 
        return $pageArr;
 

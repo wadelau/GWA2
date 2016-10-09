@@ -2,7 +2,7 @@
 ############
 # global constant configurations
 
-ini_set("memory_limit","256M"); # memory limit avoding crush
+ini_set("memory_limit","512M"); # memory limit avoding crush
 
 if(true){
 	
@@ -62,17 +62,17 @@ if(true){
 	$conf['operatelogtbl']	= $tblpre.'fin_operatelogtbl';
 	
 	# set to global container
-	Gconf::setConf($conf);
+	GConf::setConf($conf);
 	
 }
 ############
 
 global $_CONFIG;
-$_CONFIG = Gconf::getConf();
+$_CONFIG = GConf::getConf();
 
 # configuration container
 
-class Gconf{
+class GConf{
 
 	private static $conf = array();
 

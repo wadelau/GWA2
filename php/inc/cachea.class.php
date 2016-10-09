@@ -24,7 +24,7 @@ class CacheA {
 		
 		$cacheConf = ($cacheConf==null ? 'Cache_Master' : $cacheConf);
 		$this->conf = new $cacheConf;
-		$cacheDriver = Gconf::get('cachedriver');
+		$cacheDriver = GConf::get('cachedriver');
 		$this->cacheconn = new $cacheDriver($this->conf);
 		
 	}

@@ -24,8 +24,12 @@ $data['time'] = date("H:i", time());
 # tpl
 
 if($out == '' && $smttpl == ''){ # if other module do not define a smttpl and $conf['display_style_smttpl']? 
-	     
-	$smttpl = 'item.html';
+    if($fmt != ''){
+        # API
+    }
+    else{
+        $smttpl = 'item.html';
+    }
 }
 
 ?>

@@ -20,7 +20,7 @@ class Config_Master{
 	var $mDbDatabase = "";
 	
 	function __construct(){
-		$gconf = new Gconf();
+		$gconf = new GConf();
 		$this->mDbHost = $gconf->get('dbhost');
 		$this->mDbPort = $gconf->get('dbport');
 		$this->mDbUser = $gconf->get('dbuser');
@@ -39,7 +39,7 @@ class Config_Slave{
 	var $mDbDatabase = "";
 	
 	function __construct(){
-		$gconf = new Gconf();
+		$gconf = new GConf();
 		$this->mDbHost = $gconf->get('dbhost_slave');
 		$this->mDbPort = $gconf->get('dbport_slave');
 		$this->mDbUser = $gconf->get('dbuser_slave');
@@ -59,9 +59,9 @@ class Cache_Master{
 	
 	function __construct(){
 		
-		$this->chost = Gconf::get('cachehost');
-		$this->cport = Gconf::get('cacheport');
-		$this->expireTime = Gconf::get('cacheexpire');
+		$this->chost = GConf::get('cachehost');
+		$this->cport = GConf::get('cacheport');
+		$this->expireTime = GConf::get('cacheexpire');
 		
 	}
 	

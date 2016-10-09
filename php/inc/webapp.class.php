@@ -26,7 +26,7 @@ class WebApp implements WebAppInterface{
 	var $dba = null;
 	var $hm = array();
 	var $hmf = array(); # container for the Object which extends this class	
-	var $isdbg = 1;  # Gconf::get('is_debug');
+	var $isdbg = 1;
 	var $sep = "|"; # separating tag for self-defined message body
 	var $myId = 'id'; # field name 'id', in case that it can be renamed as nameid, name_id, nameId, nameID, ID, iD, Id, and so on, by wadelau@ufqi.com Mon May  9 13:34:45 CST 2016
 	
@@ -44,8 +44,7 @@ class WebApp implements WebAppInterface{
         }
 		
 		# cache
-		#print_r(__FILE__."enable_cache:[".Gconf::get('enable_cache')."]");
-		if(Gconf::get('enable_cache')){
+		if(GConf::get('enable_cache')){
 			if($this->cachea == null){
 				$this->cachea = new CacheA($args['cacheconf']);
 				#print_r(__FILE__."cachea:[".$this->cachea."]");
@@ -54,7 +53,7 @@ class WebApp implements WebAppInterface{
 		
 		# others should be invoked by its subclasses
 		
-		$this->isdbg = Gconf::get('is_debug');
+		$this->isdbg = GConf::get('is_debug');
 		
 	}
 	
@@ -114,7 +113,7 @@ class WebApp implements WebAppInterface{
 	
 	//-
 	function setTbl($tbl){
-		$tblpre = Gconf::get('tblpre');
+		$tblpre = GConf::get('tblpre');
 		if($tblpre != '' && strpos($tbl, $tblpre) !== 0){
 			$tbl = $tblpre.$tbl;
 		}
@@ -423,7 +422,17 @@ class WebApp implements WebAppInterface{
     
         $obj = '';
     
-        if($type == 'file:'){
+        if($type == 'cache:'){
+			//- cache service
+			$obj = $this->cachea->get($args['key']);
+			if(!$obj[0]){
+				$obj = array(true, $obj[1]);
+			}
+			else{
+				$obj = array(false, array('errorcode'=>1606140931, 'errordesc'=>$this->toString($obj)));
+			}
+		}
+	    else if($type == 'file:'){
             //-- local or network file system
             $obj = file_get_contents($args['target']);
             if($obj !== false){
@@ -508,7 +517,28 @@ class WebApp implements WebAppInterface{
     
         $obj = '';
     
-        if($type == 'file:'){
+        if($type == 'cache:'){
+			//- cache service
+			if(is_null($args['value'])){
+				$obj = $this->cachea->rm($args['key']);
+			}
+			else{
+				#print_r($args);
+				if($args['expire']){
+					$obj = $this->cachea->set($args['key'], $args['value'], $args['expire']);
+				}
+				else {
+					$obj = $this->cachea->set($args['key'], $args['value']);
+				}
+			}
+			if(!$obj[0]){
+				$obj = array(true, $obj[1]);
+			}
+			else{
+				$obj = array(false, array('errorcode'=>1606140930, 'errordesc'=>$this->toString($obj)));
+			}
+		}
+		else if($type == 'file:'){
             //-- local or network file system
             # test dir
             $dirfile = $args['target'];

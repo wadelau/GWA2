@@ -47,6 +47,4 @@ if(true){
 # footer.inc file
 include("./comm/footer.inc.php");
 
-# add more ---
-
 ?>

@@ -75,8 +75,7 @@ if($smttpl != ''){
 	}
 }
 else{
-	
-	//var_dump($_REQUEST);
+
 	$isOB = 0;
 	if(ob_start('ob_gzhandler')){ $isOB = 1; }
 	else if(ob_start()){ 

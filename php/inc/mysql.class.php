@@ -50,7 +50,7 @@ class MYSQL {
 				mysql_select_db($this->m_name, $this->m_link) or die($this->sayErr("use ".$this->m_name));
 			}
 			
-			if(Gconf::get('db_enable_utf8_affirm')){
+			if(GConf::get('db_enable_utf8_affirm')){
 				$this->query("SET NAMES 'utf8'", null, null);
 			}
 		}
@@ -174,8 +174,8 @@ class MYSQL {
 	function _enSafe($sql,$idxarr,$hmvars){
 		
 		$sql = $origSql = trim($sql);
-		if($hmvars[Gconf::get('no_sql_check')]){
-			$hmvars[Gconf::get('no_sql_check')] = false; # valid only once
+		if($hmvars[GConf::get('no_sql_check')]){
+			$hmvars[GConf::get('no_sql_check')] = false; # valid only once
 			return $origSql;
 		}
 		else{

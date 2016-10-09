@@ -7,7 +7,7 @@
 # menu, 
 # html page header and footer 
 
-$data['time'] = date("H:i", time());
+$data['full_time'] = date("Y-m-d-H:i:s", time());
 
 
 ?>

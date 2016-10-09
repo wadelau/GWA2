@@ -152,8 +152,8 @@ class SQLSERVER {
 	function _enSafe($sql,$idxarr,$hmvars){
 		
 		$sql = $origSql = trim($sql);
-		if($hmvars[Gconf::get('no_sql_check')]){
-			$hmvars[Gconf::get('no_sql_check')] = false; # valid only once
+		if($hmvars[GConf::get('no_sql_check')]){
+			$hmvars[GConf::get('no_sql_check')] = false; # valid only once
 			return $origSql;
 		}
 		else{

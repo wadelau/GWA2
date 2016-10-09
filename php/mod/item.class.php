@@ -17,10 +17,10 @@ class Item extends WebApp{
         $this->dba = new DBA();
 
         if($_SESSION['language'] && $_SESSION['language'] == "en_US"){
-            $this->setTbl(Gconf::get('tblpre').'itemtbl');
+            $this->setTbl(GConf::get('tblpre').'itemtbl');
         }
         else{
-            $this->setTbl(Gconf::get('tblpre').'itemtbl');
+            $this->setTbl(GConf::get('tblpre').'itemtbl');
         }
     }
 			

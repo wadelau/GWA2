@@ -39,7 +39,7 @@ class MYSQLIX {
 			$this->m_link = new mysqli($this->m_host, $this->m_user, 
 				$this->m_password, $this->m_name, $this->m_port);
 			
-			if(Gconf::get('db_enable_utf8_affirm')){
+			if(GConf::get('db_enable_utf8_affirm')){
 				$this->query("SET NAMES 'utf8'", null, null);
 			}
 			
@@ -175,8 +175,8 @@ class MYSQLIX {
 	function _enSafe($sql,$idxarr,$hmvars){
 		
 		$sql = $origSql = trim($sql);
-		if($hmvars[Gconf::get('no_sql_check')]){
-			$hmvars[Gconf::get('no_sql_check')] = false; # valid only once
+		if($hmvars[GConf::get('no_sql_check')]){
+			$hmvars[GConf::get('no_sql_check')] = false; # valid only once
 			return $origSql;
 		}
 		else{
