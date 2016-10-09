@@ -219,55 +219,67 @@ class PageNavi extends WebApp{
                 if(strpos($v,"tbl:") === 0){ #http://ufqi.com:81/dev/gtbl/ido.php?tbl=hss_dijietbl&tit=%E5%AF%BC%E6%B8%B8%E8%A1%8C%E7%A8%8B&db=&pnsktuanid=tbl:hss_findaoyoutbl:id=2 
                     $condition .= " ".$pnsm." ".$field." in (".$this->embedSql($linkfield,$v).")";
                 
-                }else if(strpos($v,"in::") === 0){ # <hidesk>tuanid=id::in::tbl:hss_tuanduitbl:operatearea=IN=USER_OPERATEAREA</hidesk>
+                }
+				else if(strpos($v,"in::") === 0){ # <hidesk>tuanid=id::in::tbl:hss_tuanduitbl:operatearea=IN=USER_OPERATEAREA</hidesk>
                     error_log(__FILE__.": k:$k, v:$v");
                     $tmparr = explode("::", $v);
                     $tmpop = $tmparr[0];
                     $tmpval = $tmparr[1];
                     if(strpos($tmpval,"tbl:") === 0){
                         $tmpval = $this->embedSql($linkfield, $tmpval);
-                    }else{
+                    }
+					else{
                         $tmpval = $this->addQuote($tmpval);
                     }
                     $condition .= " and $field in ($tmpval)";
-
-                }else{
+                }
+				else{
                     # remedy on Sun Jun 17 07:54:59 CST 2012 by wadelau
                     $fieldopv = $_REQUEST['oppnsk'.$field]; # refer to ./class/gtbl.class.php: getLogicOp,
                     if($fieldopv == null || $fieldopv == ''){
                         $fieldopv = "=";
                     }
+					else{
+                        $fieldopv = str_replace('&lt;', '<', $fieldopv);
+                    }
                     if($fieldopv == 'inlist'){
                         if($this->isNumeric($hmfield[$field]) && strpos($hmfield[$field],'date') === false){
                             # numeric
-                        }else{
+                        }
+						else{
                             $v = $this->addQuote($v);
                         }
                         $condition .= " ".$pnsm." $field in ($v)";
-                    }else if($fieldopv == 'inrange'){
+                    }
+					else if($fieldopv == 'inrange'){
                         $tmparr = explode(",", $v);
                         if(strpos($hmfield[$field],'date') === false){
                             $condition .= " ".$pnsm." ($field >= ".$tmparr[0]." and $field <= ".$tmparr[1].")";
-                        }else{
+                        }
+						else{
                             $condition .= " ".$pnsm." ($field >= '".$tmparr[0]."' and $field <= '".$tmparr[1]."')";
                         }
-                    }else if($fieldopv == 'contains'){
+                    }
+					else if($fieldopv == 'contains'){
                         $condition .= " ".$pnsm." "."$field like ?";
                         $gtbl->set($field, "%".$v."%");
-                    }else if($fieldopv == 'notcontains'){
+                    }
+					else if($fieldopv == 'notcontains'){
                         $condition .= " ".$pnsm." "."$field not like ?";
                         $gtbl->set($field, "%".$v."%");
-                    }else if($fieldopv == 'startswith'){
+                    }
+					else if($fieldopv == 'startswith'){
                         $condition .= " ".$pnsm." "."$field like ?";
                         $gtbl->set($field, $v."%");
-                    }else if($fieldopv == 'endswith'){
+                    }
+					else if($fieldopv == 'endswith'){
                         $condition .= " ".$pnsm." "."$field like ?";
                         $gtbl->set($field, "%".$v);
-                    }else{ 
+                    }
+					else{ 
                         $condition .= " ".$pnsm." $field $fieldopv ?"; # this should be numeric only.
                         $gtbl->set($field, $v);
                     }
-
                 }
             }
        }
