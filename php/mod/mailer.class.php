@@ -1,9 +1,8 @@
 <?php
 
-class Mailer  
-{  
+class Mailer{  
   
-    function Mailer($relay_host = "", $smtp_port = 25,$auth = false,$user,$pass){  
+    function __construct($relay_host = "", $smtp_port = 25,$auth = false,$user,$pass){  
    
 		$this->debug = FALSE;  
 		
@@ -28,9 +27,8 @@ class Mailer
   
 /* Main Function */  
   
- function sendMail($to, $from, $subject = "", $body = "", $mailtype, $returnpath = "", $cc = "", $bcc = "", $additional_headers = "")  
-   
- {  
+ function sendMail($to, $from, $subject = "", $body = "", $mailtype, 
+	$returnpath = "", $cc = "", $bcc = "", $additional_headers = ""){  
    
  $mail_from = $this->get_address($this->strip_comment($from));  
    

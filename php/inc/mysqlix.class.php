@@ -198,7 +198,9 @@ class MYSQLIX {
 					#print __FILE__.": t:[".$t."] i:[".$i."] vars:[".$idxarr[$i]."] hmv:[".$hmvars[$idxarr[$i]]."]\n";
 					if(!array_key_exists($idxarr[$i], $hmvars)){
 						# in case that, field was not set by $obj->set but written in sql with '?', Sat Apr  2 23:54:48 CST 2016
-						debug(__FILE__.": found unmatched field:[$t].");
+						debug(__FILE__.": found unmatched field:[$t], i:[$i], n:[$n], a:[$a].");
+						debug($idxarr);
+						debug($hmvars);
 						$sql = substr($sql,$a+1);
 						$a = strpos($sql,"?");
 						$newsql .= str_replace("?", '\'\'', $t);

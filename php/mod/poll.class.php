@@ -11,9 +11,7 @@ class Poll extends WebApp{
 
 	# construct
 	function __construct(){
-
-        $this->dba = new DBA();
-        
+     
 		if($_SESSION['language'] && $_SESSION['language'] == "en_US"){
 			# disable multiple languages for now
             $this->setTbl(GConf::get('tblpre').'polltbl');
@@ -21,6 +19,9 @@ class Poll extends WebApp{
 		else{
 			$this->setTbl(GConf::get('tblpre').'polltbl');
 		}
+		
+		parent::__construct();
+		 
     }
 
     function md5B62x($s){

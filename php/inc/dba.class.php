@@ -127,7 +127,7 @@ class DBA {
 
 						while($nextpos !== false){
 							
-							$tmparr[$nextpos] = $k.(count($tmpposarr)>0?".".$tmpposarr[$k]:""); 
+							$tmparr[$nextpos] = $k.($tmpposarr[$k]!='' ? ".".$tmpposarr[$k] : ""); 
 							/* 
 							 *  Attention: 
 							 *      one field matches more than two values, 

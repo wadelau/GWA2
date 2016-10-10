@@ -14,14 +14,16 @@ class Item extends WebApp{
     var $iname = "";
 
     function __construct () {
-        $this->dba = new DBA();
-
+      
         if($_SESSION['language'] && $_SESSION['language'] == "en_US"){
             $this->setTbl(GConf::get('tblpre').'itemtbl');
         }
         else{
             $this->setTbl(GConf::get('tblpre').'itemtbl');
         }
+		
+		parent::__construct();
+		
     }
 			
 	//- @overide,

@@ -15,7 +15,6 @@ class PageNavi extends WebApp{
 
    public function __construct(){
 
-       $this->dba = new DBA(); # added by wadelau@ufqi.com, Wed Jul 11 14:31:52 CST 2012
        $para = array();
        $pdef = array('pnpn'=>1,'pnps'=>28,'pntc'=>0); # 28 for development
 
@@ -50,6 +49,8 @@ class PageNavi extends WebApp{
             $para[$k] = $para[$k]>0?$para[$k]:$pdef[$k];
             $this->hmf[$k]=$para[$k];
        }
+	   
+	   parent::__construct();
 
    }
 
@@ -106,7 +107,7 @@ class PageNavi extends WebApp{
        $totalpage = $para['pntc'] % $para['pnps'] == 0 ? ($para['pntc']/$para['pnps']) : ceil($para['pntc']/$para['pnps']);
        $navilen = 3;
 
-		    $pageArr = array('totalpage'=>$totalpage, 'url'=>$para['url']);
+		    $pageArr = array('totalpage'=>$totalpage, 'totalrecord'=>$para['pntc'], 'url'=>$para['url']);
 
         for($i=$para['pnpn']-$navilen; $i<$para['pnpn'] + $navilen && $i<=$totalpage; $i++){
 
@@ -173,8 +174,8 @@ class PageNavi extends WebApp{
    function getCondition($gtbl, $user){
        $condition = "";
        $pnsm = $_REQUEST['pnsm']; $pnsm = $pnsm==''?"or":'and';
-       $hmfield = array(); #  $gtbl->getFieldList(); # for -gMIS
-       if(count($hmfield) < 1){
+       $hmfield = array(); #  $gtbl->getFieldList(); # for -gMIS only
+       if(false && count($hmfield) < 1){
        		$hmfield = array();
        		$tmpHm = $gtbl->execBy("desc ".$gtbl->getTbl());	
 			if($tmpHm[0]){

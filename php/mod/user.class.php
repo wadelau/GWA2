@@ -18,8 +18,10 @@ class User extends WebApp{
 	//-
 	function __construct(){
 		//-
-		$this->dba = new DBA();
 		$this->setTbl(GConf::get('tblpre').'info_siteusertbl');
+		
+		parent::__construct();
+	
 	}
 	
 	//-

@@ -34,7 +34,7 @@ if($smttpl != ''){
 			$data[$k] = $v;	
 		}	
 	}
-	foreach($data as $k=>$v){
+	foreach($data as $k=>$v){ # main point
 		$smt->assign($k, $v);
 	}
 	
@@ -87,7 +87,7 @@ else{
 			#print_r($data);
 			#print json_encode($data['respobj']);
 			$data['out'] = $out;
-			$output = json_encode($data);
+			$output = json_encode($data); # main point
 			$jsonerr = json_last_error();
 			if($jsonerr == JSON_ERROR_NONE){
 				print $output;

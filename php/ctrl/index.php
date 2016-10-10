@@ -5,6 +5,9 @@ include_once($appdir."/ctrl/include/language.php");
 #include_once($appdir."/mod/poll.class.php");
 
 #
+# objects
+
+#
 # actions
 
 $act = $act == '' ? 'index' : $act;

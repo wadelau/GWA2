@@ -21,8 +21,8 @@ class Search extends WebApp{
 
 	//-
 	function __construct(){
-		$this->dba = new DBA();
-		# no tables set 
+		
+		parent::__construct();
 		
 	}
 

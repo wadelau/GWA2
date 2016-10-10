@@ -169,7 +169,15 @@ function base62x($s,$dec=0,$numType=''){
     if($dec == 1){
         $type = "-dec";
     }
-    return $s=exec('/www/webroot/tools/base62x '.$type.($numType==''?'':' -n '.$numType).' \''.$s.'\'');
+    $s2 = '';
+    require_once($_CONFIG['appdir']."/mod/base62x.class.php");
+    if($type == "-enc"){
+        $s2 = Base62x::encode($s, $numType);
+    }
+    else{
+        $s2 = Base62x::decode($s, $numType);
+    }
+    return $s2;
 }
 
 /**
@@ -289,7 +297,7 @@ function isEmail($email){
 # get Ids list from array|hash
 # by wadelau@ufqi.com, Sat Jul 11 09:21:13 CST 2015
 function getIdList($iarray, $ikey){
-	$tmpIds = "999999,";
+	$tmpIds = "99999999,";
 
 	foreach($iarray as $k=>$v){
 		$tmpIds .= $v[$ikey].",";
