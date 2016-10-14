@@ -1,11 +1,11 @@
 <?php
 /* WebApp class, as a web application's parent for all subclass 
- * v0.1,
- * wadelau@ufqi.com, 2011-07-12 22:41
+ * v0.1, wadelau@ufqi.com, 2011-07-12 22:41
  * Sun Jul 17 10:16:03 UTC 2011
  * Mon Jan 23 12:14:15 GMT 2012
  * 08:42 Sunday, June 14, 2015
  * Sat Aug  8 11:22:40 CST 2015
+ * v0.2, Wed, 12 Oct 2016 13:07:02 +0800
  */
 
 
@@ -20,21 +20,24 @@ require(__ROOT__."/inc/session.class.php");
 require(__ROOT__."/inc/cachea.class.php");
 require(__ROOT__."/inc/filesystem.class.php");
 
-
 class WebApp implements WebAppInterface{
 	
+	//- variables
 	var $dba = null;
+	var $cachea = null;
 	var $hm = array();
 	var $hmf = array(); # container for the Object which extends this class	
 	var $isdbg = 1;
 	var $sep = "|"; # separating tag for self-defined message body
-	var $myId = 'id'; # field name 'id', in case that it can be renamed as nameid, name_id, nameId, nameID, ID, iD, Id, and so on, by wadelau@ufqi.com Mon May  9 13:34:45 CST 2016
+	var $myId = 'id'; # field name 'id', in case that it can be renamed as 
+	   # nameid, name_id, nameId, nameID, ID, iD, Id, and so on, 
+	   # by wadelau@ufqi.com Mon May  9 13:34:45 CST 2016
+	const GWA2_ERR = 'gwa2_error_TAG';
+	const GWA2_ID = 'gwa2_id_TAG';
+	const GWA2_TBL = 'gwa2_tbl_TAG';
 	
-	var $cachea = null;
-
 	//- constructor
 	function __construct($args=null){
-
 		# db as backend
 		if($this->dba == null){ # Wed Oct 22 10:23:03 CST 2014
           if($args != null && is_array($args) && array_key_exists('dbconf', $args)){
@@ -42,7 +45,6 @@ class WebApp implements WebAppInterface{
 		  }
 		  $this->dba = new DBA($dbconf);
         }
-		
 		# cache
 		if(GConf::get('enable_cache')){
 			if($this->cachea == null){
@@ -50,18 +52,15 @@ class WebApp implements WebAppInterface{
 				#print_r(__FILE__."cachea:[".$this->cachea."]");
 			}
 		}
-		
 		# others should be invoked by its subclasses
-		
 		$this->isdbg = GConf::get('is_debug');
-		
 	}
 	
 	//-
-	function set($field,$value=null){ # update, Sat May 16 08:54:54 CST 2015
-		
+	function set($field, $value=null){ # update, Sat May 16 08:54:54 CST 2015
 		if($field == null || $field == ''){
 		    # @todo ?
+		    return false;
 		}
 		else{
     	    if($value === null){
@@ -72,43 +71,61 @@ class WebApp implements WebAppInterface{
     			}
     			else{
     				$this->hmf[$field] = '';
-    				error_log(__FILE__.": Warning! field:[$field] set a null value.");
+    				#error_log(__FILE__.": Warning! field:[$field] set a null value.");
     			}
     		}
     		else{
     			$this->hmf[$field] = $value;
     		}
 		}
+		return true;
 	}
 	
 	//-
-	function get($field){
-		
+	function get($field, $noExtra=null){
 		if(array_key_exists($field,$this->hmf)){
 			return $this->hmf[$field];
 		}
-		else if($field != $this->myId & $field != 'tbl' && $field != 'er'){
-			#! Otherwise, this will cause a dead loop with ._setAll.
-			if($this->get('er') != 1){
-				if($this->_setAll()){
-					if(isset($this->hmf[$field])){
-						return $this->hmf[$field];
-					}
-					else{
-						return $this->hmf[$field]='';	
-					}
-				}
-				else{
-					return '';
-				}
-			}
-			else {
-				return '';
-			}
-		}
-		else{
-			return '';
-		}
+		else {
+		    if($noExtra == null){
+		        if($field == $this->myId
+		                || $field == self::GWA2_TBL
+		                || $field == self::GWA2_ERR){
+		            $noExtra = 1; 
+		            #! Otherwise, this will cause a dead loop with ._setAll,
+		            # or some query loop between getBy, get and _setAll,
+		            # noExtra means just retrieve runtime value, not for db, file...
+		            # Wed, 12 Oct 2016 09:39:54 +0800
+		        }
+		    }
+		    if($noExtra == null){
+    			if($this->get(self::GWA2_ERR) != 1){
+    				if($this->_setAll()){
+    					if(isset($this->hmf[$field])){
+    						return $this->hmf[$field];
+    					}
+    					else{
+    						return $this->hmf[$field]='';	
+    					}
+    				}
+    				else{
+    					return '';
+    				}
+    			}
+    			else {
+    				return '';
+    			}
+    		}
+    		else{
+    			return '';
+    		}
+	   }
+	}
+	
+	//-
+	function del($filed){
+	    unset($this->hmf[$field]);
+	    return true;
 	}
 	
 	//-
@@ -119,6 +136,7 @@ class WebApp implements WebAppInterface{
 		}
 		$this->set("tbl",$tbl);
 		if($this->dba == null){ $this->dba = new DBA(); }
+		return true;
 	}
 
 	function getTbl(){
@@ -126,8 +144,9 @@ class WebApp implements WebAppInterface{
 	}
 
 	function setId($id){
-		debug("id:$id, myId:".$this->myId);
+		#debug("id:$id, myId:".$this->myId);
 		$this->set($this->myId, $id);
+		return true;
 	}
 
 	function getId(){
@@ -138,9 +157,9 @@ class WebApp implements WebAppInterface{
 	 * mandatory return $hm = (0 => true|false, 1 => string|array);
 	 * Thu Jul 21 11:31:47 UTC 2011, wadelau@gmail.com
 	 * update by extending to writeObject by wadelau, Sat May  7 11:06:37 CST 2016
+	 * # fieldname should precede with a space, e.g. "where a>?&& b < ?"
 	 */
 	function setBy($fields, $conditions){
-
 		$hm = array();
 		if(strpos($fields, ':') !== false){ # write to  file: or http(s): or cache
 			$hm = $this->writeObject($type=$fields, $args=$conditions);
@@ -157,7 +176,6 @@ class WebApp implements WebAppInterface{
 				$isupdate = 1;
 			}
 			$fieldarr = explode(",",$fields);
-
 			foreach($fieldarr as $k => $v){
 				$v = trim($v);
 				if($v == "updatetime" || $v == 'inserttime' || $v == 'createtime'){
@@ -184,26 +202,37 @@ class WebApp implements WebAppInterface{
 			else{
 				$sql .= " where ".$conditions;
 			}
-
 			if($issqlready == 1){
 				if($this->getId() != ""){ $this->hmf["pagesize"] = 1; } # single record
 				$hm = $this->dba->update($sql, $this->hmf);
 				$hm[]['isupdate'] = $isupdate;
 			}
 		}
-
 		return $hm;
-
 	}
 
 	/* 
 	 * mandatory return $hm = (0 => true|false, 1 => string|array);
 	 * Thu Jul 21 11:31:47 UTC 2011, wadelau@gmail.com
 	 * update by extending to readObject by wadelau, Sat May  7 11:06:37 CST 2016
+	 * # fieldname should precede with a space, e.g. "where a>?&& b < ?"
 	 */
-	function getBy($fields, $conditions){
-
-		if(strpos($fields, ':') !== false){ # read from file: or http(s): or cache
+	function getBy($fields, $conditions, $withCache=null){
+        $hm = array();
+        if($withCache != null){
+            $hm = $this->readObject($type='cache:', $args=$withCache);
+            if($hm[0]){
+                #debug(__FILE__.": get from cache succ. ckstr:[".$this->toString($withCache)."]");
+            }
+            else{
+                $this->set('cache:'.$fields, $ckstr=$withCache['key']);
+                #debug(__FILE__.": get from cache failed, rtn:[".$this->toString($hm)."], try db.
+                #        ckstr:[".$ckstr."]");
+                $hm = $this->getBy($fields, $conditions);
+            }
+        }
+		else if(strpos($fields, ':') !== false){ 
+		    # read from file: or http(s): or cache
 			$hm = $this->readObject($type=$fields, $args=$conditions);
 		}
 		else{
@@ -211,12 +240,10 @@ class WebApp implements WebAppInterface{
 			$sql = "";
 			$hm = array();
 			$haslimit1 = 0;
-			#print_r($this->hmf);
 			$pagenum = 1; # default pagenum set to "1", unless pre set in hmvar, 20080903  
 			$pagesize = 0;# default pagesize set to "0", unless pre set in hmvar, "0" means all, no limit, 20080903
 			if(array_key_exists('pagenum',$this->hmf)){ $pagenum = $this->hmf['pagenum'];}
 			if(array_key_exists('pagesize',$this->hmf)){ $pagesize = $this->hmf['pagesize'];}
-
 			$sql .= "select ".$fields." from ".$this->getTbl()." where ";
 			if($conditions == null || $conditions == ""){
 				if($this->getId() != ""){
@@ -230,8 +257,7 @@ class WebApp implements WebAppInterface{
 			else{
 				$sql .= $conditions;
 			}
-
-			if(array_key_exists('orderby',$this->hmf)){ $sql .= " order by ".$this->hmf['orderby'];}
+			if(array_key_exists('orderby',$this->hmf)){ $sql .= " order by ".$this->hmf['orderby']; }
 			if($haslimit1 == 1){
 				$sql .= " limit 1 ";
 			}
@@ -239,54 +265,70 @@ class WebApp implements WebAppInterface{
 				if($pagesize == 0){ $pagesize = 99999; } # maximum records per query
 				$sql .= ' limit '.(($pagenum-1)*$pagesize).','.$pagesize;	
 			}
-			#print __FILE__.':<br/>/inc/webapp.class.php: sql:['.$sql.']';
 			#error_log(__FILE__.": getBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
 			$hm = $this->dba->select($sql, $this->hmf);
+			$this->_setCache($hm, $fields);
 		}
-
 		return $hm;
-
 	}
 
     /*
      * added on Mon Jan 23 12:20:24 GMT 2012 by wadelau@ufqi.com
+     * # fieldname should precede with a space, e.g. "where a>?&& b < ?"
+     * remedy on Thu, 13 Oct 2016 10:10:55 +0800 by xenxin@pbtt
      */
-    function execBy($sql, $conditions=array()){
-	
+    function execBy($sql, $conditions=array(), $withCache=null){
         $hm = array();
-        if($conditions == null){
-            $conditions = '';
-        }
-        $pos = stripos($sql, "select ");
-		
-        if($pos === 0){
-			#
-		}
-		else{
-            $pos = stripos($sql, "desc ");
-            if($pos === 0){
-				#
-			}
-			else{
-                $pos = stripos($sql, "show ");
+        $origSql = $sql;
+        if($withCache != null){
+            $hm = $this->readObject($type='cache:', $args=$withCache);
+            if($hm[0]){
+                #debug(__FILE__.": get from cache succ. ckstr:[".$this->toString($withCache)."]");
+            }
+            else{
+                $this->set('cache:'.$origSql, $ckstr=$withCache['key']);
+                #debug(__FILE__.": get from cache failed, try db. ckstr:[".$ckstr."]");
+                $hm = $this->execBy($sql, $conditions);
             }
         }
-		#error_log(__FILE__.": select!! sql:$pos");
-		if($conditions != ''){
-			if(strpos($sql, " where") === false){
-				$sql .= " where ".$conditions;
-			}
-			else{
-				$sql .= $conditions;
-			}
-		}
-        if($pos === 0){
-            $hm = $this->dba->select($sql, $this->hmf);
-            #error_log(__FILE__.": select!! sql:[$sql] pos:[$pos]");
-        }
-		else{
-            #error_log(__FILE__.": update!! sql:[$sql] pos:[$pos]");
-            $hm = $this->dba->update($sql, $this->hmf);
+        else{
+            if($conditions == null){
+                $conditions = '';
+            }
+            $pos = stripos($sql, "select ");
+            if($pos === 0){
+    			#
+    		}
+    		else{
+                $pos = stripos($sql, "desc ");
+                if($pos === 0){
+    				#
+    			}
+    			else{
+                    $pos = stripos($sql, "show ");
+                }
+            }
+    		#error_log(__FILE__.": select!! sql:$pos");
+    		if($conditions != ''){
+    			if(strpos($sql, " where") === false){
+    				$sql .= " where ".$conditions;
+    			}
+    			else{
+    				$sql .= $conditions;
+    			}
+    		}
+            if($pos === 0){
+                $hm = $this->dba->select($sql, $this->hmf);
+                #error_log(__FILE__.": select!! sql:[$sql] pos:[$pos]");
+            }
+    		else{
+                #error_log(__FILE__.": update!! sql:[$sql] pos:[$pos]");
+                $hm = $this->dba->update($sql, $this->hmf);
+            }
+            #error_log(__FILE__.": execBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
+            if($pos === 0){
+                $this->_setCache($hm, $origSql);
+            }
         }
         return $hm;
     }
@@ -305,7 +347,8 @@ class WebApp implements WebAppInterface{
 				$issqlready = 1;
 			}
 			else{
-				print "unconditional deletion is strictly forbidden. stop it. sql:[".$sql."] conditions:[".$conditions."]";
+				debug("unconditional deletion is strictly forbidden. stop it. sql:["
+				        .$sql."] conditions:[".$conditions."]");
 				$hm[0] = false;
 				$hm[1] = array("error"=>"unconditional deletion is strictly forbidden.");
 			}
@@ -323,17 +366,14 @@ class WebApp implements WebAppInterface{
 
 	//-
 	# method override not support? so rename set to setAll, Sat Jul 23 10:13:14 UTC 2011
-	function _setAll(){
+	private function _setAll(){
 		$isinclude = 0;
 		if($this->getId() != ''){
 			$tmphm = $this->getBy('*',null);
-			#print "/inc/webapp.class.php: _setAll";
-            #print_r($tmphm);
-            #print_r($this->hmf);
+			#debug(__FILE__.": _setAll: rtn: ");
+			#debug($tmphm);
 			if($tmphm[0]){
-                #print_r($tmphm);
 				$infoarr = $tmphm[1][0];
-                #print_r($infoarr);
 				foreach($infoarr as $k => $v){
 					$this->hmf[$k] = $v;	
 					if($field == $k){
@@ -346,8 +386,8 @@ class WebApp implements WebAppInterface{
 				return true;
 			}
 			else{
-				error_log(__FILE__.': _setAll: failed for reading table. id:['.$this->getId().']');
-				$this->set('er', 1);
+				#error_log(__FILE__.': _setAll: failed for reading table. id:['.$this->getId().']');
+				$this->set(self::GWA2_ERR, 1);
 				return false;
 			}
 		}
@@ -356,7 +396,7 @@ class WebApp implements WebAppInterface{
 			$this->set('er', 1);
 			return false;
 		}
-		$this->set('er', 1);
+		$this->set(self::GWA2_ERR, 1);
 		return false;
 	}
 
@@ -374,6 +414,11 @@ class WebApp implements WebAppInterface{
                         if(is_array($v1)){
                             foreach($v1 as $k2=>$v2){
                                 $str .= "\t\t $k2:[$v2]\n";
+                                if(is_array($v2)){
+                                    foreach ($v2 as $k3=>$v3){
+                                        $str .= "\t\t\t$k3:[$v3]\n";
+                                    }
+                                }
                             }
                         }
                     }
@@ -394,11 +439,12 @@ class WebApp implements WebAppInterface{
         if(strpos($fieldtype, "int") !== false
             || strpos($fieldtype, "float") !== false
             || strpos($fieldtype, "double") !== false
-            || strpos($fieldtype, "date") !== false){
+            || strpos($fieldtype, "date") !== false
+			|| strpos($fieldtype, "decimal") !== false){
 
 		    $isNumeric = 1;
 	    }
-	return $isNumeric;
+	    return $isNumeric;
     }
 
     # get count based on some conditions
@@ -413,26 +459,23 @@ class WebApp implements WebAppInterface{
 	    }
     }
 
-
     //- read an object of file or http post|get
     //- by wadelau, Fri May  6 18:57:17 CST 2016
     //- $args: 'target', 'method', 'parameter', and so on....
     //- http://ufqi.com/blog/gwa2-add-read-write-object-201605/
     public function readObject($type, $args){
-    
         $obj = '';
-    
         if($type == 'cache:'){
-			//- cache service
-			$obj = $this->cachea->get($args['key']);
-			if(!$obj[0]){
-				$obj = array(true, $obj[1]);
-			}
-			else{
-				$obj = array(false, array('errorcode'=>1606140931, 'errordesc'=>$this->toString($obj)));
-			}
-		}
-	    else if($type == 'file:'){
+            //- cache service
+            $obj = $this->cachea->get($args['key']);
+            if(!$obj[0]){
+                $obj = array(true, $obj[1]);
+            }
+            else{
+                $obj = array(false, array('errorcode'=>1606140931, 'errordesc'=>$this->toString($obj)));
+            }
+        }
+        else if($type == 'file:'){
             //-- local or network file system
             $obj = file_get_contents($args['target']);
             if($obj !== false){
@@ -474,7 +517,8 @@ class WebApp implements WebAppInterface{
                 else{
                     $obj = array(false,
                             array('errorcode'=>'1605071139',
-                                    'errordesc'=>'file:['.$args['target'].'] read failed. response header:['.$http_response_header.']'
+                                    'errordesc'=>'file:['.$args['target'].'] read failed. 
+                                    response header:['.$http_response_header.']'
                             )
                     );
                 }
@@ -492,7 +536,8 @@ class WebApp implements WebAppInterface{
                 else{
                     $obj = array(false,
                             array('errorcode'=>'1605071140',
-                                    'errordesc'=>'file:['.$args['target'].'] read failed. response header:['.$http_response_header.']'
+                                    'errordesc'=>'file:['.$args['target'].'] read failed. 
+                                        response header:['.$http_response_header.']'
                             )
                     );
                 }
@@ -505,18 +550,14 @@ class WebApp implements WebAppInterface{
                     )
             );
         }
-    
         return $obj;
-    
     }
     
     //- write to an object of file or http post
     //- by wadelau, Sat May  7 11:14:47 CST 2016
     # $args, 'target', 'method', 'content'....
     public function writeObject($type, $args){
-    
-        $obj = '';
-    
+        $obj = null;
         if($type == 'cache:'){
 			//- cache service
 			if(is_null($args['value'])){
@@ -530,6 +571,8 @@ class WebApp implements WebAppInterface{
 				else {
 					$obj = $this->cachea->set($args['key'], $args['value']);
 				}
+				#debug(__FILE__.": writeObject: type:[$type] args:[".$this->toString($args)."] cache result:");
+				#debug($obj);
 			}
 			if(!$obj[0]){
 				$obj = array(true, $obj[1]);
@@ -548,7 +591,6 @@ class WebApp implements WebAppInterface{
             foreach($parts as $part){
                 if(!is_dir($dir .= "/$part")){ mkdir($dir); }
             }
-    
             # write data
             debug($dir.'/'.$file);
             $flags = 0;
@@ -561,11 +603,11 @@ class WebApp implements WebAppInterface{
             else{
                 $obj = array(false,
                         array('errorcode'=>'1605071211',
-                                'errordesc'=>'file:['.$args['target'].'] write failed. response header:['.$http_response_header.']'
+                                'errordesc'=>'file:['.$args['target'].'] write failed. 
+                                    response header:['.$http_response_header.']'
                         )
                 );
             }
-    
         }
         else if($type == 'url:'){
             //-- http(s) request
@@ -585,22 +627,23 @@ class WebApp implements WebAppInterface{
                 $header .= "Content-Length: ".strlen($paraStr)."\n";
                 #debug(__FILE__.": header:[$header]");
                 $reqContext = stream_context_create(array('http'=>array('method'=>'POST',
-                        'header'=>$header,
-                        'content'=>http_build_query($args['parameter'])
-                )
-                )
-                        ); # $args: 'method', 'header', 'content'...
-                        $obj = file_get_contents($args['target'], false, $reqContext);
-                        if($obj !== false){
-                            $obj = array(true, array('content'=>$obj, 'header'=>$http_response_header));
-                        }
-                        else{
-                            $obj = array(false,
-                                    array('errorcode'=>'1605071212',
-                                            'errordesc'=>'url:['.$args['target'].'] write failed. response header:['.$http_response_header.']'
-                                    )
-                            );
-                        }
+                                'header'=>$header,
+                                'content'=>http_build_query($args['parameter'])
+                            )
+                        )
+                    ); # $args: 'method', 'header', 'content'...
+                $obj = file_get_contents($args['target'], false, $reqContext);
+                if($obj !== false){
+                    $obj = array(true, array('content'=>$obj, 'header'=>$http_response_header));
+                }
+                else{
+                    $obj = array(false,
+                            array('errorcode'=>'1605071212',
+                                    'errordesc'=>'url:['.$args['target'].'] write failed. 
+                                        response header:['.$http_response_header.']'
+                            )
+                    );
+                }
             }
             else{
                 //- http(s) get or not specified
@@ -615,7 +658,8 @@ class WebApp implements WebAppInterface{
                 else{
                     $obj = array(false,
                             array('errorcode'=>'1605071213',
-                                    'errordesc'=>'url:['.$args['target'].'] write failed. response header:['.$http_response_header.']'
+                                    'errordesc'=>'url:['.$args['target'].'] write failed. 
+                                        response header:['.$http_response_header.']'
                             )
                     );
                 }
@@ -628,20 +672,30 @@ class WebApp implements WebAppInterface{
                     )
             );
         }
-    
         return $obj;
-    
     }
 
 	//-
 	public function setMyId($myId){
-		
 		$this->myId = $myId;
-
-		return 0;
-
+		return false;
 	}
 
+	//-
+	//-- setCache
+	private function _setCache($hm, $fields){
+	    if($hm[0]){
+	        $ckstr = $this->get('cache:'.$fields, $noExtra=1);
+	        if($ckstr != ''){
+	            $tmphm = $this->setBy('cache:', array('key'=>$ckstr, 'value'=>$hm[1]));
+	            $this->set('cache:'.$fields, '');
+	        }
+	    }
+	    else{
+	        # @todo
+	    }
+	    return true;
+	}
 
 }
 

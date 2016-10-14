@@ -248,7 +248,7 @@ function redirect($url, $time=0, $msg='') {
 	$hideMsg .= "</head><body>";  # remedy Mon Nov 23 22:03:24 CST 2015
     if (empty($msg)){
         #$msg = "系统将在{$time}秒之后自动跳转到{$url}！";
-		$hideMsg = $hideMsg." <a href=\"".$url."\">系统将在{$time}秒之后自动跳转</a> <!-- {$url}！--> ...";
+		$hideMsg = $hideMsg." <a href=\"".$url."\">系统将在{$time}秒之后自动跳转</a> ...";
 	}
 	else{
 		$hideMsg = $hideMsg . $msg;

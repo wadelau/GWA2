@@ -16,7 +16,7 @@ class PageNavi extends WebApp{
    public function __construct(){
 
        $para = array();
-       $pdef = array('pnpn'=>1,'pnps'=>28,'pntc'=>0); # 28 for development
+       $pdef = array('pnpn'=>1,'pnps'=>100,'pntc'=>0); # 28 for development
 
        $file = $_SERVER['PHP_SELF'];
        #$rawurl =$_SERVER['REQUEST_URI'];
@@ -49,8 +49,8 @@ class PageNavi extends WebApp{
             $para[$k] = $para[$k]>0?$para[$k]:$pdef[$k];
             $this->hmf[$k]=$para[$k];
        }
-	   
-	   parent::__construct();
+       
+       parent::__construct();
 
    }
 
@@ -105,14 +105,13 @@ class PageNavi extends WebApp{
        #print_r($this->hmf);
 
        $totalpage = $para['pntc'] % $para['pnps'] == 0 ? ($para['pntc']/$para['pnps']) : ceil($para['pntc']/$para['pnps']);
-       $navilen = 3;
+       $navilen = 10;
 
 		    $pageArr = array('totalpage'=>$totalpage, 'totalrecord'=>$para['pntc'], 'url'=>$para['url']);
 
         for($i=$para['pnpn']-$navilen; $i<$para['pnpn'] + $navilen && $i<=$totalpage; $i++){
 
             if($i>0){
-
                 if($i == $para['pnpn']){
                     $pageArr['pnpn'] = $i;
                 }
@@ -121,7 +120,7 @@ class PageNavi extends WebApp{
             }
             #print "$i: [$str] totalpage:[$totalpage]\n";
         }
-		$pageArr['pnps'] = $para['pnps'];
+        $pageArr['pnps'] = $para['pnps'];
 
        return $pageArr;
 
@@ -252,15 +251,19 @@ class PageNavi extends WebApp{
                             $v = $this->addQuote($v);
                         }
                         $condition .= " ".$pnsm." $field in ($v)";
+                        $gtbl->del($field);
                     }
 					else if($fieldopv == 'inrange'){
                         $tmparr = explode(",", $v);
                         if(strpos($hmfield[$field],'date') === false){
-                            $condition .= " ".$pnsm." ($field >= ".$tmparr[0]." and $field <= ".$tmparr[1].")";
+                            $condition .= " ".$pnsm." ($field >= ".intval($tmparr[0])
+                                ." and $field <= ".intval($tmparr[1]).")";
                         }
 						else{
-                            $condition .= " ".$pnsm." ($field >= '".$tmparr[0]."' and $field <= '".$tmparr[1]."')";
+                            $condition .= " ".$pnsm." ($field >= ".$this->addQuote($tmparr[0])." and $field <= "
+                                    .$this->addQuote($tmparr[1]).")";
                         }
+                        $gtbl->del($field);
                     }
 					else if($fieldopv == 'contains'){
                         $condition .= " ".$pnsm." "."$field like ?";
@@ -326,11 +329,12 @@ class PageNavi extends WebApp{
            $arr = explode(",", $str);
            $tmpval = '';
            foreach($arr as $k12=>$v12){
-               $tmpval .= "'".$v12."',";
+               $tmpval .= "'".addslashes($v12)."',";
            }
            $tmpval = substr($tmpval, 0, strlen($tmpval)-1);
-       }else{
-           $tmpval = "'".$str."'";
+       }
+       else{
+           $tmpval = addslashes($str);
        }
        return $tmpval;
    }

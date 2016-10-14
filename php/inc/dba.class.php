@@ -62,7 +62,7 @@ class DBA {
 		$haslimit1 = 0;
 		if(strpos($sql,"limit 1 ") != false ||(array_key_exists('pagesize',$hmvars) && $hmvars['pagesize'] == 1))
 		{
-			$result = $this->dbconn->readSingle($sql, $hmvars,$idxarr); # why need this?
+			$result = $this->dbconn->readSingle($sql, $hmvars,$idxarr); # why need this? @todo need to be removed.
 			$haslimit1 = 1;
 		}
 		else
@@ -79,7 +79,7 @@ class DBA {
 			$hm[0] = false;
 			$hm[1] = $result[1];
 		}
-    	#print_r($hmvars);
+    	#debug(__FILE__.": vars in dba::select: ".debug($hmvars));
 		#error_log(__FILE__.": select sql:[".$sql."] result:[".$hm[0]."]");
 		return $hm;
 	}
@@ -87,8 +87,7 @@ class DBA {
 	# added on Sun Jul 17 22:19:15 UTC 2011 by wadelau@gmail.com
 	# sort the parameter in order
 	# return sorted array 
-	function hm2idxArray($sql, $hmvars)
-	{
+	function hm2idxArray($sql, $hmvars){
 		$idxarr = array();
 		$tmparr = array();
 		$tmpposarr = array();
@@ -101,51 +100,41 @@ class DBA {
 			        debug(__FILE__.": found empty k:[$k], skip.");
 			        continue;
 			    }
-				$hasK = strpos($sql, $k."="); 
-				if($hasK === false){ $hasK = strpos($sql, $k." "); }
-				if($hasK !== false ){
-					$spacek = " ".$k;
-					$sql = str_replace("(".$k, "(".$spacek, $sql);
-					$sql = str_replace(",".$k, ",".$spacek, $sql);
-					$kpos = strpos($sql,$spacek."=");
-					$kpos = $kpos === false ? strpos($sql,$spacek." ") : $kpos;
-					if($kpos !== false)
-					{
+			    $spacek = " ".$k." ";
+				$hasK = strpos($sql, " ".$k); 
+				# fieldname should precede with a space, e.g. "where a>?&& b < ?"
+				# this is ILLEGAL! "wherea>?&& b < ?" or "where a>?&&b<?"
+				if($hasK !== false){
+				    $sql = str_replace($k, $spacek, $sql);
+					$kpos = strpos($sql, $spacek); 
+					if($kpos !== false){
 			   			if($selectpos !== false && $kpos > $wherepos){
 							$tmparr[$kpos] = $k;	# in case "select a, b, c where a = ?"; # by wadelau on Sat Nov  3 20:35:46 CST 2012
-							$tmpposarr[$k] = 2;
+							$tmpposarr[$k] = isset($tmpposarr)? $tmpposarr[$k]++ : 2;
 			   			}
 						else if($selectpos === false){
 							$tmparr[$kpos] = $k;	# in case "select a, b, c where a = ?"; # by wadelau on Sat Nov  3 20:35:46 CST 2012
-							$tmpposarr[$k] = 2;
+							$tmpposarr[$k] = isset($tmpposarr)? $tmpposarr[$k]++ : 2;
 			   			} 
-
-						#$tmparr[$kpos] = $k;	
-						#$tmpposarr[$k] = 2;
-						$nextpos = strpos($sql,$spacek."=",$kpos+1);
-			  			$nextpos = $nextpos === false ? strpos($sql,$spacek." ",$kpos+1) : $nextpos;
-
+						$nextpos = strpos($sql, $spacek, $kpos+1);
+			  			$nextpos = $nextpos===false ? strpos($sql, $spacek, $kpos+1) : $nextpos;
 						while($nextpos !== false){
-							
-							$tmparr[$nextpos] = $k.($tmpposarr[$k]!='' ? ".".$tmpposarr[$k] : ""); 
-							/* 
-							 *  Attention: 
+							$tmparr[$nextpos] = $k.($tmpposarr[$k]!='' ? ".".$tmpposarr[$k] : "");
+							 /*  Attention: 
 							 *      one field matches more than two values, 
 							 *      name it as "field.2","field.3", "field.N", etc, as hash key
 							 *  e.g. in sql: "... where age > ? and age < ? and gender=? ", settings go like:
 							 *      $Obj->set('age', 20);
 							 *      $obj->set('age.2', 30); # for the second match of 'age'
 							 *  Sun Jul 24 21:18:00 UTC 2011
-							 *  !!!Need space before > or < in this case, Thu Sep 11 16:29:03 CST 2014
+							 *  !! Need space before > or < in this case, Thu Sep 11 16:29:03 CST 2014
 							 */
-							$nextpos = strpos($sql,$spacek,$nextpos+1);
+							$nextpos = strpos($sql, $spacek, $nextpos+1);
 							$tmpposarr[$k]++;
 						}
 					}
-					else
-					{
-						#print "<br/>/inc/class.dba.php:  hm2idxArray NOT exist k:[".$k."] sql:[".$sql."] ";
-						#print_r($tmparr); 
+					else{
+						debug(__FILE__.": hm2idxArray NOT exist k:[".$k."] sql:[".$sql."]");
 					}
 				}
 				else{
@@ -159,24 +148,22 @@ class DBA {
 		$sqllen = strlen($sql);
 		$tmpi = 0;
 		for($i=0;$i<$sqllen;$i++){
-			if(array_key_exists($i,$tmparr))
-			{
+			if(array_key_exists($i, $tmparr)){
 				$idxarr[$tmpi] = $tmparr[$i];
 				$tmpi++;
 			}
-			else
-			{
-				#print "<br/>/inc/class.dba.php: hm2idxArray NOT exist i:[".$i."]";
+			else{
+				# @todo;
 			}
 		}
-		#print_r($idxarr);
+		#debug(__FILE__.": sql:[$sql] hmvars:[".serialize($hmvars)."] idxarr:");
+		#debug($idxarr);
 		return $idxarr;
 	}
 
-	function showDb()
-	{
+	//-
+	function showDb(){
 		$this->dbconn->showConf();
-
 	}
 
 }

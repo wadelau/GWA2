@@ -57,7 +57,7 @@ class MYSQLIX {
 		}
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
 		
-		#debug($sql);
+		#debug(__FILE__.": query: sql:[".$sql."]");
 		try{
 		  $result = $this->m_link->query($sql) or $this->sayErr("[$sql] 201605240944.");		
 		}
@@ -86,7 +86,6 @@ class MYSQLIX {
 	 * Sun Jul 24 21:20:04 UTC 2011, wadelau@ufqi.com
 	 */
 	function readSingle($sql,$hmvars,$idxarr){
-		
 		$hm = array();
 		if (!$this->m_link){
 			$this->_initConnection();
@@ -96,7 +95,7 @@ class MYSQLIX {
 		if( strpos($sql,"limit")===false && strpos($sql,"show tables")===false){
 			$sql .= " limit 1 ";
 		} 
-		#debug($sql);
+		#debug(__FILE__.": readSingle: sql:[".$sql."]");
         $result = $this->m_link->query($sql) or $this->sayErr("[$sql] query failed. 201605220716.");
         		
 		if($result){
@@ -132,7 +131,7 @@ class MYSQLIX {
 		}
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
 		
-		#debug($sql);
+		#debug(__FILE__.": readBatch: sql:[".$sql."]");
 		$rtnarr = array();	
 		$result = $this->m_link->query($sql) or $this->sayErr("[$sql] query failed. 201605220717.");
 		
@@ -145,7 +144,7 @@ class MYSQLIX {
 			//--- refined by tim's advice on 20060804 by wadelau
 			mysqli_free_result($result);
 		} 
-		if( count($rtnarr)>0 ){
+		if(count($rtnarr)>0 ){
 			$hm[0] = true;
 			$hm[1] = $rtnarr;
 		}	
@@ -184,7 +183,7 @@ class MYSQLIX {
 			$wherepos = strpos($sql, " where ");
 			if( (strpos($sql,"delete ")!==false || strpos($sql,"update ")!==false) 
 				&& $wherepos === false){
-				$this->sayErr("table action [update, delete] need [where] clause.sql:[".$sql."]");
+				$this->sayErr("table action [update, delete] need [where] clause. sql:[".$sql."]");
 			}
 			else{
 				$a = strpos($sql,"?");
@@ -195,9 +194,10 @@ class MYSQLIX {
 						$this->sayErr("_enSafe, fields not matched with vars.sql:[".$origSql."] i:[".$i."] n:[".$n."].");
 					}
 					$t = substr($sql,0,$a+1);
-					#print __FILE__.": t:[".$t."] i:[".$i."] vars:[".$idxarr[$i]."] hmv:[".$hmvars[$idxarr[$i]]."]\n";
+					#debug(__FILE__.": t:[".$t."] i:[".$i."] vars:[".$idxarr[$i]."] hmv:[".$hmvars[$idxarr[$i]]."]\n");
 					if(!array_key_exists($idxarr[$i], $hmvars)){
-						# in case that, field was not set by $obj->set but written in sql with '?', Sat Apr  2 23:54:48 CST 2016
+						# in case that, field was not set by $obj->set but written in sql with '?', 
+						# Sat Apr  2 23:54:48 CST 2016
 						debug(__FILE__.": found unmatched field:[$t], i:[$i], n:[$n], a:[$a].");
 						debug($idxarr);
 						debug($hmvars);
@@ -208,14 +208,16 @@ class MYSQLIX {
 					else{
 						$sql = substr($sql,$a+1);
 						$a = strpos($sql,"?");
-						$newsql .= str_replace("?",$this->_quoteSafe($hmvars[$idxarr[$i]]),$t);
+						$newsql .= str_replace("?", $this->_quoteSafe($hmvars[$idxarr[$i]]), $t);
 					}
 					$i++;
 				}
 				if($sql!=""){
 					$newsql .=  $sql ;
 				}
-				#print __FILE__."\n: sql:[".$sql."] sql_new:[".$newsql."]\n";
+				#debug(__FILE__."\n: sql:[".$sql."] sql_new:[".$newsql."]\n");
+				#debug($idxarr);
+				#debug($hmvars);
 				return $newsql;
 			}
 		}
