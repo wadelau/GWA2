@@ -27,16 +27,19 @@ function getSmtTpl($file, $act){
  */
 function curlPost($url, array $post = NULL, array $options = array()){
     $defaults = array(
-            CURLOPT_POST => 1,
-            CURLOPT_HEADER => 0,
-            CURLOPT_URL => $url,
-            CURLOPT_FRESH_CONNECT => 1,
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_FORBID_REUSE => 1,
-            CURLOPT_TIMEOUT => 4,
-            CURLOPT_POSTFIELDS => http_build_query($post)
-            );
-
+		CURLOPT_POST => 1,
+		CURLOPT_HEADER => 0,
+		CURLOPT_URL => $url,
+		CURLOPT_FRESH_CONNECT => 1,
+		CURLOPT_RETURNTRANSFER => 1,
+		CURLOPT_FORBID_REUSE => 1,
+		CURLOPT_TIMEOUT => 4,
+		CURLOPT_POSTFIELDS => http_build_query($post)
+		);
+	if($_CONFIG['ssl_verify_ignore']){
+		$defaults[CURLOPT_SSL_VERIFYHOST] = 0;
+		$defaults[CURLOPT_SSL_VERIFYPEER] = 0;
+	}
     $ch = curl_init();
     curl_setopt_array($ch, ($options + $defaults));
     if( ! $result = curl_exec($ch))
@@ -93,7 +96,6 @@ function sendMail($to,$subject,$body, $from='', $local=0){
         }
 
         #print __FILE__.": from:$from";
-        
         $rtnarr[0] = $mail->sendMail($to, $from, $subject, $body, 'HTML');
 
     }
@@ -162,7 +164,7 @@ function shortenStr($str, $len=0){
 
 }
 
-function base62x($s,$dec=0,$numType=''){
+function base62x($s,$dec=0,$numType=null){
     # e.g. base62x('abcd', 0, '8');
     # e.g. base62x('abcd', 1, '16');
     $type = "-enc";
@@ -258,7 +260,7 @@ function redirect($url, $time=0, $msg='') {
     if (!headers_sent()) {
         // redirect
         if (0 === $time) {
-            header("Location: " . $url);
+            header("Location: " . $url, true, 302);
 			print $hideMsg;
         }
         else {

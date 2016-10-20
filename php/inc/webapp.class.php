@@ -35,6 +35,7 @@ class WebApp implements WebAppInterface{
 	const GWA2_ERR = 'gwa2_error_TAG';
 	const GWA2_ID = 'gwa2_id_TAG';
 	const GWA2_TBL = 'gwa2_tbl_TAG';
+	var $ssl_verify_ignore = false;
 	
 	//- constructor
 	function __construct($args=null){
@@ -54,6 +55,7 @@ class WebApp implements WebAppInterface{
 		}
 		# others should be invoked by its subclasses
 		$this->isdbg = GConf::get('is_debug');
+		$this->ssl_verify_ignore = GConf::get('ssl_verify_ignore');
 	}
 	
 	//-
@@ -506,10 +508,20 @@ class WebApp implements WebAppInterface{
                 }
                 $header .= "Content-Length: ".strlen($paraStr)."\n";
                 #debug(__FILE__.": header:[$header]");
-                $reqContext = stream_context_create(array('http'=>array('method'=>'POST',
-                                                                'header'=>$header,
-                                                                'content'=> $paraStr ))
-                        ); # $args: 'method', 'header', 'content'...
+                $ctxArr = array(
+					'http'=>array(
+						'method'=>'POST',
+						'header'=>$header,
+						'content'=> $paraStr
+						)
+					); # $args: 'method', 'header', 'content'...
+				if($this->ssl_verify_ignore){
+					$ctxArr['ssl'] = array(
+						'verify_peer'=>false, # for reliable src
+						'verify_peer_name'=>false
+						);
+				}
+				$reqContext = stream_context_create($ctxArr);
                 $obj = file_get_contents($args['target'], false, $reqContext);
                 if($obj !== false){
                     $obj = array(true, array('content'=>$obj, 'header'=>$http_response_header));
@@ -517,7 +529,7 @@ class WebApp implements WebAppInterface{
                 else{
                     $obj = array(false,
                             array('errorcode'=>'1605071139',
-                                    'errordesc'=>'file:['.$args['target'].'] read failed. 
+                                'errordesc'=>'file:['.$args['target'].'] read failed. 
                                     response header:['.$http_response_header.']'
                             )
                     );
@@ -529,7 +541,15 @@ class WebApp implements WebAppInterface{
                     $args['target'] .= (inString('?', $args['target']) ? '&' : '?');
                     $args['target'] .= http_build_query($args['parameter']);
                 }
-                $obj = file_get_contents($args['target']);
+				$ctxArr = array();
+				if($this->ssl_verify_ignore){
+					$ctxArr['ssl'] = array(
+						'verify_peer'=>false, # for reliable src
+						'verify_peer_name'=>false
+						);
+				}
+				$reqContext = stream_context_create($ctxArr);
+                $obj = file_get_contents($args['target'], false, $reqContext);
                 if($obj !== false){
                     $obj = array(true, array('content'=>$obj, 'header'=>$http_response_header));
                 }
@@ -603,7 +623,7 @@ class WebApp implements WebAppInterface{
             else{
                 $obj = array(false,
                         array('errorcode'=>'1605071211',
-                                'errordesc'=>'file:['.$args['target'].'] write failed. 
+                            'errordesc'=>'file:['.$args['target'].'] write failed. 
                                     response header:['.$http_response_header.']'
                         )
                 );
@@ -626,12 +646,20 @@ class WebApp implements WebAppInterface{
                 }
                 $header .= "Content-Length: ".strlen($paraStr)."\n";
                 #debug(__FILE__.": header:[$header]");
-                $reqContext = stream_context_create(array('http'=>array('method'=>'POST',
-                                'header'=>$header,
-                                'content'=>http_build_query($args['parameter'])
-                            )
-                        )
-                    ); # $args: 'method', 'header', 'content'...
+                $ctxArr = array(
+					'http'=>array(
+						'method'=>'POST',
+						'header'=>$header,
+						'content'=> $paraStr
+						)
+					); # $args: 'method', 'header', 'content'...
+				if($this->ssl_verify_ignore){
+					$ctxArr['ssl'] = array(
+						'verify_peer'=>false, # for reliable src
+						'verify_peer_name'=>false
+						);
+				}
+				$reqContext = stream_context_create($ctxArr);
                 $obj = file_get_contents($args['target'], false, $reqContext);
                 if($obj !== false){
                     $obj = array(true, array('content'=>$obj, 'header'=>$http_response_header));
@@ -651,14 +679,22 @@ class WebApp implements WebAppInterface{
                     $args['target'] .= (inString('?', $args['target']) ? '&' : '?');
                     $args['target'] .= http_build_query($args['parameter']);
                 }
-                $obj = file_get_contents($args['target']);
+				$ctxArr = array(); # $args: 'method', 'header', 'content'...
+				if($this->ssl_verify_ignore){
+					$ctxArr['ssl'] = array(
+						'verify_peer'=>false, # for reliable src
+						'verify_peer_name'=>false
+						);
+				}
+				$reqContext = stream_context_create($ctxArr);
+                $obj = file_get_contents($args['target'], false, $reqContext);
                 if($obj !== false){
                     $obj = array(true, array('content'=>$obj, 'header'=>$http_response_header));
                 }
                 else{
                     $obj = array(false,
                             array('errorcode'=>'1605071213',
-                                    'errordesc'=>'url:['.$args['target'].'] write failed. 
+                                'errordesc'=>'url:['.$args['target'].'] write failed. 
                                         response header:['.$http_response_header.']'
                             )
                     );
@@ -668,7 +704,7 @@ class WebApp implements WebAppInterface{
         else{
             $obj = array(false,
                     array('errorcode'=>'1605071215',
-                            'errordesc'=>'Unsupported objecttype:['.$type.']'
+                        'errordesc'=>'Unsupported objecttype:['.$type.']'
                     )
             );
         }

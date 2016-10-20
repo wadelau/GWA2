@@ -9,9 +9,9 @@ if(1){ # in some scenarios, this should be set as 0 to disable this function glo
 	if($argv && $argc > 0){ # run from cmd line?
 		error_log(__FILE__.": run from cmd line. argc:[".$argc."]");
 		# e.g.  A-style
-		# /usr/local/php/bin/php -c /www/bin/php/php.ini "/www/webroot/pages/WebApp/index.php" "mod=mobisummer_hasoffers" "act=get_offer" "fmt=json"
+		# /usr/local/php/bin/php -c /www/bin/php/php.ini "/path/to/index.php" "mod=mob" "act=get_offer" "fmt=json"
 		# or B-style
-		# /usr/local/php/bin/php -c /www/bin/php/php.ini "/www/webroot/pages/WebApp/index.php" "?mod=mobisummer_hasoffers&act=get_offer&fmt=json"
+		# /usr/local/php/bin/php -c /www/bin/php/php.ini "/path/to/index.php" "?mod=mob&act=get_offer&fmt=json"
 		# $_REQUEST
 		foreach ($argv as $arg) {
 			$qPos = strpos($arg, '?');

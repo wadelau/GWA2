@@ -61,6 +61,8 @@ if(true){
 	$conf['welcometbl']	= $tblpre.'info_welcometbl';
 	$conf['operatelogtbl']	= $tblpre.'fin_operatelogtbl';
 	
+	$conf['ssl_verify_ignore'] = true;
+	
 	# set to global container
 	GConf::setConf($conf);
 	
