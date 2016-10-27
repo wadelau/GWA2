@@ -1,5 +1,5 @@
 <?php
-/* Files and Directories reading and writing, handling IO transactions
+/* Administrator of Files and Directories reading and writing, handling IO transactions
  * v0.1
  * wadelau@ufqi.com
  * Sat Jul 23 09:50:58 UTC 2011
@@ -11,34 +11,32 @@ if(!defined('__ROOT__')){
 }
 
 require_once(__ROOT__."/inc/config.class.php");
+require_once(__ROOT__."/inc/filesystem.class.php");
 
-class FileSystem{
+class FileA {
 	
-    var $file = null;
-    var $fp = null;
+    var $conf = null;
+    var $filehdl = array();
+    var $isclosed = true;
     
  	//- construct
 	function __construct(){
 		//-
 	}
-	
+
+	//-
 	function __destruct(){
 	    $this->close();
 	}
-
-	//-
-	function open($file){
-	    //- @todo
-	    return true;
-	}
 	
+	//-
 	function close(){
 	    //- @todo
-	   return true;
 	}
-	
 	# Todo: to be implemented in second stage for uniting the storage engine.
+
  	# need todo ....
+	
 	/*
 	 * WebApp.class has been added two extended methods as
 		$webapp->setBy('url:', $args);

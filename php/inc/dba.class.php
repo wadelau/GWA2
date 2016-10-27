@@ -96,14 +96,14 @@ class DBA {
         #print_r($hmvars);
 		if(is_array($hmvars)){
 			foreach($hmvars as $k => $v){
-			    if($k == ''){
-			        debug(__FILE__.": found empty k:[$k], skip.");
+			    if($k == '' || $k == 'tbl'){
+			        #debug(__FILE__.": found n/a k:[$k], skip.");
 			        continue;
 			    }
 			    $spacek = " ".$k." ";
 				$hasK = strpos($sql, " ".$k); 
 				# fieldname should precede with a space, e.g. "where a>?&& b < ?"
-				# this is ILLEGAL! "wherea>?&& b < ?" or "where a>?&&b<?"
+				# this is ILLEGAL! "wherea>?&& b < ?" or "where a>?&&b<?" , !!ATTENTION!!
 				if($hasK !== false){
 				    $sql = str_replace($k, $spacek, $sql);
 					$kpos = strpos($sql, $spacek); 
@@ -166,6 +166,11 @@ class DBA {
 		$this->dbconn->showConf();
 	}
 
+	//-
+	function close(){
+	    # @todo
+	    return true;
+	}
 }
 
 ?>

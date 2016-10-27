@@ -25,6 +25,7 @@ class WebApp implements WebAppInterface{
 	//- variables
 	var $dba = null;
 	var $cachea = null;
+	var $fila = null;
 	var $hm = array();
 	var $hmf = array(); # container for the Object which extends this class	
 	var $isdbg = 1;
@@ -56,6 +57,17 @@ class WebApp implements WebAppInterface{
 		# others should be invoked by its subclasses
 		$this->isdbg = GConf::get('is_debug');
 		$this->ssl_verify_ignore = GConf::get('ssl_verify_ignore');
+	}
+	
+	//- destruct
+	function __destruct(){
+	    $this->dba->close();
+	    if($this->cachea != null){
+	       $this->cachea->close();
+	    }
+	    if($this->filea != null){
+	        $this->filea->close();
+	    }
 	}
 	
 	//-
