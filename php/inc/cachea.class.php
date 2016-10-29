@@ -62,5 +62,10 @@ class CacheA {
 		return strlen($k)>32 ? md5($k) : $k;
 	}
  	
+	//-
+	function close(){
+	    # @todo
+	    return true;
+	}
  }
 ?>
