@@ -12,10 +12,11 @@ if(!defined('__ROOT__')){
 
 require_once(__ROOT__."/inc/config.class.php");
 
-class FileSystem{
+class FileSystem {
 	
     var $file = null;
     var $fp = null;
+    var $handlelist = array();
     
  	//- construct
 	function __construct(){
@@ -29,6 +30,8 @@ class FileSystem{
 	//-
 	function open($file){
 	    //- @todo
+	    $this->file = $file;
+	    
 	    return true;
 	}
 	
