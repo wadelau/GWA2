@@ -624,7 +624,7 @@ class WebApp implements WebAppInterface{
                 if(!is_dir($dir .= "/$part")){ mkdir($dir); }
             }
             # write data
-            debug($dir.'/'.$file);
+            #debug($dir.'/'.$file);
             $flags = 0;
             if($args['islock']){ $flags = $flags |  LOCK_EX; }
             if($args['isappend']){ $flags = $flags | FILE_APPEND; }
