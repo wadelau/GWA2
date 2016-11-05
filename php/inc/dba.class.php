@@ -102,7 +102,7 @@ class DBA {
 			    }
 			    $spacek = " ".$k." ";
 				$hasK = strpos($sql, " ".$k); 
-				# fieldname should precede with a space, e.g. "where a>?&& b < ?"
+				# fieldname should precede with a space ' ', e.g. "where a>?&& b < ?"
 				# this is ILLEGAL! "wherea>?&& b < ?" or "where a>?&&b<?" , !!ATTENTION!!
 				if($hasK !== false){
 				    $sql = str_replace($k, $spacek, $sql);
@@ -168,7 +168,7 @@ class DBA {
 
 	//-
 	function close(){
-	    # @todo
+	    # @todo, long conn?
 	    return true;
 	}
 }

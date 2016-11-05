@@ -62,6 +62,11 @@ class MEMCACHEDX {
 		
 	}
 	
+	//-
+	function __destruct(){
+		$this->close();
+	}
+	
 	//- init
 	function _init(){
 		if(!is_object($this->mcache)){
@@ -80,7 +85,7 @@ class MEMCACHEDX {
 		}
 		return $this->mcache;
 	}
-
+	
 	//- set
 	function set($k, $v, $expr){
 		$rtn = '';
@@ -111,6 +116,10 @@ class MEMCACHEDX {
 		
 	}
 	
+	//- close
+	function close(){
+		$this->mcache->quit();
+	}
 	
  }
 ?>

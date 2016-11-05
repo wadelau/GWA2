@@ -46,6 +46,10 @@ if(true){
 	$conf['cachedriver'] = 'MEMCACHEDX'; # REDISX, XCACHEX
 	$conf['cacheexpire'] = 1800; # 30 * 60;
 	
+	# file system
+	$conf['enable_file'] = 1; # true for 1, false for 0 to init at entry stage
+	$conf['filedriver'] = 'FileSystem'; # files operations, since 2016-11-05
+	
 	# misc
 	$conf['is_debug'] = 1;
 	$conf['html_resp'] = '<!DOCTYPE html><html><head><title>RESP_TITLE</title></head><body>RESP_BODY</body></html>';

@@ -25,7 +25,7 @@ class WebApp implements WebAppInterface{
 	//- variables
 	var $dba = null;
 	var $cachea = null;
-	var $fila = null;
+	var $filea = null;
 	var $hm = array();
 	var $hmf = array(); # container for the Object which extends this class	
 	var $isdbg = 1;
@@ -54,6 +54,13 @@ class WebApp implements WebAppInterface{
 				#print_r(__FILE__."cachea:[".$this->cachea."]");
 			}
 		}
+		# file
+		if(GConf::get('enable_file')){
+			if($this->filea == null){
+				$this->filea = new CacheA($args['fileconf']);
+				#print_r(__FILE__."cachea:[".$this->cachea."]");
+			}
+		}
 		# others should be invoked by its subclasses
 		$this->isdbg = GConf::get('is_debug');
 		$this->ssl_verify_ignore = GConf::get('ssl_verify_ignore');
@@ -61,6 +68,7 @@ class WebApp implements WebAppInterface{
 	
 	//- destruct
 	function __destruct(){
+		#  @todo, long conn?
 	    $this->dba->close();
 	    if($this->cachea != null){
 	       $this->cachea->close();
@@ -437,7 +445,7 @@ class WebApp implements WebAppInterface{
                         }
                     }
                 }
-                $str .= "\n";
+                #$str .= "\n";
             } 
         }
 		else{
@@ -469,6 +477,7 @@ class WebApp implements WebAppInterface{
 		    return intval($ro[1][0]['inum']==null ? 0 : $ro[1][0]['inum']);
 	    }
 	    else{
+	    	debug(__FILE__.": getCount failed. 1611051522.");
 		    return 0;
 	    }
     }
@@ -491,8 +500,9 @@ class WebApp implements WebAppInterface{
         }
         else if($type == 'file:'){
             //-- local or network file system
-            $obj = file_get_contents($args['target']);
-            if($obj !== false){
+            #$obj = file_get_contents($args['target']);
+            $obj = $this->filea->read($args['target'], $args); # since 15:55 05 November 2016, # $fp reusable by $args['reuse']=true
+        	if($obj !== false){
                 $obj = array(true, array('content'=>$obj));
             }
             else{
@@ -615,6 +625,7 @@ class WebApp implements WebAppInterface{
 		}
 		else if($type == 'file:'){
             //-- local or network file system
+            /*
             # test dir
             $dirfile = $args['target'];
             $parts = explode('/', $dirfile);
@@ -629,6 +640,8 @@ class WebApp implements WebAppInterface{
             if($args['islock']){ $flags = $flags |  LOCK_EX; }
             if($args['isappend']){ $flags = $flags | FILE_APPEND; }
             $obj = file_put_contents($dir.'/'.$file, $args['content'], $flags);
+            */
+			$obj = $this->filea->write($args['target'], $args['content'], $args); # since, 15:55 05 November 2016, # $fp reusable by $args['reuse']=true
             if($obj !== false){
                 $obj = array(true, $obj);
             }
@@ -732,6 +745,7 @@ class WebApp implements WebAppInterface{
 	//-
 	//-- setCache
 	private function _setCache($hm, $fields){
+		# cache successful resultset
 	    if($hm[0]){
 	        $ckstr = $this->get('cache:'.$fields, $noExtra=1);
 	        if($ckstr != ''){

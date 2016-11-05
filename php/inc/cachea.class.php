@@ -28,6 +28,11 @@ class CacheA {
 		$this->cacheconn = new $cacheDriver($this->conf);
 		
 	}
+	
+	//-
+	function __destruct(){
+		$this->close();
+	}
 
 	# get
 	public function get($k){
@@ -64,7 +69,9 @@ class CacheA {
  	
 	//-
 	function close(){
-	    # @todo
+	    # @todo, long conn?
+	    # need sub class to override with actual close handler
+	    $this->cacheconn->close();
 	    return true;
 	}
  }

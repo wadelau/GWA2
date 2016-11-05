@@ -5,17 +5,6 @@
 # update 09:56 Tuesday, November 24, 2015
 #
 
-/* get Smarty template file name
-   wadelau, Wed Feb 15 09:18:27 CST 2012
-   */
-function getSmtTpl($file, $act){
-    $scriptname = explode("/",$file);
-    $scriptname = $scriptname[count($scriptname)-1];
-    $scriptname = explode(".",$scriptname);
-    $scriptname = $scriptname[0];
-    return $smttpl = $scriptname.'_'.($act==''?'main':$act).'.html';
-}
-
 /**
  * Send a POST requst using cURL, refer to http://www.php.net/manual/en/function.curl-exec.php
  * @param string $url to request
@@ -51,7 +40,7 @@ function curlPost($url, array $post = NULL, array $options = array()){
 }
 
 /**
- * send mail by system built-in sendmail commands
+ * send mail by system built-in sendmail commands or extra mailer.class
  * @para string $to, receiver's email address
  * @para string $subject, email's subject
  * @para string $body, message body
@@ -103,14 +92,13 @@ function sendMail($to,$subject,$body, $from='', $local=0){
     return $rtnarr;
 }
 
-function startsWith($haystack, $needle)
-{
+//- string utils
+function startsWith($haystack, $needle){
     $length = strlen($needle);
     return (substr($haystack, 0, $length) === $needle);
 }
 
-function endsWith($haystack, $needle)
-{
+function endsWith($haystack, $needle){
     $length = strlen($needle);
     $start  = $length * -1; //negative
     return (substr($haystack, $start) === $needle);
@@ -124,6 +112,21 @@ function inList($needle, $haystack){
 function inString($needle, $haystack){
     $pos = stripos($haystack, $needle);
     return ($pos === false ? false : true);
+}
+
+function substr_unicode($str, $s, $l = null) {
+	return join("", array_slice(preg_split("//u", $str, -1, PREG_SPLIT_NO_EMPTY), $s, $l));
+}
+
+function shortenStr($str, $len=0){
+	$newstr = '';
+	if($len == 0){
+		$len = 10;
+	}
+	$newstr = substr_unicode($str, 0, $len);
+
+	return $newstr;
+
 }
 
 function mkUrl($file, $_REQU){
@@ -149,22 +152,7 @@ function mkUrl($file, $_REQU){
 
 }
 
-function substr_unicode($str, $s, $l = null) {
-    return join("", array_slice(preg_split("//u", $str, -1, PREG_SPLIT_NO_EMPTY), $s, $l));
-}
-
-function shortenStr($str, $len=0){
-    $newstr = '';
-    if($len == 0){
-        $len = 10;
-    }
-    $newstr = substr_unicode($str, 0, $len);
-
-    return $newstr;
-
-}
-
-function base62x($s,$dec=0,$numType=null){
+function base62x($s, $dec=0, $numType=null){
     # e.g. base62x('abcd', 0, '8');
     # e.g. base62x('abcd', 1, '16');
     $type = "-enc";
@@ -181,6 +169,9 @@ function base62x($s,$dec=0,$numType=null){
     }
     return $s2;
 }
+
+
+//--- page navigator utils
 
 /**
  *	alert
@@ -279,7 +270,7 @@ function isImg($file){
 	$isimg = 0;
 	if($file != ''){
 		$tmpfileext = substr($file, strlen($file)-4);
-		if(in_array($tmpfileext,array("jpeg",".jpg",".png",".gif",".bmp"))){
+		if(in_array(strtolower($tmpfileext),array("jpeg",".jpg",".png",".gif",".bmp"))){
 			$isimg = 1;
 		}
 	}
@@ -414,7 +405,6 @@ function debug($obj, $tag='', $output=null){
  	# set output to dest
  	public static function set($dest, $k, $v) {
  		// dest=setHeader, setStatus, setCookie ...
- 
  		self::$hmt['set'][$dest] = array($k, $v);
  
  	}
@@ -477,7 +467,17 @@ function debug($obj, $tag='', $output=null){
 		
 	 }
  
+ }
  
+ /* get Smarty template file name
+  wadelau, Wed Feb 15 09:18:27 CST 2012
+  */
+ function getSmtTpl($file, $act){
+ 	$scriptname = explode("/",$file);
+ 	$scriptname = $scriptname[count($scriptname)-1];
+ 	$scriptname = explode(".",$scriptname);
+ 	$scriptname = $scriptname[0];
+ 	return $smttpl = $scriptname.'_'.($act==''?'main':$act).'.html';
  }
  
  

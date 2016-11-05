@@ -49,7 +49,6 @@ class Config_Slave{
 	} 
 }
 
-
 # cache master
 class Cache_Master{
 	
@@ -67,6 +66,15 @@ class Cache_Master{
 	
 }
 
+# file sys
+class File_System{
+	var $uplddir = '';
+	
+	function __construct(){
+		$this->uplddir = GConf::get('upld');
+	}
+	
+}
 
 //-- Todo
 
