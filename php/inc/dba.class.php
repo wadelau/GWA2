@@ -28,8 +28,9 @@ class DBA {
 		#$this->dbconn = new MySQLDB($this->conf);
 		$dbDriver = GConf::get('dbdriver');
 		$this->dbconn = new $dbDriver($this->conf);
-		$this->sql_operator_list = array(' ','^','~',':','!','/','*','&','%',
-		        '+','=','|','>','<','-','(',')');
+		$this->sql_operator_list = array(' '=>1,'^'=>1,'~'=>1,':'=>1,'!'=>1,'/'=>1,
+				'*'=>1,'&'=>1,'%'=>1,'+'=>1,'='=>1,'|'=>1,
+				'>'=>1,'<'=>1,'-'=>1,'('=>1,')'=>1);
 	}	
 
 	/* 
@@ -62,22 +63,18 @@ class DBA {
 		$idxarr = $this->hm2idxArray($sql,$hmvars);
     	#print_r($idxarr);
 		$haslimit1 = 0;
-		if(strpos($sql,"limit 1 ") != false ||(array_key_exists('pagesize',$hmvars) && $hmvars['pagesize'] == 1))
-		{
+		if(strpos($sql,"limit 1 ") != false ||(array_key_exists('pagesize',$hmvars) && $hmvars['pagesize'] == 1)){
 			$result = $this->dbconn->readSingle($sql, $hmvars,$idxarr); # why need this? @todo need to be removed.
 			$haslimit1 = 1;
 		}
-		else
-		{
+		else{
 			$result = $this->dbconn->readBatch($sql, $hmvars,$idxarr);
 		}
-		if($result[0])
-		{
+		if($result[0]){
 			$hm[0] = true;
 			$hm[1] = $result[1]; # single-dimension or double-dimension array
 		}
-		else
-		{
+		else{
 			$hm[0] = false;
 			$hm[1] = $result[1];
 		}
@@ -109,7 +106,7 @@ class DBA {
         		        $preK = substr($sql, $keyPos-1, 1);
         		        $aftK = substr($sql, $keyPos+$keyLen, 1);
         		        #debug(__FILE__.": sql:[$sql] k:[$k] pos:[$keyPos] prek:[$preK] aftk:[$aftK]");
-        		        if(in_array($preK, $sqloplist) && in_array($aftK, $sqloplist)){
+        		        if(isset($sqloplist[$preK]) && isset($sqloplist[$aftK])){
         		            if($selectpos !== false){
         		                if($keyPos > $wherepos){
         		                    $tmparr[$keyPos] = $k;
