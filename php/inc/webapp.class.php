@@ -42,22 +42,22 @@ class WebApp implements WebAppInterface{
 	function __construct($args=null){
 		# db as backend
 		if($this->dba == null){ # Wed Oct 22 10:23:03 CST 2014
-          if($args != null && is_array($args) && array_key_exists('dbconf', $args)){
-			 $dbconf = $args['dbconf']; 
-		  }
-		  $this->dba = new DBA($dbconf);
+			$dbconf = isset($args['dbconf']) ? $args['dbconf'] : null;
+			$this->dba = new DBA($dbconf);
         }
 		# cache
 		if(GConf::get('enable_cache')){
 			if($this->cachea == null){
-				$this->cachea = new CacheA($args['cacheconf']);
+				$cacheconf = isset($args['cacheconf']) ? $args['cacheconf'] : null;
+				$this->cachea = new CacheA($cacheconf);
 				#print_r(__FILE__."cachea:[".$this->cachea."]");
 			}
 		}
 		# file
 		if(GConf::get('enable_file')){
 			if($this->filea == null){
-				$this->filea = new CacheA($args['fileconf']);
+				$fileconf = isset($args['fileconf']) ? $args['fileconf'] : null;
+				$this->filea = new CacheA($fileconf);
 				#print_r(__FILE__."cachea:[".$this->cachea."]");
 			}
 		}
@@ -190,7 +190,7 @@ class WebApp implements WebAppInterface{
 			# write to db
 			$sql = "";
 			$isupdate = 0;
-			if($this->getId() == '' && ($conditions == null || $args == '')){
+			if($this->getId() == '' && ($conditions == null || $conditions == '')){
 				$sql = "insert into ".$this->getTbl()." set ";
 			}
 			else{
@@ -625,22 +625,6 @@ class WebApp implements WebAppInterface{
 		}
 		else if($type == 'file:'){
             //-- local or network file system
-            /*
-            # test dir
-            $dirfile = $args['target'];
-            $parts = explode('/', $dirfile);
-            $file = array_pop($parts);
-            $dir = '';
-            foreach($parts as $part){
-                if(!is_dir($dir .= "/$part")){ mkdir($dir); }
-            }
-            # write data
-            #debug($dir.'/'.$file);
-            $flags = 0;
-            if($args['islock']){ $flags = $flags |  LOCK_EX; }
-            if($args['isappend']){ $flags = $flags | FILE_APPEND; }
-            $obj = file_put_contents($dir.'/'.$file, $args['content'], $flags);
-            */
 			$obj = $this->filea->write($args['target'], $args['content'], $args); # since, 15:55 05 November 2016, # $fp reusable by $args['reuse']=true
             if($obj !== false){
                 $obj = array(true, $obj);

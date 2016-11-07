@@ -17,6 +17,7 @@ class DBA {
 	
 	var $conf = null; 
 	var $dbconn = null;
+	var $sql_operator_list = array(); # first chars of ansi sql operators
 
 	//-construct
 	function __construct($dbconf=null){
@@ -27,7 +28,8 @@ class DBA {
 		#$this->dbconn = new MySQLDB($this->conf);
 		$dbDriver = GConf::get('dbdriver');
 		$this->dbconn = new $dbDriver($this->conf);
-			
+		$this->sql_operator_list = array(' ','^','~',':','!','/','*','&','%',
+		        '+','=','|','>','<','-','(',')');
 	}	
 
 	/* 
@@ -96,6 +98,43 @@ class DBA {
         #print_r($hmvars);
 		if(is_array($hmvars)){
 			foreach($hmvars as $k => $v){
+		        if($k == ''){
+		            #debug(__FILE__.": found n/a k:[$k], skip.");
+		            continue;
+		        }
+		        $keyLen = strlen($k);
+		        $keyPos = strpos($sql, $k);
+		        if($keyPos !== false){
+		            while($keyPos !== false){
+        		        $preK = substr($sql, $keyPos-1, 1);
+        		        $aftK = substr($sql, $keyPos+$keyLen, 1);
+        		        #debug(__FILE__.": sql:[$sql] k:[$k] pos:[$keyPos] prek:[$preK] aftk:[$aftK]");
+        		        if(in_array($preK, $sqloplist) && in_array($aftK, $sqloplist)){
+        		            if($selectpos !== false){
+        		                if($keyPos > $wherepos){
+        		                    $tmparr[$keyPos] = $k;
+        		                }
+        		                else{
+        		                    # select fields
+        		                }
+        		            }
+        		            else{
+        		                $tmparr[$keyPos] = $k;
+        		            }
+        		        }
+        		        else{
+        		            #debug(__FILE__.": found illegal key preset. k:[$k] pos:[$keyPos] 
+        		            #        prek:[$preK] aftk:[$aftK]");
+        		        }
+        		        $keyPos = strpos($sql, $k, $keyPos+$keyLen);
+		            }
+		        }
+		        else{
+		            #debug(__FILE__.": no such key:[$k] in sql:[$sql]");
+		        }
+		    }
+			/*
+			foreach($hmvars as $k => $v){
 			    if($k == '' || $k == 'tbl'){
 			        #debug(__FILE__.": found n/a k:[$k], skip.");
 			        continue;
@@ -129,6 +168,7 @@ class DBA {
 							 *  Sun Jul 24 21:18:00 UTC 2011
 							 *  !! Need space before > or < in this case, Thu Sep 11 16:29:03 CST 2014
 							 */
+							 /*
 							$nextpos = strpos($sql, $spacek, $nextpos+1);
 							$tmpposarr[$k]++;
 						}
@@ -141,12 +181,26 @@ class DBA {
 					#error_log(__FILE__.": not found k:[$k] v:[$v] in sql:[$sql]");	
 				}
 			}
+			*/
 		}
 		else{
 			error_log(__FILE__.": illegal array found with hmvars.");				
 		}
 		$sqllen = strlen($sql);
 		$tmpi = 0;
+		for($i=0;$i<$sqlLen;$i++){
+		    if(array_key_exists($i, $tmparr)){
+		        $k = $tmparr[$i];
+		        $ki = isset($kSerial[$k]) ? $kSerial[$k] : ''; 
+		        $idxarr[$tmpi] = $tmparr[$i].($ki=='' ? '' : '.'.($ki+1));
+		        $tmpi++;
+		        $kSerial[$k]++;
+		    }
+		    else{
+		        # @todo;
+		    }
+		}
+		/*
 		for($i=0;$i<$sqllen;$i++){
 			if(array_key_exists($i, $tmparr)){
 				$idxarr[$tmpi] = $tmparr[$i];
@@ -156,6 +210,7 @@ class DBA {
 				# @todo;
 			}
 		}
+		*/
 		#debug(__FILE__.": sql:[$sql] hmvars:[".serialize($hmvars)."] idxarr:");
 		#debug($idxarr);
 		return $idxarr;
