@@ -30,7 +30,7 @@ class DBA {
 		$this->dbconn = new $dbDriver($this->conf);
 		$this->sql_operator_list = array(' '=>1,'^'=>1,'~'=>1,':'=>1,'!'=>1,'/'=>1,
 				'*'=>1,'&'=>1,'%'=>1,'+'=>1,'='=>1,'|'=>1,
-				'>'=>1,'<'=>1,'-'=>1,'('=>1,')'=>1);
+				'>'=>1,'<'=>1,'-'=>1,'('=>1,')'=>1,','=>1);
 	}	
 
 	/* 
@@ -92,6 +92,7 @@ class DBA {
 		$tmpposarr = array();
         $wherepos = strpos($sql, " where ");
         $selectpos = strpos($sql, "select ");
+		$sqloplist = $this->sql_operator_list;
         #print_r($hmvars);
 		if(is_array($hmvars)){
 			foreach($hmvars as $k => $v){
@@ -183,8 +184,9 @@ class DBA {
 		else{
 			error_log(__FILE__.": illegal array found with hmvars.");				
 		}
-		$sqllen = strlen($sql);
+		$sqlLen = strlen($sql);
 		$tmpi = 0;
+		$kSerial = array();
 		for($i=0;$i<$sqlLen;$i++){
 		    if(array_key_exists($i, $tmparr)){
 		        $k = $tmparr[$i];
