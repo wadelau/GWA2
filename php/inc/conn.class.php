@@ -18,6 +18,7 @@ class Config_Master{
 	var $mDbPassword = ""; 
 	var $mDbPort     = "";	
 	var $mDbDatabase = "";
+	var $mDbSock = '';
 	
 	function __construct(){
 		$gconf = new GConf();
@@ -26,6 +27,7 @@ class Config_Master{
 		$this->mDbUser = $gconf->get('dbuser');
 		$this->mDbPassword = $gconf->get('dbpassword');
 		$this->mDbDatabase = $gconf->get('dbname');
+		$this->mDbSock = $gconf->get('dbsock');
 
 	} 
 }
@@ -37,6 +39,7 @@ class Config_Slave{
 	var $mDbPassword = ""; 
 	var $mDbPort     = "";	
 	var $mDbDatabase = "";
+	var $mDbSock = '';
 	
 	function __construct(){
 		$gconf = new GConf();
@@ -45,6 +48,7 @@ class Config_Slave{
 		$this->mDbUser = $gconf->get('dbuser_slave');
 		$this->mDbPassword = $gconf->get('dbpassword_slave');
 		$this->mDbDatabase = $gconf->get('dbname_slave');
+		$this->mDbSock = $gconf->get('dbsock');
 
 	} 
 }
@@ -57,7 +61,6 @@ class Cache_Master{
 	var $expireTime = 1800; # 30 * 60; 
 	
 	function __construct(){
-		
 		$this->chost = GConf::get('cachehost');
 		$this->cport = GConf::get('cacheport');
 		$this->expireTime = GConf::get('cacheexpire');
@@ -69,9 +72,11 @@ class Cache_Master{
 # file sys
 class File_System{
 	var $uplddir = '';
+	var $reuse = false;
 	
 	function __construct(){
 		$this->uplddir = GConf::get('upld');
+		$this->reuse = GConf::get('enable_filehandle_share');
 	}
 	
 }

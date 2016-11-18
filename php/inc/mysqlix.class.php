@@ -16,7 +16,8 @@ class MYSQLIX {
 	var $m_user; 
 	var $m_password; 
 	var $m_name; 
-	var $m_link; 
+	var $m_link;
+	var $m_sock;
 	var $isdebug = 0; # debug mode
 
 	# 
@@ -26,7 +27,8 @@ class MYSQLIX {
 		$this->m_port     = $config->mDbPort; 
 		$this->m_user     = $config->mDbUser; 
 		$this->m_password = $config->mDbPassword; 
-		$this->m_name     = $config->mDbDatabase; 
+		$this->m_name     = $config->mDbDatabase;
+		$this->m_sock     = $config->mDbSock;
 		$this->m_link = null;
 		
 	} 
@@ -35,9 +37,8 @@ class MYSQLIX {
 	function _initConnection(){
 		
 		if (!is_object($this->m_link)){
-			$real_host = $this->m_host.":".$this->m_port;
-			$this->m_link = new mysqli($this->m_host, $this->m_user, 
-				$this->m_password, $this->m_name, $this->m_port);
+		    $this->m_link = new mysqli($this->m_host, $this->m_user, 
+				$this->m_password, $this->m_name, $this->m_port, $this->m_sock);
 			
 			if(GConf::get('db_enable_utf8_affirm')){
 				$this->query("SET NAMES 'utf8'", null, null);
@@ -181,7 +182,7 @@ class MYSQLIX {
 		else{
 			$newsql = "";
 			$wherepos = strpos($sql, " where ");
-			if( (strpos($sql,"delete ")!==false || strpos($sql,"update ")!==false) 
+			if( (strpos($sql,"delete ")===0 || strpos($sql,"update ")===0)
 				&& $wherepos === false){
 				$this->sayErr("table action [update, delete] need [where] clause. sql:[".$sql."]");
 			}

@@ -1,0 +1,12 @@
+
+http://perldoc.perl.org/perlobj.html
+http://perldoc.perl.org/perlootut.html
+
+OOP - Object Oriented Perl
+	https://perlmaven.com/oop
+
+Object-Oriented Perl
+	http://blob.perl.org/books/beginning-perl/3145_Chap11.pdf
+
+
+

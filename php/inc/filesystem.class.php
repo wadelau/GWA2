@@ -28,6 +28,7 @@ class FileSystem {
 	function __construct($config=null){
 		//- init at first access
 		$this->uplddir = $config->uplddir;
+		$this->reuse = $config->reuse;
 	}
 	
 	function __destruct(){
@@ -65,7 +66,7 @@ class FileSystem {
 			}
 			else{
 				# make $fp reusable from settings
-				if($args['reuse']){
+				if($args['reuse'] || $this->reuse){
 					$this->handlelist[$file] = array('filepointer'=>$this->fp, 
 							'accessmode'=>$accessmode, 'reuse'=>true);
 				}

@@ -38,7 +38,8 @@ if(true){
 	$conf['dbname'] 	= 'DB_NAME';
 	$conf['dbdriver']	= 'MYSQL'; # 'MYSQL', 'MYSQLIX', 'PDOX', 'SQLSERVER', 'ORACLE' in support, UPCASE only
 	$conf['db_enable_utf8_affirm'] = false; # append utf-8 affirm after db connection established, should be false in a all-utf-8 env.
-
+	$conf['dbsock'] = '/www/bin/mysql/mysql.sock'; # use only if dbhost=localhost since php7.0+
+	
 	# cache server
 	$conf['enable_cache'] = 1; # or true for 1, false for 0
 	$conf['cachehost'] = '127.0.0.1'; # '/www/bin/memcached/memcached.sock'; #  ip, domain or .sock
@@ -49,6 +50,7 @@ if(true){
 	# file system
 	$conf['enable_file'] = 1; # true for 1, false for 0 to init at entry stage
 	$conf['filedriver'] = 'FileSystem'; # files operations, since 2016-11-05
+	$conf['enable_filehandle_share'] = 1; # 17:31 10 November 2016
 	
 	# misc
 	$conf['is_debug'] = 1;
