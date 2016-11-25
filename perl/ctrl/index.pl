@@ -16,4 +16,8 @@ sub __exec__ {
 
 print "\tvar-a:[$_ctrl_var_a] in ctrl.\n";
 
+__exec__($ARGV);
+
+print "\tI am now at the end of ctrl/index.pl.\n";
+
 1;

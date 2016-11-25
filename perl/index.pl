@@ -31,6 +31,8 @@ flock(LOCK,LOCK_EX|LOCK_NB) || warn "another $basename is running,exit\n";
 
 # main body
 
+# comm/header.inc.pl ?
+
 print "now is: ".strftime("%Y-%m-%d-%H:%M:%S", localtime)."\n";
 
 use lib '/mnt/hgfs/HostGitHub/GWA2/perl';
@@ -39,12 +41,13 @@ use lib './';
 my $_ctrl_var_a = "I am a var from $0, 1:[".$ARGV[0]."]";
 my $ctrl = "index";
 
-require("./ctrl/".$ctrl.".pl");
+require "./ctrl/$ctrl.pl";
 
 print "var-a:[$_ctrl_var_a] in index 1:[".$ARGV[1]."].\n";
 
-__exec__($ARGV);
+#__exec__($ARGV); # why?
 
+# comm/footer.inc.pl ?
 
 close(LOCK);
 unlink($mydir."/".$basename.".lock") or warn "remove lock file failed:[$!].\n";
