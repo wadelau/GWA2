@@ -145,7 +145,7 @@ public final class Dba { //- db administrator
 			while(itr.hasNext()){
 				k=(String)itr.next();
 				k = k==null ? "" : k;
-				if(k.equals(""){ 
+				if(k.equals("")){ 
 					
 					continue; 
 				}

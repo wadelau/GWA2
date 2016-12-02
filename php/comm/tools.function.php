@@ -391,7 +391,7 @@ function debug($obj, $tag='', $output=null){
  			$rtn = trim($src[$k]);
  		}
  
- 		if (! $rtn && $defaultValue != null) {
+ 		if (!$rtn && $defaultValue != null) {
  			$rtn = $defaultValue;
  		}
  

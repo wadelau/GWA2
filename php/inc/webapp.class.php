@@ -37,6 +37,7 @@ class WebApp implements WebAppInterface{
 	const GWA2_ID = 'gwa2_id_TAG';
 	const GWA2_TBL = 'gwa2_tbl_TAG';
 	var $ssl_verify_ignore = false;
+	var $GWA2_Runtime_Env_List = null;
 	
 	//- constructor
 	function __construct($args=null){
@@ -64,6 +65,10 @@ class WebApp implements WebAppInterface{
 		# others should be invoked by its subclasses
 		$this->isdbg = GConf::get('is_debug');
 		$this->ssl_verify_ignore = GConf::get('ssl_verify_ignore');
+		$this->GWA2_Runtime_Env_List = array('id'=>1, 'tbl'=>1, 'pagesize'=>1, 'pagenum'=>1,
+		       'orderby'=>1, 'groupby'=>1, self::GWA2_TBL=>1, self::GWA2_ERR=>1,
+		       self::GWA2_ID=>1);
+		
 	}
 	
 	//- destruct
@@ -111,8 +116,7 @@ class WebApp implements WebAppInterface{
 		else {
 		    if($noExtra == null){
 		        if($field == $this->myId
-		                || $field == self::GWA2_TBL
-		                || $field == self::GWA2_ERR){
+		                || isset($this->GWA2_Runtime_Env_List[$field])){
 		            $noExtra = 1; 
 		            #! Otherwise, this will cause a dead loop with ._setAll,
 		            # or some query loop between getBy, get and _setAll,
@@ -145,7 +149,7 @@ class WebApp implements WebAppInterface{
 	}
 	
 	//-
-	function del($filed){
+	function del($field){
 	    unset($this->hmf[$field]);
 	    return true;
 	}
@@ -215,7 +219,7 @@ class WebApp implements WebAppInterface{
 					$sql .= " where ".$this->myId."=?";
 				}
 				else if($isupdate == 1){
-					error_log("/inc/webapp.class.php: setBy: unconditonal update is forbidden.");
+					debug("/inc/webapp.class.php: setBy: unconditonal update is forbidden.");
 					$issqlready = 0;
 					$hm[0] = false;
 					$hm[1] = array("error"=>"unconditonal update is forbidden.");
@@ -287,7 +291,7 @@ class WebApp implements WebAppInterface{
 				if($pagesize == 0){ $pagesize = 99999; } # maximum records per query
 				$sql .= ' limit '.(($pagenum-1)*$pagesize).','.$pagesize;	
 			}
-			#error_log(__FILE__.": getBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
+			#debug(__FILE__.": getBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
 			$hm = $this->dba->select($sql, $this->hmf);
 			$this->_setCache($hm, $fields);
 		}
@@ -563,7 +567,18 @@ class WebApp implements WebAppInterface{
                     $args['target'] .= (inString('?', $args['target']) ? '&' : '?');
                     $args['target'] .= http_build_query($args['parameter']);
                 }
-				$ctxArr = array();
+				$header = '';
+                if(is_array($args['header'])){
+                    foreach($args['header'] as $k=>$v){
+                        $header .= "$k: $v\r\n";
+                    }
+                }
+                $ctxArr = array(
+                        'http'=>array(
+							'method'=>'GET',
+							'header'=>$header,
+                        )
+                    ); # $args: 'method', 'header', 'content'...
 				if($this->ssl_verify_ignore){
 					$ctxArr['ssl'] = array(
 						'verify_peer'=>false, # for reliable src

@@ -118,7 +118,9 @@ class MEMCACHEDX {
 	
 	//- close
 	function close(){
-		$this->mcache->quit();
+	    if($this->mcache != null){
+		  $this->mcache->quit();
+	    }
 	}
 	
  }
