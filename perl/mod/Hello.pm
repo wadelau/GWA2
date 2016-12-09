@@ -14,7 +14,8 @@ sub new {
 		_lastname => shift,
 	};
 	bless $self, $class;
-	print "\t\tHello.pm init with firstname:[".$self->{_firstname}."].\n";
+	print "\t\tmod/Hello.pm: init with firstname:["
+		.$self->{_firstname}."] at time:[".time()."].\n";
 	return $self;
 }
 

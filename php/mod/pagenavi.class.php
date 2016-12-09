@@ -81,10 +81,10 @@ class PageNavi extends WebApp{
            }
 			#print "$i: [$str] totalpage:[$totalpage]\n";
        }
-       $str .= " &nbsp;<b><a href=\"javascript:pnAction('".$para['url']."&pnpn=".$totalpage."');\" title=\"最后一页\">&raquo;|</a> </b> &nbsp; &nbsp; <a href=\"javascript:void(0);\" title=\"改变显示条数\" onclick=\"javascript:var pnps=window.prompt('请输入新的每页显示条数:','".$para['pnps']."'); if(pnps>0){ myurl='".$para['url']."'; myurl=myurl.replace('/pnps/','/opnps/'); doAction(myurl+'&pnps='+pnps);};\"><b>".$para['pnps']."</b>条/页</a> &nbsp; 共 <b>".$para['pntc']."</b>条 / <b>".$totalpage."</b>页 &nbsp;";
+       $str .= " &nbsp;<b><a href=\"javascript:pnAction('".$para['url']."&pnpn=".$totalpage."');\" title=\"最后一页\">&raquo;|</a> </b> &nbsp; &nbsp; <a href=\"javascript:void(0);\" title=\"改变显示条数\" onclick=\"javascript:var pnps=window.prompt('请输入新的每页显示条数:','".$para['pnps']."'); if(pnps>0){ myurl='".$para['url']."'; myurl=myurl.replace('/pnps/','/opnps/'); doAction(myurl+'&pnps='+pnps);};\"><b>".$para['pnps']."</b>条/页</a> &nbsp; 共 <b>".number_format($para['pntc'])."</b>条 / <b>".number_format($totalpage)."</b>页 &nbsp;";
        if($_REQUEST['isheader'] != '0'){
            $str .= "<button name=\"initbtn\" onclick=\"javascript:pnAction('".$this->getInitUrl()."');\">初始页</button>&nbsp;";
-           $str .= "<button name=\"initbtn2\" onclick=\"javascript:doAction('".str_replace("&list","&list-toexcel",$para['url'])."');\">导出xls</button>";
+           $str .= "<button name=\"initbtn2\" onclick=\"javascript:doAction('".str_replace("&list","&list-toexcel",$para['url'])."');\">导出表</button>";
        }
 
        return $str;
@@ -209,7 +209,7 @@ class PageNavi extends WebApp{
        #error_log(__FILE__.": req:".$this->toString($_REQUEST));
 
        foreach($_REQUEST as $k=>$v){
-            if(strpos($k,"pnsk") === 0){
+            if($k != 'pnsk' && strpos($k,"pnsk") === 0){
                 $field = substr($k, 4);
                 $linkfield = $field;
                 if(strpos($field,"=") !== false){
@@ -217,6 +217,10 @@ class PageNavi extends WebApp{
                     $field = $arr[0];
                     $linkfield = $arr[1];
                 }
+				# for select 
+       	   		if(isset($_REQUEST[$field]) && $_REQUEST[$field] != $v){
+       	   			$v = $_REQUEST[$field];	
+       	   		}
                 if(strpos($v,"tbl:") === 0){ #http://ufqi.com:81/dev/gtbl/ido.php?tbl=hss_dijietbl&tit=%E5%AF%BC%E6%B8%B8%E8%A1%8C%E7%A8%8B&db=&pnsktuanid=tbl:hss_findaoyoutbl:id=2 
                     $condition .= " ".$pnsm." ".$field." in (".$this->embedSql($linkfield,$v).")";
                 
@@ -280,6 +284,14 @@ class PageNavi extends WebApp{
 					else if($fieldopv == 'endswith'){
                         $condition .= " ".$pnsm." "."$field like ?";
                         $gtbl->set($field, "%".$v);
+                    }
+					else if($fieldopv == '!='){
+                        $condition .= " ".$pnsm." "."$field <> ?";
+                        $gtbl->set($field, $v);
+                    }
+                    else if($fieldopv == 'notregexp'){
+                        $condition .= " ".$pnsm." "."$field not regexp ?";
+                        $gtbl->set($field, $v);
                     }
 					else{ 
                         $condition .= " ".$pnsm." $field $fieldopv ?"; # this should be numeric only.

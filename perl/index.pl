@@ -39,23 +39,48 @@ use lib './';
 
 print "now is: ".strftime("%Y-%m-%d-%H:%M:%S", localtime)."\n";
 
-my $i = 100;
+my $i = 1612071942;
 my $hmf;
-my %hmf = ();
-my $_ctrl_var_a = "I:[$i] am a var from $0, 1:[".$ARGV[0]."] index.";
+my %hmf = (); # runtime container
+my $_ctrl_var_a = "I:[$i] am a var from $0, index.";
 my $ctrl = "index";
 my $argvsize = @ARGV;
 
 $hmf{'var_a'} = $_ctrl_var_a;
-$ARGV[$argvsize+1] = $hmf;
+$hmf{'i'} = $i;
+$ARGV[$argvsize] = \%hmf; # $hmf; prepare for controller
 
-print "bfr var-a:[$_ctrl_var_a] in index 1:[".$ARGV[1]."] size:[".@ARGV."] 3:[".$ARGV[3]."].\n";
+for(my $i=0; $i<@ARGV; $i++){
+	my $v = $ARGV[$i];
+	#print Dumper($v);
+	#print "\ti:$i v:[".$v."]\n";
+}
+
+print "bfr var-a:[$_ctrl_var_a] in index, argvsize:[".@ARGV."] size2:[".$argvsize."] var_a:["
+	.$hmf{'var_a'}."] var_a:2:[".$ARGV[$argvsize]{'var_a'}."].\n\n";
 
 require "./ctrl/$ctrl.pl";
 
-print "aft var-a:[$_ctrl_var_a] in index 1:[".$ARGV[1]."] 2:[".$ARGV[2]."].\n";
+_exec_();
 
-#__exec__($ARGV); # why?
+print "\naft var-a:[$_ctrl_var_a] in index.\n\n";
+
+for(my $i=0; $i<@ARGV; $i++){
+	my $v = $ARGV[$i];
+	#print Dumper($v);
+	#print "\ti:$i v:[".$v."]\n";
+}
+
+%hmf = %{$ARGV[$argvsize]}; # return from controller
+print Dumper($hmf);
+print "var_in_ctrl/index:[".$hmf{'var_in_ctrl/index'}."]\n";
+print "i_in_ctrl/index:[".$hmf{'i_in_ctrl/index'}."]\n\n";
+
+sub _exec_index_ {
+	my $hello = mod::Hello->new($ARGV[0], $ARGV[1]);
+	print "\tindex: I am a func from $0 in index:[".$ARGV[0]."] i:$i.\n";	
+	$hmf{'var_in__exec_in_index'} = "_exec_index_: time: ".time();
+}
 
 # comm/footer.inc.pl ?
 
