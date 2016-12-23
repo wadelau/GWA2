@@ -22,12 +22,6 @@ interface WebAppInterface{
 	function rmBy($conditions);
 
   	function toString($object);
-
-	/*
-	function setLang($lang);
-	function getLang();
-	function checkDB();
-	*/
 	
 }
 ?>

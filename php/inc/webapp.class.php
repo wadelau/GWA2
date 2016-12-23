@@ -37,6 +37,7 @@ class WebApp implements WebAppInterface{
 	const GWA2_ID = 'gwa2_id_TAG';
 	const GWA2_TBL = 'gwa2_tbl_TAG';
 	var $ssl_verify_ignore = false;
+	var $http_enable_gzip = false;
 	var $GWA2_Runtime_Env_List = null;
 	
 	//- constructor
@@ -65,6 +66,7 @@ class WebApp implements WebAppInterface{
 		# others should be invoked by its subclasses
 		$this->isdbg = GConf::get('is_debug');
 		$this->ssl_verify_ignore = GConf::get('ssl_verify_ignore');
+		$this->http_enable_gzip = GConf::get('http_enable_gzip');
 		$this->GWA2_Runtime_Env_List = array('id'=>1, 'tbl'=>1, 'pagesize'=>1, 'pagenum'=>1,
 		       'orderby'=>1, 'groupby'=>1, self::GWA2_TBL=>1, self::GWA2_ERR=>1,
 		       self::GWA2_ID=>1);
@@ -523,10 +525,18 @@ class WebApp implements WebAppInterface{
                 //- curl or fsockopen, todo
                 //- or file_get_contents with  stream_context_create()
                 $header = '';
+                $enableZip = false;
                 if(is_array($args['header'])){
                     foreach($args['header'] as $k=>$v){
                         $header .= "$k: $v\r\n";
+                        if($k == 'Accept-Encoding'){
+                            $enableZip = true;
+                        }
                     }
+                }
+                if(!$enableZip && $this->http_enable_gzip){
+                    $header .= "Accept-Encoding: gzip, deflate, compress\r\n";
+                    $enableZip = true;
                 }
                 $paraStr = '';
                 if($args['parameter']){
@@ -550,6 +560,16 @@ class WebApp implements WebAppInterface{
 				$reqContext = stream_context_create($ctxArr);
                 $obj = file_get_contents($args['target'], false, $reqContext);
                 if($obj !== false){
+					if($enableZip){
+                        $objArr = ZeeA::unzip($obj, $more=array('header'=>$http_response_header));
+                        if($objArr[0]){
+                            $obj = $objArr[1];
+                        }
+                        else{
+                            $obj = $objArr[1];
+                            debug(__FILE__.": enableZip but failed. 1612322010.");
+                        }
+                    }
                     $obj = array(true, array('content'=>$obj, 'header'=>$http_response_header));
                 }
                 else{
@@ -567,11 +587,18 @@ class WebApp implements WebAppInterface{
                     $args['target'] .= (inString('?', $args['target']) ? '&' : '?');
                     $args['target'] .= http_build_query($args['parameter']);
                 }
-				$header = '';
+				$enableZip = false;
                 if(is_array($args['header'])){
                     foreach($args['header'] as $k=>$v){
                         $header .= "$k: $v\r\n";
+                        if($k == 'Accept-Encoding'){
+                            $enableZip = true;
+                        }
                     }
+                }
+                if(!$enableZip && $this->http_enable_gzip){
+                    $header .= "Accept-Encoding: gzip, deflate, compress\r\n";
+                    $enableZip = true;
                 }
                 $ctxArr = array(
                         'http'=>array(
@@ -588,6 +615,16 @@ class WebApp implements WebAppInterface{
 				$reqContext = stream_context_create($ctxArr);
                 $obj = file_get_contents($args['target'], false, $reqContext);
                 if($obj !== false){
+					if($enableZip){
+                        $objArr = ZeeA::unzip($obj, $more=array('header'=>$http_response_header));
+                        if($objArr[0]){
+                            $obj = $objArr[1];
+                        }
+                        else{
+                            $obj = $objArr[1];
+                            debug(__FILE__.": enableZip but failed. 1612222010.");
+                        }
+                    }
                     $obj = array(true, array('content'=>$obj, 'header'=>$http_response_header));
                 }
                 else{

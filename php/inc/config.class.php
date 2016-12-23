@@ -68,6 +68,7 @@ if(true){
 	$conf['operatelogtbl']	= $tblpre.'fin_operatelogtbl';
 	
 	$conf['ssl_verify_ignore'] = true;
+	$conf['http_enable_gzip'] = false;
 	
 	# set to global container
 	GConf::setConf($conf);
