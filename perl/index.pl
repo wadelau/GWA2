@@ -37,7 +37,7 @@ use lib './';
 
 # comm/header.inc.pl ?
 
-print "now is: ".strftime("%Y-%m-%d-%H:%M:%S", localtime)."\n";
+print "now is: ".strftime("%Y-%m-%d-%H:%M:%S%z", localtime)."\n";
 
 my $i = 1612071942;
 my $hmf;
@@ -48,20 +48,21 @@ my $argvsize = @ARGV;
 
 $hmf{'var_a'} = $_ctrl_var_a;
 $hmf{'i'} = $i;
+$hmf{'mod'} = $ctrl;
 $ARGV[$argvsize] = \%hmf; # $hmf; prepare for controller
 
+print "ARGV:\n";
 for(my $i=0; $i<@ARGV; $i++){
 	my $v = $ARGV[$i];
 	#print Dumper($v);
-	#print "\ti:$i v:[".$v."]\n";
+	print "\ti:$i v:[".$v."]\n";
 }
 
-print "bfr var-a:[$_ctrl_var_a] in index, argvsize:[".@ARGV."] size2:[".$argvsize."] var_a:["
-	.$hmf{'var_a'}."] var_a:2:[".$ARGV[$argvsize]{'var_a'}."].\n\n";
+print "bfr var-a:[$_ctrl_var_a] in index\n"; 
 
 require "./ctrl/$ctrl.pl";
 
-_exec_();
+_exec_(); # child's func
 
 print "\naft var-a:[$_ctrl_var_a] in index.\n\n";
 
@@ -72,7 +73,7 @@ for(my $i=0; $i<@ARGV; $i++){
 }
 
 %hmf = %{$ARGV[$argvsize]}; # return from controller
-print Dumper($hmf);
+print "\$hmf: ".Dumper($hmf);
 print "var_in_ctrl/index:[".$hmf{'var_in_ctrl/index'}."]\n";
 print "i_in_ctrl/index:[".$hmf{'i_in_ctrl/index'}."]\n\n";
 
