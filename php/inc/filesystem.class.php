@@ -31,6 +31,7 @@ class FileSystem {
 		$this->reuse = $config->reuse;
 	}
 	
+	//- destruct
 	function __destruct(){
 	    $this->close();
 	}

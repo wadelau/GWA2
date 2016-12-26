@@ -364,6 +364,26 @@ class PageNavi extends WebApp{
        }
        $condition .= "select $field from ".$varr[1]." where ".$varr2[0]." ".$tmpop." ".$tmpval." order by id desc";
        return $condition;
-   }  
+   }
+   
+   //-
+   //- isNumeric
+   # test whether a field is numeric or not
+   # added on Mon Jun 18 20:43:55 CST 2012
+   public function isNumeric($fieldtype){
+	   	$isNumeric = 0;
+	   	if(strpos($fieldtype, "int") !== false
+	   			|| strpos($fieldtype, "float") !== false
+	   			|| strpos($fieldtype, "double") !== false
+	   			|| strpos($fieldtype, "date") !== false
+	   			|| strpos($fieldtype, "decimal") !== false){
+	   
+	   				$isNumeric = 1;
+	   	}
+	   	return $isNumeric;
+   }
+   
+    
+   
 }
 

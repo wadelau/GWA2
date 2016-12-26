@@ -34,7 +34,7 @@ class MYSQLIX {
 	} 
 
 	//-
-	function _initConnection(){
+	private function _initConnection(){
 		
 		if (!is_object($this->m_link)){
 		    $this->m_link = new mysqli($this->m_host, $this->m_user, 
@@ -172,7 +172,7 @@ class MYSQLIX {
 	}
 	
 	#
-	function _enSafe($sql,$idxarr,$hmvars){
+	private function _enSafe($sql,$idxarr,$hmvars){
 		
 		$sql = $origSql = trim($sql);
 		if($hmvars[GConf::get('no_sql_check')]){
@@ -226,7 +226,7 @@ class MYSQLIX {
 	}
 
 	//--- for sql injection remedy, added on 20061113 by wadelau
-	function _quoteSafe($value, $defaultValue=null){
+	private function _quoteSafe($value, $defaultValue=null){
 
 		if (!is_numeric($value)) {
 			$value = "'".mysqli_real_escape_string($this->m_link, $value)."'";
@@ -310,7 +310,7 @@ class MYSQLIX {
 	}
 
 	#
-	function sayErr($sql = ""){
+	private function sayErr($sql = ""){
 		
 		global $HTTP_HOST;
 		global $REMOTE_ADDR;
@@ -325,8 +325,10 @@ class MYSQLIX {
 			$str .= "<font color=red>sayError information : </font><br>&nbsp;&nbsp;".$this->getError();
 		}
 		else{
-			$str .= "<div id=\"sayErrdiv_201210131751\" style=\"color:red;z-index:99;position:absolute\">Found internal Error when process your transaction..., please report this to wadelau@gmail.com . [2007211253]</div>\n";
-			error_log(__FILE__.": MYSQL_sayErrOR: sayErr_no:[".$this->getErrno()."] sayErr_info:[".$this->getError()."] sayErr_sql:[".serialize($sql)."] [07211253]");
+			$str .= "<div id=\"sayErrdiv_201210131751\" style=\"color:red;z-index:99;position:absolute\">"
+					."Found internal Error when process your transaction..., please report this to wadelau@gmail.com . [2007211253]</div>\n";
+			error_log(__FILE__.": MYSQL_sayErrOR: sayErr_no:[".$this->getErrno()."] sayErr_info:[".$this->getError()."] sayErr_sql:["
+					.serialize($sql)."] [07211253]");
 		}
 		debug($sql);
 		$html = GConf::get('html_resp'); $html = str_replace("RESP_TITLE","sayError!", $html); $html = str_replace("RESP_BODY", $str, $html);
@@ -337,7 +339,6 @@ class MYSQLIX {
 	
 	//- for test purpose, wadelau@gmail.com, Wed Jul 13 19:21:37 UTC 2011
 	function showConf(){
-		
 		print __FILE__.":[".$this->m_name."].";
 		
 	}	

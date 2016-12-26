@@ -68,7 +68,7 @@ class MEMCACHEDX {
 	}
 	
 	//- init
-	function _init(){
+	private function _init(){
 		if(!is_object($this->mcache)){
 			$this->mcache = new Memcached($this->persistConnId);
 			$servers = $this->mcache->getServerList(); 
