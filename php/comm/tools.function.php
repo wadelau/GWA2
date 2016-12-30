@@ -76,7 +76,8 @@ function sendMail($to,$subject,$body, $from='', $local=0){
         $_CONFIG['isauth'] = true;
         $_CONFIG['mail_smtp_fromuser'] = $_CONFIG['mail_smtp_username'];
 
-        $mail = new Mailer($_CONFIG['mail_smtp_server'],25,$_CONFIG['isauth'],$_CONFIG['mail_smtp_username'],$_CONFIG['mail_smtp_password']);
+        $mail = new Mailer($_CONFIG['mail_smtp_server'],25,$_CONFIG['isauth'],$_CONFIG['mail_smtp_username'],
+                $_CONFIG['mail_smtp_password']);
 
         $mail->debug = true;;
         $from==''?'bangco@'.$_CONFIG['agentname']:$from;
@@ -118,15 +119,19 @@ function substr_unicode($str, $s, $l = null) {
 	return join("", array_slice(preg_split("//u", $str, -1, PREG_SPLIT_NO_EMPTY), $s, $l));
 }
 
-function shortenStr($str, $len=0){
-	$newstr = '';
-	if($len == 0){
-		$len = 10;
-	}
-	$newstr = substr_unicode($str, 0, $len);
-
-	return $newstr;
-
+function shortenStr($str, $len = 0) {
+    $newstr = '';
+    if ($len == 0) {
+        $len = 10;
+    }
+    if(strlen($str) <= $len){
+        $newstr = $str;
+    }
+    else{
+        $newstr = substr_unicode ( $str, 0, $len );
+    }
+    $str = null;
+    return $newstr;
 }
 
 function mkUrl($file, $_REQU){

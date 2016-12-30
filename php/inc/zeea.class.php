@@ -90,15 +90,15 @@ class ZeeA {
 	            $headers = $args['header'];
 	            foreach($headers as $k=>$v){
 	                if(strpos($v, 'Content-Encoding') !== false){
-	                    if(strpos($v, self::Type_Gzip) !== false){
+	                    if(stripos($v, self::Type_Gzip) !== false){
 	                        $ztype = self::Type_Gzip;
 	                        break;
 	                    }
-	                    else if(strpos($v, self::Type_Deflate) !== false){
+	                    else if(stripos($v, self::Type_Deflate) !== false){
 	                        $ztype = self::Type_Deflate;
 	                        break;
 	                    }
-	                    else if(strpos($v, self::Type_Compress) !== false){
+	                    else if(stripos($v, self::Type_Compress) !== false){
 	                        $ztype = self::Type_Compress;
 	                        break;
 	                    }
@@ -124,7 +124,7 @@ class ZeeA {
 	    }
 	    else{
 	        $ns = false;
-	        debug(__FILE__.": unknown ztype:[$ztype], let it be. 1612222232.");
+	        #debug(__FILE__.": unknown ztype:[$ztype], let it be. 1612222232.");
 	    }
 	    if($ns !== false){
 	        $rtn = array(true, $ns);
@@ -145,7 +145,7 @@ class ZeeA {
 		$etype = '';
 		if($args != null){
 			if(isset($args['encodetype'])){
-				$etype = $args['encodetype'];
+				$etype = strtolower($args['encodetype']);
 			}
 		}
 		$etype = $etype=='' ? self::Type_Encode_Base62x : $etype;
@@ -177,7 +177,7 @@ class ZeeA {
 		$unkn = 'unkn';
 		if($args != null){
 			if(isset($args['encodetype'])){
-				$etype = $args['encodetype'];
+				$etype = strtolower($args['encodetype']);
 			}
 		}
 		$etype = $etype=='' ? self::Type_Encode_Base62x : $etype;
