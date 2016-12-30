@@ -43,7 +43,7 @@ my $i = 1612071942;
 my $hmf;
 my %hmf = (); # runtime container
 my $_ctrl_var_a = "I:[$i] am a var from $0, index.";
-my $ctrl = "index";
+my $ctrl = "index"; # hello
 my $argvsize = @ARGV;
 
 $hmf{'var_a'} = $_ctrl_var_a;
@@ -62,7 +62,9 @@ print "bfr var-a:[$_ctrl_var_a] in index\n";
 
 require "./ctrl/$ctrl.pl";
 
-_exec_(); # child's func
+_exec2_(); # child's func
+
+_exec_(); # this func
 
 print "\naft var-a:[$_ctrl_var_a] in index.\n\n";
 
@@ -74,13 +76,14 @@ for(my $i=0; $i<@ARGV; $i++){
 
 %hmf = %{$ARGV[$argvsize]}; # return from controller
 print "\$hmf: ".Dumper($hmf);
-print "var_in_ctrl/index:[".$hmf{'var_in_ctrl/index'}."]\n";
-print "i_in_ctrl/index:[".$hmf{'i_in_ctrl/index'}."]\n\n";
+#print "var_in_ctrl/index:[".$hmf{'var_in_ctrl/index'}."]\n";
+#print "i_in_ctrl/index:[".$hmf{'i_in_ctrl/index'}."]\n\n";
 
-sub _exec_index_ {
+sub _exec_ {
 	my $hello = mod::Hello->new($ARGV[0], $ARGV[1]);
 	print "\tindex: I am a func from $0 in index:[".$ARGV[0]."] i:$i.\n";	
-	$hmf{'var_in__exec_in_index'} = "_exec_index_: time: ".time();
+	$hmf{'var_in__exec_in_index'} = "_exec_index_: time: ".localtime();
+	$hello->sayHi($0);
 }
 
 # comm/footer.inc.pl ?
