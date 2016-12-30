@@ -1,6 +1,7 @@
 
 http://perldoc.perl.org/perlobj.html
 http://perldoc.perl.org/perlootut.html
+http://perldoc.perl.org/perlsub.html
 
 OOP - Object Oriented Perl
 	https://perlmaven.com/oop
