@@ -1,5 +1,12 @@
 package inc::WebApp;
 
+#
+# Main designs from -GWA2 in -PHP
+# By Xenxin@ufqi.com, Wadelau@ufqi.com
+# Since Sun Jan  1 22:56:46 CST 2017
+# v0.10
+#
+
 use strict;
 use warnings;
 use Cwd qw(abs_path realpath);
@@ -50,6 +57,7 @@ sub DESTROY {
 }
 
 #
+# by Xenxin@ufqi.com since Sun Jan  1 22:54:54 CST 2017
 sub getBy {
 	my $fields = shift;
 	my $conditions = shift;
@@ -57,17 +65,19 @@ sub getBy {
 	
 	my $sql = "select $fields from tbl where $conditions";
 
-	my %result = $dba->select($sql, ());
+	my $result = $dba->select($sql, ());
+	my %result = %{$result};
+
+	print "\t\t\tinc::WebApp: result:".%result."\n";
 	
 	sleep(rand(3));
 
-	return %result;
+	return \%result;
 }
 
 #
 sub getEnv {
 	return "ver:[".VER."] root:[".$_ROOT_."]";	
 }
-
 
 1;

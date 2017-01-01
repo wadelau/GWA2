@@ -26,7 +26,7 @@ sub new {
 
 	$conf = shift;
 	if($conf ne ""){ $conf = "inc::Conn::$conf"; }
-	print "\t\t\tconf:[$conf] in inc::Dba\n";
+	print "\t\t\tinc::Dba: conf:[$conf] in inc::Dba\n";
 	my $confo = $conf->new();
 	$dbconn = inc::MySQL->new($confo); # swith to other drivers @todo
 
@@ -38,13 +38,16 @@ sub new {
 sub DESTROY {}
 
 #
+# Xenxin@ufqi.com, Sun Jan  1 22:51:55 CST 2017
 sub select {
 	my $sql = shift;		
 	my $hmvars = shift;
 
 	my %result = $dbconn->readSingle($sql, $hmvars);
 
-	return %result;
+	print "\t\t\tinc::Dba: result:".%result."\n";
+
+	return \%result;
 }
 
 #
@@ -52,8 +55,9 @@ sub update {
 	my $sql = shift;		
 	my $hmvars = shift;
 
-	my %result = $dbconn->query($sql, $hmvars);
+	my $result = $dbconn->query($sql, $hmvars);
 
-	return %result;
+	return $result;
 }
+
 1;

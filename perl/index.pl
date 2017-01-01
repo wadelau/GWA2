@@ -2,6 +2,9 @@
 
 # see desc at the bottom
 
+use lib '/mnt/hgfs/HostGitHub/GWA2/perl'; # @todo
+use lib './';
+
 use strict;
 use Cwd qw(abs_path realpath);
 use File::Basename qw(dirname basename);
@@ -30,8 +33,6 @@ if($singlerun == 1){
 	open(LOCK,">".$mydir."/".$basename.".lock") || die $!;
 	flock(LOCK,LOCK_EX|LOCK_NB) || warn "another $basename is running,exit\n";
 }
-use lib '/mnt/hgfs/HostGitHub/GWA2/perl'; # @todo
-use lib './';
 
 # main body
 

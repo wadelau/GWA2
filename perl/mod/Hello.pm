@@ -17,12 +17,14 @@ sub new {
 	my $class = shift;
 	my $args = shift;
 	my $self = {
-		_firstname => shift,
+		_firstname => shift ,
 		_lastname => shift,
 	};
 	bless $self, $class;
-	print "\t\tmod/Hello.pm: init with firstname:["
-		.$self->{_firstname}."] at time:[".time()."].\n\n";
+	if(!defined($self->{_firstname})){
+		$self->{_firstname} = 'Unnamed';	
+	}
+	print "\t\tmod/Hello.pm: init with firstname:[".$self->{_firstname}."] at time:[".time()."].\n\n";
 
 	my %args = ("args"=>$args, "dbconf"=>"MasterDB");
 	inc::WebApp->new(\%args);
@@ -34,7 +36,8 @@ sub new {
 sub sayHi {
 	my $self = shift;
 	my $to = shift;
-	print "\t\ti am in mod::Hello->say: _var:[".$self->{_firstname}
+	print "\t\ti am in mod::Hello->say: _var:["
+		.($self->{_firstname})
 		."] to:[$to] _var:[$hello_var] parent-ver:["
 		.$self->getEnv."].\n"; # getVer is inheriting from parent inc::WebApp
 

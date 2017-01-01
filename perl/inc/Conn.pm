@@ -23,18 +23,15 @@ my $isdbg = 1;
 	sub new {
 		my $class = shift;
 		my $self = {};
-		my $conf = (); # shift;
-		my %conf = (); # %{$conf};
+		my $gconf = inc::Config->new(); 
 
-		# @todo
-		# read from inc::Config automatically 
-
-		$self->{mDbHost} = $conf{'mDbHost'};
-		$self->{mDbPort} = $conf{'mDbPort'};
-		$self->{mDbUser} = $conf{'mDbUser'};
-		$self->{mDbPassword} = $conf{'mDbPassword'};
-		$self->{mDbDatabase} = $conf{'mDbDatabase'};
-		$self->{mDbSock} = $conf{'mDbSock'};
+		$self->{mDbHost} = $gconf->{'dbhost'};
+		print "\t\t\tinc::Conn: dbhost:".$self->{mDbHost}." 2:".$gconf->{'dbhost'}."\n";
+		$self->{mDbPort} = $gconf->{'dbport'};
+		$self->{mDbUser} = $gconf->{'dbuser'};
+		$self->{mDbPassword} = $gconf->{'dbpassword'};
+		$self->{mDbDatabase} = $gconf->{'dbname'};
+		$self->{mDbSock} = $gconf->{'dbsock'};
 
 		bless $self, $class;
 		return $self;
