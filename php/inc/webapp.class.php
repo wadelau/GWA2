@@ -68,7 +68,7 @@ class WebApp implements WebAppInterface{
 		$this->ssl_verify_ignore = GConf::get('ssl_verify_ignore');
 		$this->http_enable_gzip = GConf::get('http_enable_gzip');
 		$this->GWA2_Runtime_Env_List = array('id'=>1, 'tbl'=>1, 'pagesize'=>1, 'pagenum'=>1,
-		       'orderby'=>1, 'groupby'=>1, self::GWA2_TBL=>1, self::GWA2_ERR=>1,
+		       'orderby'=>1, 'groupby'=>1, self::GWA2_TBL=>1, self::GWA2_ERR=>0,
 		       self::GWA2_ID=>1);
 		
 	}
@@ -112,42 +112,51 @@ class WebApp implements WebAppInterface{
 	
 	//-
 	function get($field, $noExtra=null){
-		if(array_key_exists($field,$this->hmf)){
-			return $this->hmf[$field];
-		}
-		else {
-		    if($noExtra == null){
-		        if($field == $this->myId
-		                || isset($this->GWA2_Runtime_Env_List[$field])){
-		            $noExtra = 1; 
-		            #! Otherwise, this will cause a dead loop with ._setAll,
-		            # or some query loop between getBy, get and _setAll,
-		            # noExtra means just retrieve runtime value, not for db, file...
-		            # Wed, 12 Oct 2016 09:39:54 +0800
-		        }
-		    }
-		    if($noExtra == null){
-    			if($this->get(self::GWA2_ERR) != 1){
-    				if($this->_setAll()){
-    					if(isset($this->hmf[$field])){
-    						return $this->hmf[$field];
-    					}
-    					else{
-    						return $this->hmf[$field]='';	
-    					}
-    				}
-    				else{
-    					return '';
-    				}
-    			}
-    			else {
-    				return '';
-    			}
-    		}
-    		else{
-    			return '';
-    		}
-	   }
+	    $rtn = null;
+	    if(array_key_exists($field,$this->hmf)){
+	        $rtn = $this->hmf[$field];
+	    }
+	    else {
+	        if($field == self::GWA2_ERR){
+	            $rtn = $this->GWA2_Runtime_Env_List[$field];
+	        }
+	        else{
+	            if($noExtra == null || $noExtra == ''){
+	                if($field == $this->myId
+	                        || isset($this->GWA2_Runtime_Env_List[$field])){
+	                            $noExtra = 1;
+	                            #! Otherwise, this will cause a dead loop with ._setAll,
+	                            # or some query loop between getBy, get and _setAll,
+	                            # noExtra means just retrieve runtime value, not for db, file...
+	                            # Wed, 12 Oct 2016 09:39:54 +0800
+	                }
+	            }
+	            if($noExtra == null || $noExtra == ''){
+	                if($this->get(self::GWA2_ERR) != 1){
+	                    debug(__FILE__.": aa1");
+	                    if($this->_setAll()){
+	                        debug(__FILE__.": aa2");
+	                        if(isset($this->hmf[$field])){
+	                            $rtn = $this->hmf[$field];
+	                        }
+	                        else{
+	                            $rtn = $this->hmf[$field]='';
+	                        }
+	                    }
+	                    else{
+	                        $rtn = '';
+	                    }
+	                }
+	                else {
+	                    $rtn = '';
+	                }
+	            }
+	            else{
+	                $rtn = '';
+	            }
+	        }
+	    }
+	    return $rtn;
 	}
 	
 	//-
