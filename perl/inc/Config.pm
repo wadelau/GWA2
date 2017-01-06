@@ -19,7 +19,7 @@ my %conf = (
 	'dbport' => '3306',
 	'dbuser' => '',
 	'dbpassword' => '',
-	'dbname' => 'bizsftdb',
+	'dbname' => '',
 	'dbdriver' => 'mysql',
 	'dbsock' => '/www/bin/mysql/mysql.sock',
 	'db_enable_utf8_affirm' => 1,
@@ -30,7 +30,7 @@ my %conf = (
 sub new {
 	my $class = shift;
 	my $args = shift;
-	my $self = {};
+	my $self = {}; #{@_};
 	$self = \%conf;
 
 	bless $self, $class;	

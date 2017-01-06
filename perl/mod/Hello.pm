@@ -10,12 +10,13 @@ use parent 'inc::WebApp';
 
 our @ISA = qw(inc::WebApp); # for what?
 
-my $hello_var = 'glad to see you @'.time();
+my $hello_var = 'glad to see you @'.time().' from mod::Hello.';
 
 # override new of WebApp
 sub new {
 	my $class = shift;
 	my $args = shift;
+	#my $self = {@_};
 	my $self = {
 		_firstname => shift ,
 		_lastname => shift,

@@ -41,7 +41,7 @@ sub new {
 	my $args = shift; # @_ may be omitted.
 	my %args = %{$args};
 	print "\t\tclass:[$class] args:[".\%args."]\n";
-	my $self = {};
+	my $self = {@_};
 	if(1){
 		$dba = inc::Dba->new($args{'dbconf'});	
 	}
