@@ -12,11 +12,11 @@ use Time::HiRes qw(sleep time);
 use Fcntl qw(:flock);
 use POSIX qw(strftime);
 use Encode qw(decode_utf8 encode_utf8);
-use Date::Parse;
-use Data::Dumper;
-use JSON;
-use DBI;
-use DBD::mysql;
+#use Date::Parse;
+#use Data::Dumper;
+#use JSON;
+#use DBI;
+#use DBD::mysql;
 
 use utf8;
 no warnings 'utf8';
@@ -76,7 +76,6 @@ for(my $i=0; $i<@ARGV; $i++){
 }
 
 %hmf = %{$ARGV[$argvsize]}; # return from controller
-print "\$hmf: ".Dumper($hmf);
 #print "var_in_ctrl/index:[".$hmf{'var_in_ctrl/index'}."]\n";
 #print "i_in_ctrl/index:[".$hmf{'i_in_ctrl/index'}."]\n\n";
 

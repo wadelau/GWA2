@@ -22,7 +22,7 @@ my $isdbg = 1;
 
 	sub new {
 		my $class = shift;
-		my $self = {};
+		my $self = {}; #{@_};
 		my $gconf = inc::Config->new(); 
 
 		$self->{mDbHost} = $gconf->{'dbhost'};

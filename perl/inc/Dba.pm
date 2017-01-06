@@ -22,7 +22,7 @@ my $sql_operator_list = ();
 #
 sub new {
 	my $class = shift @_;
-	my $self = {};
+	my $self = {}; # {@_}
 
 	$conf = shift;
 	if($conf ne ""){ $conf = "inc::Conn::$conf"; }

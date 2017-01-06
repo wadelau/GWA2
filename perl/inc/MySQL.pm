@@ -25,7 +25,7 @@ my $isdbg = 1;
 #
 sub new {
 	my $class = shift;
-	my $self = {};
+	my $self = {}; # {@_};
 	my $conf = shift;
 	my %conf = %{$conf};
 	$self->{m_host} = $m_host = $conf{'mDbHost'};
@@ -52,7 +52,7 @@ sub readSingle {
 	if(!defined($dbh)){
 		$dbh = _initConnection();	
 	}
-	$sql = "select * from sft_softwaretbl order by rand() limit 1";
+	$sql = "show tables";
 	$sth = $dbh->prepare($sql);
 	$sth->execute();
 	my @rows = []; my $i = 0;

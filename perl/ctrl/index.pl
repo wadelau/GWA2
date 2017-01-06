@@ -44,7 +44,8 @@ sub _exec2_ {
 	my %result = %{$result};
 	print "\t\tresult-state:[".$result{0}."] rtn:[".$result{1}."] now:[".time()."]\n";	
 	my @rows = @{$result{1}};
-	for($i=0; $i<@rows; $i++){
+	my $rowCount = @rows;
+	for($i=0; $i<$rowCount; $i++){
 		print "\t\ti:$i\n";	
 		my %row = %{$rows[$i]};
 		foreach(keys %row){
