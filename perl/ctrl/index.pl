@@ -25,7 +25,7 @@ $hmf{'var_in_ctrl/index'} = "ctrl/index: time:[".time()."]";
 $i = 1612071852;
 $hmf{'i_in_ctrl/index'} = $i;
 
-_exec2_(); # this func
+_exec_in_child_(); # this func
 
 _exec_(); # parent's func
 
@@ -33,7 +33,7 @@ $ARGV[$argvsize-1] = \%hmf; # return to parent
 
 print "\tctrl/index: i:[$i] am now at the end of ctrl/index.\n";
 
-sub _exec2_ {
+sub _exec_in_child_ {
 	my $hello = mod::Hello->new($ARGV[0], $ARGV[1]);
 	print "\tctrl/index: I am a func from $0 in ctrl/index:[".$ARGV[0]."].\n";	
 	$hmf{'var_in__exec_in_ctr/index'} = "_exec: time: ".time()."";

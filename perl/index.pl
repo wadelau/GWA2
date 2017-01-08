@@ -13,7 +13,6 @@ use Fcntl qw(:flock);
 use POSIX qw(strftime);
 use Encode qw(decode_utf8 encode_utf8);
 #use Date::Parse;
-#use Data::Dumper;
 #use JSON;
 #use DBI;
 #use DBD::mysql;
@@ -55,7 +54,6 @@ $ARGV[$argvsize] = \%hmf; # $hmf; prepare for controller
 print "ARGV:\n";
 for(my $i=0; $i<@ARGV; $i++){
 	my $v = $ARGV[$i];
-	#print Dumper($v);
 	print "\ti:$i v:[".$v."]\n";
 }
 
@@ -63,7 +61,7 @@ print "bfr var-a:[$_ctrl_var_a] in index\n";
 
 require "./ctrl/$ctrl.pl";
 
-_exec2_(); # child's func
+_exec_in_child_(); # child's func
 
 _exec_(); # this func
 
@@ -71,7 +69,6 @@ print "\naft var-a:[$_ctrl_var_a] in index.\n\n";
 
 for(my $i=0; $i<@ARGV; $i++){
 	my $v = $ARGV[$i];
-	#print Dumper($v);
 	#print "\ti:$i v:[".$v."]\n";
 }
 
