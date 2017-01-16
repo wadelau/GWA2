@@ -135,6 +135,6 @@ view/default/signin.html
 
   view/default/my.html
 
-###4. Define routing, 在入口定义模板
+###4. Define routing, 在入口定义路由
 /index.php?mod=user&act=xxxx
 
