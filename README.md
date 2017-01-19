@@ -1,6 +1,5 @@
 # GWA2
-GWA2 is General Web Application Architecture. 
-
+GWA2 is General Web Application Architecture. 通用網絡應用架構
 ![gwa2](http://ufqi.com/blog/wp-content/uploads/2016/09/gwa2-logo-201606.v2.png)
 ----
 [-NatureDNS](http://ufqi.com/naturedns) : [-GWA2](http://ufqi.com/naturedns/search?q=-gwa2) , [-吉娃兔](http://ufqi.com/naturedns/search?q=-吉娃兔)
