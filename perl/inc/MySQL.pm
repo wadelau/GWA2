@@ -9,6 +9,7 @@ no warnings 'utf8';
 binmode( STDIN,  ':encoding(utf8)' );
 binmode( STDOUT, ':encoding(utf8)' );
 binmode( STDERR, ':encoding(utf8)' );
+use autodie;
 
 use DBI;
 use DBD::mysql;
@@ -72,7 +73,7 @@ sub _initConnection {
 	$dbh = DBI->connect("DBI:mysql:database=$m_name;host=$m_host", 
 		$m_user, 
 		$m_password, 
-		{'RaiseError'=>1, 'mysql_enable_utf8'=>1, 'AutoCommit'=>1});		
+		{'RaiseError'=>1, 'mysql_enable_utf8'=>1, 'AutoCommit'=>1}) or warn "cannot connect to mysql server. 17011201556.";		
 	print "\t\t\tinc::MySQL: initConnection....".time()."\n";
 	return $dbh;
 }

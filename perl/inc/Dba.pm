@@ -44,6 +44,8 @@ sub select {
 	my $hmvars = shift;
 
 	my %result = $dbconn->readSingle($sql, $hmvars);
+	
+	#my %result = $dbconn->readBatch($sql, $hmvars);
 
 	print "\t\t\tinc::Dba: result:".%result."\n";
 
@@ -58,6 +60,17 @@ sub update {
 	my $result = $dbconn->query($sql, $hmvars);
 
 	return $result;
+}
+
+# sort object
+sub sortObject{
+	my @rtn = ();
+	my $sql = shift;
+	my $hmvars = shift;
+
+	# @todo
+
+	return \@rtn;
 }
 
 1;

@@ -16,16 +16,17 @@ no warnings 'utf8';
 binmode( STDIN,  ':encoding(utf8)' );
 binmode( STDOUT, ':encoding(utf8)' );
 binmode( STDERR, ':encoding(utf8)' );
+#use Try::Tiny;
 
 use parent 'inc::WebInterface';
-use inc::Config;
+use inc::Config qw(GConf);
 use inc::Dba;
 
 my $_ROOT_ = dirname(abs_path($0));
 use constant VER => 0.01;
 my $dba = {};
-my $hm = [];
-my $hmf = ();
+my %hm = (); # [];
+my %hmf = ();
 my $isdbg = 1;
 my $myId = 'id';
 use constant {
@@ -57,6 +58,48 @@ sub DESTROY {
 }
 
 #
+sub get($){
+	my $k = pop @_; # @_[1]; # shift;
+	return $hmf{$k};
+}
+
+# 
+sub set($ $){
+	# @_[0]:self module; @_[1]:args-1; @_[1]:args-2
+	my $v = pop @_; # last one, in case of two (outer caller) or three (inner caller) arguments
+	my $k = pop @_;
+	print "\t\tinc::WebApp: k:$k v:$v\n";
+	$hmf{$k} = $v;
+	return 1;
+}
+
+# 
+sub getId{
+	return get(GWA2_ID);	
+}
+
+#
+sub setId($){
+	my $v = pop @_; # @_[1];
+	set(GWA2_ID, $v);
+	return 1;
+}
+
+#
+sub getTbl{
+	return get(GWA2_TBL);	
+}
+
+#
+sub setTbl($){
+	my $v = pop @_; # @_[1];
+	my $tblpre = inc::Config::get('tblpre'); # use qw ?
+	print "\t\tinc::WebApp: setTbl: tblpre:[$tblpre]\n";
+	set(GWA2_TBL, $v);
+	return 1;
+}
+
+#
 # by Xenxin@ufqi.com since Sun Jan  1 22:54:54 CST 2017
 sub getBy {
 	my $fields = shift;
@@ -70,7 +113,7 @@ sub getBy {
 
 	print "\t\t\tinc::WebApp: result:".%result."\n";
 	
-	sleep(rand(3));
+	sleep(rand(2));
 
 	return \%result;
 }
