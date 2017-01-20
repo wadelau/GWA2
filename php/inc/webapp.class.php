@@ -133,9 +133,7 @@ class WebApp implements WebAppInterface{
 	            }
 	            if($noExtra == null || $noExtra == ''){
 	                if($this->get(self::GWA2_ERR) != 1){
-	                    debug(__FILE__.": aa1");
 	                    if($this->_setAll()){
-	                        debug(__FILE__.": aa2");
 	                        if(isset($this->hmf[$field])){
 	                            $rtn = $this->hmf[$field];
 	                        }
