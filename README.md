@@ -37,9 +37,9 @@ GWA2 is General Web Application Architecture. 通用網絡應用架構
 
 ***Three More Instances***
 ----
-*-PHP* , 
+*-PHP*  
 
-*-Java* ,
+*-Java* 
 
 *-Aspx*
 
