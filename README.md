@@ -37,13 +37,13 @@ GWA2 is General Web Application Architecture. 通用網絡應用架構
 
 ***Three More Instances***
 ----
-*-PHP*  
+*-PHP* Version  
 
-*-Java* 
+*-Java* Version
 
-*-Aspx*
+*-Aspx* Version
 
-*-Perl*
+*-Perl* Version
 
 ----
 
@@ -75,11 +75,11 @@ gwa2更新多数据库驱动支持
 
 ----
 
-# An Example Module (User)
+# An Example Functional Module (User)
 
 ##User module, 用户模块
 
-###0. Create table, 建表
+###0. Create table, 建用戶表
 ```sql
 create table gmis_usertbl(
   id int(11) not null auto_increment,
