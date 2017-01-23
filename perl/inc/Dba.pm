@@ -39,34 +39,60 @@ sub DESTROY {}
 
 #
 # Xenxin@ufqi.com, Sun Jan  1 22:51:55 CST 2017
-sub select {
-	my $sql = shift;		
-	my $hmvars = shift;
-
-	my %result = $dbconn->readSingle($sql, $hmvars);
-	
-	#my %result = $dbconn->readBatch($sql, $hmvars);
-
-	print "\t\t\tinc::Dba: result:".%result."\n";
-
-	return \%result;
+sub select($ $) {
+	my %rtnhm = ();
+	my %hmvars = %{pop @_};
+	my $sql = pop @_;		
+	my @idxarr = _sortObject($sql, %hmvars);
+	my %result =  (); 
+	my $haslimit1 = 0;
+	print "\t\tinc::Dba: select: sql:[$sql]\n";
+	if((defined($hmvars{'pagesize'}) && $hmvars{'pagesize'} == 1)
+		|| index($sql, 'limit 1') > -1){
+		%result = $dbconn->readSingle($sql, \%hmvars, \@idxarr);	
+		$haslimit1 = 1;
+	}
+	else{
+		%result = $dbconn->readBatch($sql, \%hmvars, \@idxarr);
+	}
+	if($result{0}){
+		$rtnhm{0} = 1;
+		$rtnhm{1} = $result{1};
+	}
+	else{
+		$rtnhm{0} = 0;
+		$rtnhm{1} = $result{1};
+	}
+	print "\t\t\tinc::Dba: ret:".%rtnhm."\n";
+	return \%rtnhm;
 }
 
 #
-sub update {
-	my $sql = shift;		
-	my $hmvars = shift;
-
-	my $result = $dbconn->query($sql, $hmvars);
-
-	return $result;
+sub update($ $) {
+	my %rtnhm = ();
+	my %hmvars = %{pop @_};
+	my $sql = pop @_;		
+	my @idxarr = _sortObject($sql, %hmvars);
+	my %result =  (); 
+	%result = $dbconn->query($sql, \%hmvars, \@idxarr);
+	if($result{0}){
+		$rtnhm{0} = 1;
+		my @rows = $result{1};
+		my %tmp = ("affectedrows"=>$rows[0], "insertid"=>$rows[1]);
+		$rtnhm{1} = %tmp;
+	}
+	else{
+		$rtnhm{0} = 0;
+		$rtnhm{1} = $result{1};
+	}
+	return \%rtnhm;
 }
 
 # sort object
-sub sortObject{
+sub _sortObject($ $){
 	my @rtn = ();
-	my $sql = shift;
-	my $hmvars = shift;
+	my $hmvars = pop @_;
+	my $sql = pop @_;
 
 	# @todo
 

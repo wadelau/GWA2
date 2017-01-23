@@ -42,25 +42,58 @@ sub new {
 }
 
 #
-sub query {
-	# @todo
+# refined by Xenxin@ufqi.com, Mon Jan 23 22:35:23 CST 2017
+sub query($ $ $) {
+	my $idxarr = pop @_;
+	my $hmvars = pop @_;
+	my $sql = pop @_;
+	if(!defined($dbh)){
+		$dbh = _initConnection();	
+	}
+	$sql = _enSafe($sql, $hmvars, $idxarr);
+	$sth = $dbh->prepare($sql);
+	$sth->execute();
+	my @rows = [];
+	$rows[0] = $sth->rows; # affected rows
+	$rows[1] = $dbh->last_insert_id(undef, undef, undef, undef); # 
+	$sth->finish();
+	return ('0'=>1, '1'=>\@rows);
 }
 
 #
 # by Xenxin@ufqi.com since Sun Jan  1 22:54:18 CST 2017
-sub readSingle {
-	my $sql2 = "this is resultset via inc::MySQL->query, time:".time().", dbname:[".$m_host."]";
+sub readSingle($ $ $) {
+	my $idxarr = pop @_;
+	my $hmvars = pop @_;
+	my $sql = pop @_;
 	if(!defined($dbh)){
 		$dbh = _initConnection();	
 	}
-	$sql = "show tables";
+	$sql = _enSafe($sql, $hmvars, $idxarr);
+	$sth = $dbh->prepare($sql);
+	$sth->execute();
+	my @rows = []; 
+	if(my $ref = $sth->fetchrow_hashref()){
+		$rows[0] = $ref;		
+	}
+	$sth->finish();
+	return ('0'=>1, '1'=>\@rows);
+}
+
+# by Xenxin@ufqi.com since  Mon Jan 23 21:07:09 CST 2017
+sub readBatch($ $ $) {
+	my $idxarr = pop @_;
+	my $hmvars = pop @_;
+	my $sql = pop @_;
+	if(!defined($dbh)){
+		$dbh = _initConnection();	
+	}
+	$sql = _enSafe($sql, $hmvars, $idxarr);
+	print "\t\tinc::MySql: readBatch: sql:[$sql]\n";
 	$sth = $dbh->prepare($sql);
 	$sth->execute();
 	my @rows = []; my $i = 0;
 	while(my $ref = $sth->fetchrow_hashref()){
-		#foreach(keys $ref){
-		#	print "\t\t\tk:$_ v:".$ref->{$_}."\n";	
-		#}
 		$rows[$i++] = $ref;		
 	}
 	$sth->finish();
@@ -73,9 +106,22 @@ sub _initConnection {
 	$dbh = DBI->connect("DBI:mysql:database=$m_name;host=$m_host", 
 		$m_user, 
 		$m_password, 
-		{'RaiseError'=>1, 'mysql_enable_utf8'=>1, 'AutoCommit'=>1}) or warn "cannot connect to mysql server. 17011201556.";		
+		{'RaiseError'=>1, 'mysql_enable_utf8'=>1, 'AutoCommit'=>1}) or warn "cannot connect to mysql server. errno:["
+			.$dbh->err."] errmsg:[".$dbh->errstr."]. 17011201556.";		
 	print "\t\t\tinc::MySQL: initConnection....".time()."\n";
 	return $dbh;
+}
+
+#
+sub _enSafe($ $ $){
+	my $idxarr = pop @_;
+	my $hmvars = pop @_;
+	my $sql = pop @_;
+
+		# @todo
+		# $sth->bind_param, instead of, refer to GWA2 in Java
+
+	return $sql;
 }
 
 1;

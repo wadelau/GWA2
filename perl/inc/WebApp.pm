@@ -68,21 +68,26 @@ sub set($ $){
 	# @_[0]:self module; @_[1]:args-1; @_[1]:args-2
 	my $v = pop @_; # last one, in case of two (outer caller) or three (inner caller) arguments
 	my $k = pop @_;
-	print "\t\tinc::WebApp: k:$k v:$v\n";
 	$hmf{$k} = $v;
 	return 1;
 }
 
 # 
 sub getId{
-	return get(GWA2_ID);	
+	return get($myId);	
 }
 
 #
 sub setId($){
 	my $v = pop @_; # @_[1];
-	set(GWA2_ID, $v);
+	set($myId, $v);
 	return 1;
+}
+
+#
+sub setMyId($){
+	my $v = pop @_;
+	$myId = $v;		
 }
 
 #
@@ -101,26 +106,125 @@ sub setTbl($){
 
 #
 # by Xenxin@ufqi.com since Sun Jan  1 22:54:54 CST 2017
-sub getBy {
-	my $fields = shift;
-	my $conditions = shift;
-	my $withCache = shift;
-	
-	my $sql = "select $fields from tbl where $conditions";
+sub getBy($ $ $) {
+	print "\t\tinc::WebApp: getBy: argc:".(scalar @_).", argv:@_\n";
+	my $argc = scalar @_;
+	my ($withCache, $conditions, $fields) = (0, '', ''); # pop @_;
+	if($argc == 3){
+		$conditions = pop @_;
+		$fields = pop @_;
+	}
+	elsif($argc == 4){
+		$withCache = pop @_;
+		$conditions = pop @_;
+		$fields = pop @_;
+	}
+	my %result = (); 
+	if(1){
+		my $sql = "";
+		my %hm = ();
+		my $haslimit1 = 0;
+		my $pagenum = 1;
+		my $pagesize = 0;
+		if(defined($hmf{'pagenum'})){ $pagenum=$hmf{'pagenum'}; }
+		if(defined($hmf{'pagesize'})){ $pagesize=$hmf{'pagesize'}; }
+		$sql = "select $fields from ".getTbl()." where ";
+		my $idval = getId(); $idval = defined($idval) ? '' : $idval;
+		if($conditions eq ""){
+			if($idval ne ""){
+				$sql .= $myId."=? ";
+				$haslimit1 = 1;
+			}
+			else{
+				$sql .= "1=1 ";
+			}
+		}
+		else{
+			$sql .= $conditions;		
+		}
+		if(defined($hmf{'groupby'})){ $sql .= " group by ".$hmf{'orderby'}; }
+		if(defined($hmf{'orderby'})){ $sql .= " order by ".$hmf{'orderby'}; }
+		if($haslimit1 == 1){
+			$sql .= " limit 1";	
+		}
+		else{
+			if($pagesize == 0){ $pagesize = 99999; } # default maxium records per page
+			$sql .= " limit ".(($pagenum-1)*$pagesize).", ".$pagesize;	
+		}
+		print "\t\t\tinc::WebApp: getBy: sql:[$sql] result:".%result."\n";
+		my $result = $dba->select($sql, \%hmf);
+		%result = %{$result};
+		print "\t\t\tinc::WebApp: getBy: sql:[$sql] result:".%result."\n";
+	}	
+	return \%result;
+}
 
-	my $result = $dba->select($sql, ());
-	my %result = %{$result};
-
-	print "\t\t\tinc::WebApp: result:".%result."\n";
-	
-	sleep(rand(2));
-
+# 
+sub setBy($ $){
+	my %result = (); 
+	print "\t\tinc::WebApp: setBy: argc:".(scalar @_).", argv:@_\n";
+	my $argc = scalar @_;
+	my ($conditions, $fields) = ('', ''); # pop @_;
+	$conditions = pop @_;
+	$fields = pop @_;
+	my $idval = getId(); $idval = !defined($idval) ? '' : $idval;
+	if(1){
+		my $sql = '';
+		my $isupdate = 0;
+		if($idval eq '' && ($conditions eq '')){
+			$sql .= "insert into ".getTbl()." set ";
+		}
+		else{
+			$sql .= "update ".getTbl()." set ";	
+			$isupdate = 1;
+		}
+		my @fieldarr = split(/,/, $fields);
+		my $fieldcount = scalar @fieldarr;
+		my $field = '';
+		for(my $i=0; $i<$fieldcount; $i++){
+			$field = trim($fieldarr[$i]);
+			if($field eq 'updatetime' || $field eq 'inserttime' || $field eq 'createtime'){
+				$sql .= "$field=NOW(), ";
+				delete $hmf{$field};
+			}	
+			else{
+				$sql .= "$field=?, ";	
+			}
+		}
+		$sql = substr($sql, 0, length($sql)-2); #
+		my $issqlready = 1;
+		if($conditions eq ''){
+			if($idval ne ''){
+				$sql .= " where ".$myId."=? ";	
+			}
+			elsif($isupdate == 1){
+				$issqlready = 0;
+				$result{0} = 0;
+				$result{1} = ("error"=>"Unconditional update is forbidden. 1701232229.");
+			}
+		}
+		else{
+			$sql .= " where ".$conditions;	
+		}
+		print "\t\tinc::WebApp: setBy: sql:[$sql]\n";
+		if($issqlready == 1){
+			if($idval ne ''){ $hmf{'pagesize'} = 1; }	
+			%result = $dba->update($sql, \%hmf);
+		}
+	}	
 	return \%result;
 }
 
 #
 sub getEnv {
 	return "ver:[".VER."] root:[".$_ROOT_."]";	
+}
+
+#
+sub trim($){
+	my $s = shift;
+	$s =~ s/^\s+|\s+$//g;
+	return $s;
 }
 
 1;

@@ -39,10 +39,12 @@ sub _exec_in_child_ {
 	print "\tctrl/index: I am a func from $0 in ctrl/index:[".$ARGV[0]."].\n";	
 	$hmf{'var_in__exec_in_ctr/index'} = "_exec: time: ".time()."";
 	#$hello->sayHi($0);
-	my $result = $hello->getBy("*", "1=1");
+	$hello->setTbl('materials');
+	$hello->set('pagesize', 3);
+	my $result = $hello->getBy("*", "1=1", 123);
 	my %result = %{$result};
 	print "\t\t0-result-state:[".$result{0}."] rtn:[".$result{1}."] now:[".time()."]\n";	
-	#$result = $hello->getBy("*", "1=1");
+	$hello->set('orderby', 'rand()');
 	$result = $hello->getBy("*", "1=1");
 	%result = %{$result};
 	print "\t\t1-result-state:[".$result{0}."] rtn:[".$result{1}."] now:[".time()."]\n";	
@@ -56,11 +58,16 @@ sub _exec_in_child_ {
 		}
 	}
 
-	my $k = 'key-a';
+	my $k = 'unionname';
 	$hello->set($k, 'value-a'.time());
-	$hello->setId(12345);
-	$hello->setTbl('gmis_info_usertbl');
-	print "\t\t\tget-key-a:[".$hello->get($k)."] id:[".$hello->getId()."] tbl:[".$hello->getTbl()."]\n";
+	$hello->set('threshold', 20001);
+	$hello->set('updateu', 'gwa2-in-perl-'.time());
+	#$hello->setId(12345);
+	$hello->setTbl('temptbl');
+	print "\t\t\tget-key-a:[".$hello->get($k)."] id:[".$hello->get('updateu')."] tbl:[".$hello->getTbl()."]\n";
+	$result = $hello->setBy('unionname, threshold, updateu', '');
+	%result = %{$result};
+	print "\t\t2-setBy-result-state:[".$result{0}."] rtn:[".$result{1}."] now:[".time()."]\n";	
 }
 
 1;
