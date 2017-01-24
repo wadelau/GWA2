@@ -40,7 +40,7 @@ sub _exec_in_child_ {
 	$hmf{'var_in__exec_in_ctr/index'} = "_exec: time: ".time()."";
 	#$hello->sayHi($0);
 	$hello->setTbl('materials');
-	$hello->set('pagesize', 3);
+	$hello->set('pagesize', 2);
 	my $result = $hello->getBy("*", "1=1", 123);
 	my %result = %{$result};
 	print "\t\t0-result-state:[".$result{0}."] rtn:[".$result{1}."] now:[".time()."]\n";	
