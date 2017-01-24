@@ -16,8 +16,9 @@ my $argvsize = @ARGV;
 my $hmf;
 my %hmf = %{$ARGV[$argvsize-1]};
 $i = $hmf{'i'};
+my @arr1 = $hmf{'arr1'};
 
-my $_ctrl_var_a = "I:[$i] am a var from [$0] in ctrl/index.";
+my $_ctrl_var_a = "I:[$i] am a var from [$0] in ctrl/index. arr1-0-0:[".$arr1[0][0]."]";
 
 print "\tctrl/index: var-a:[$_ctrl_var_a] in ctrl/index.\n";
 $hmf{'var_in_ctrl/index'} = "ctrl/index: time:[".time()."]";
@@ -25,7 +26,7 @@ $hmf{'var_in_ctrl/index'} = "ctrl/index: time:[".time()."]";
 $i = 1612071852;
 $hmf{'i_in_ctrl/index'} = $i;
 
-_exec_in_child_(); # this func
+#_exec_in_child_(); # this func
 
 _exec_(); # parent's func
 
@@ -37,12 +38,16 @@ sub _exec_in_child_ {
 	my $hello = mod::Hello->new($ARGV[0], $ARGV[1]);
 	print "\tctrl/index: I am a func from $0 in ctrl/index:[".$ARGV[0]."].\n";	
 	$hmf{'var_in__exec_in_ctr/index'} = "_exec: time: ".time()."";
-	$hello->sayHi($0);
-	my $result = $hello->getBy("*", "1=1");
-	$result = $hello->getBy("*", "1=1");
-	$result = $hello->getBy("*", "1=1");
+	#$hello->sayHi($0);
+	$hello->setTbl('materials');
+	$hello->set('pagesize', 2);
+	my $result = $hello->getBy("*", "1=1", 123);
 	my %result = %{$result};
-	print "\t\tresult-state:[".$result{0}."] rtn:[".$result{1}."] now:[".time()."]\n";	
+	print "\t\t0-result-state:[".$result{0}."] rtn:[".$result{1}."] now:[".time()."]\n";	
+	$hello->set('orderby', 'rand()');
+	$result = $hello->getBy("*", "1=1");
+	%result = %{$result};
+	print "\t\t1-result-state:[".$result{0}."] rtn:[".$result{1}."] now:[".time()."]\n";	
 	my @rows = @{$result{1}};
 	my $rowCount = @rows;
 	for($i=0; $i<$rowCount; $i++){
@@ -52,6 +57,17 @@ sub _exec_in_child_ {
 			print "\t\t\tk:$_ v:".$row{$_}."\n";
 		}
 	}
+
+	my $k = 'unionname';
+	$hello->set($k, 'value-a'.time());
+	$hello->set('threshold', 20001);
+	$hello->set('updateu', 'gwa2-in-perl-'.time());
+	#$hello->setId(12345);
+	$hello->setTbl('temptbl');
+	print "\t\t\tget-key-a:[".$hello->get($k)."] id:[".$hello->get('updateu')."] tbl:[".$hello->getTbl()."]\n";
+	$result = $hello->setBy('unionname, threshold, updateu', '');
+	%result = %{$result};
+	print "\t\t2-setBy-result-state:[".$result{0}."] rtn:[".$result{1}."] now:[".time()."]\n";	
 }
 
 1;

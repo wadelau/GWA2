@@ -16,6 +16,7 @@ use Encode qw(decode_utf8 encode_utf8);
 #use JSON;
 #use DBI;
 #use DBD::mysql;
+use autodie;
 
 use utf8;
 no warnings 'utf8';
@@ -49,6 +50,7 @@ my $argvsize = @ARGV;
 $hmf{'var_a'} = $_ctrl_var_a;
 $hmf{'i'} = $i;
 $hmf{'mod'} = $ctrl;
+$hmf{'arr1'} = ['a', 'b', 'c']; # ('a', 'b');
 $ARGV[$argvsize] = \%hmf; # $hmf; prepare for controller
 
 print "ARGV:\n";
@@ -63,7 +65,7 @@ require "./ctrl/$ctrl.pl";
 
 _exec_in_child_(); # child's func
 
-_exec_(); # this func
+#_exec_(); # this func
 
 print "\naft var-a:[$_ctrl_var_a] in index.\n\n";
 
