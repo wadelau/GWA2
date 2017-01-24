@@ -17,9 +17,9 @@ my %conf = (
 	# db info
 	'dbhost' => '127.0.0.1',
 	'dbport' => '3306',
-	'dbuser' => 'adSystem',
-	'dbpassword' => '6KH4U69EZaP6sbym',
-	'dbname' => 'adSystem',
+	'dbuser' => '',
+	'dbpassword' => '',
+	'dbname' => '',
 	'dbdriver' => 'mysql',
 	'dbsock' => '/www/bin/mysql/mysql.sock',
 	'db_enable_utf8_affirm' => 1,
