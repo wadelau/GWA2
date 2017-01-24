@@ -292,6 +292,7 @@ class WebApp implements WebAppInterface{
 			else{
 				$sql .= $conditions;
 			}
+			if(array_key_exists('groupby',$this->hmf)){ $sql .= " group by ".$this->hmf['orderby']; }
 			if(array_key_exists('orderby',$this->hmf)){ $sql .= " order by ".$this->hmf['orderby']; }
 			if($haslimit1 == 1){
 				$sql .= " limit 1 ";
