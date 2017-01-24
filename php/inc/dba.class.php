@@ -63,7 +63,7 @@ class DBA {
 		$idxarr = $this->hm2idxArray($sql,$hmvars);
     	#print_r($idxarr);
 		$haslimit1 = 0;
-		if(strpos($sql,"limit 1 ") != false ||(array_key_exists('pagesize',$hmvars) && $hmvars['pagesize'] == 1)){
+		if((array_key_exists('pagesize',$hmvars) && $hmvars['pagesize'] == 1) || strpos($sql,"limit 1 ") != false){
 			$result = $this->dbconn->readSingle($sql, $hmvars,$idxarr); # why need this? @todo need to be removed.
 			$haslimit1 = 1;
 		}
@@ -131,55 +131,6 @@ class DBA {
 		            #debug(__FILE__.": no such key:[$k] in sql:[$sql]");
 		        }
 		    }
-			/*
-			foreach($hmvars as $k => $v){
-			    if($k == '' || $k == 'tbl'){
-			        #debug(__FILE__.": found n/a k:[$k], skip.");
-			        continue;
-			    }
-			    $spacek = " ".$k." ";
-				$hasK = strpos($sql, " ".$k); 
-				# fieldname should precede with a space ' ', e.g. "where a>?&& b < ?"
-				# this is ILLEGAL! "wherea>?&& b < ?" or "where a>?&&b<?" , !!ATTENTION!!
-				if($hasK !== false){
-				    $sql = str_replace($k, $spacek, $sql);
-					$kpos = strpos($sql, $spacek); 
-					if($kpos !== false){
-			   			if($selectpos !== false && $kpos > $wherepos){
-							$tmparr[$kpos] = $k;	# in case "select a, b, c where a = ?"; # by wadelau on Sat Nov  3 20:35:46 CST 2012
-							$tmpposarr[$k] = isset($tmpposarr)? $tmpposarr[$k]++ : 2;
-			   			}
-						else if($selectpos === false){
-							$tmparr[$kpos] = $k;	# in case "select a, b, c where a = ?"; # by wadelau on Sat Nov  3 20:35:46 CST 2012
-							$tmpposarr[$k] = isset($tmpposarr)? $tmpposarr[$k]++ : 2;
-			   			} 
-						$nextpos = strpos($sql, $spacek, $kpos+1);
-			  			$nextpos = $nextpos===false ? strpos($sql, $spacek, $kpos+1) : $nextpos;
-						while($nextpos !== false){
-							$tmparr[$nextpos] = $k.($tmpposarr[$k]!='' ? ".".$tmpposarr[$k] : "");
-							 /*  Attention: 
-							 *      one field matches more than two values, 
-							 *      name it as "field.2","field.3", "field.N", etc, as hash key
-							 *  e.g. in sql: "... where age > ? and age < ? and gender=? ", settings go like:
-							 *      $Obj->set('age', 20);
-							 *      $obj->set('age.2', 30); # for the second match of 'age'
-							 *  Sun Jul 24 21:18:00 UTC 2011
-							 *  !! Need space before > or < in this case, Thu Sep 11 16:29:03 CST 2014
-							 */
-							 /*
-							$nextpos = strpos($sql, $spacek, $nextpos+1);
-							$tmpposarr[$k]++;
-						}
-					}
-					else{
-						debug(__FILE__.": hm2idxArray NOT exist k:[".$k."] sql:[".$sql."]");
-					}
-				}
-				else{
-					#error_log(__FILE__.": not found k:[$k] v:[$v] in sql:[$sql]");	
-				}
-			}
-			*/
 		}
 		else{
 			error_log(__FILE__.": illegal array found with hmvars.");				
@@ -199,19 +150,6 @@ class DBA {
 		        # @todo;
 		    }
 		}
-		/*
-		for($i=0;$i<$sqllen;$i++){
-			if(array_key_exists($i, $tmparr)){
-				$idxarr[$tmpi] = $tmparr[$i];
-				$tmpi++;
-			}
-			else{
-				# @todo;
-			}
-		}
-		*/
-		#debug(__FILE__.": sql:[$sql] hmvars:[".serialize($hmvars)."] idxarr:");
-		#debug($idxarr);
 		return $idxarr;
 	}
 
