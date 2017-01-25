@@ -376,10 +376,10 @@ class WebApp implements WebAppInterface{
 	function rmBy($conditions=null){
 		$hm = array();
 		$issqlready = 0;
-		$sql = "delete from ".$this->getTbl()." where ";
+		$sql = "delete from ".$this->getTbl()." ";
 		if($conditions == null || $conditions == ""){
 			if($this->getId() != ""){
-				$sql .= $this->myId."=?";
+				$sql .= " where ".$this->myId."=?";
 				$issqlready = 1;
 			}
 			else{
@@ -390,6 +390,9 @@ class WebApp implements WebAppInterface{
 			}
 		}
 		else{
+			if(stripos($conditions, 'where ') === false){
+				$sql .= " where ";
+			}
 			$sql .= $conditions;
 			$issqlready = 1;
 		}
