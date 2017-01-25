@@ -44,18 +44,32 @@ sub new {
 #
 # refined by Xenxin@ufqi.com, Mon Jan 23 22:35:23 CST 2017
 sub query($ $ $) {
-	my $idxarr = pop @_;
-	my $hmvars = pop @_;
+	my %rtn = (); # [] as a ref
+	my $self = shift;
+	my @idxarr = @{pop @_};
+	my %hmvars = %{pop @_};
 	my $sql = pop @_;
 	if(!defined($dbh)){
-		$dbh = _initConnection();	
+		$dbh = $self->_initConnection();	
 	}
-	$sql = _enSafe($sql, $hmvars, $idxarr);
+	$sql = $self->_enSafe($sql, \%hmvars, \@idxarr);
 	$sth = $dbh->prepare($sql);
-	$sth->execute();
-	my @rows = [];
-	$rows[0] = $sth->rows; # affected rows
-	$rows[1] = $dbh->last_insert_id(undef, undef, undef, undef); # 
+	my $arrsize = scalar @idxarr;
+	for(my $i=0; $i<$arrsize; $i++){
+		#print "\t\tinc::MySQL: query: $i: ".$idxarr[$i]."\n";
+		$sth->bind_param($i+1, $hmvars{$idxarr[$i]});
+	}
+	my $result = $sth->execute();
+	my @rows = (); # [] as a ref to array
+	if($result){
+		$rows[0] = $sth->rows; # affected rows
+		$rows[1] = $dbh->last_insert_id(undef, undef, undef, undef); # refer to http://search.cpan.org/~timb/DBI-1.636/DBI.pm#execute 
+		#print "\t\t\tinc::MySql: update: lastid:[".$rows[1]."] affectedrows:[".$rows[0]."].\n";
+	}
+	else{
+		$rows[0] = "Query failed for sql:[$sql]. 1701250954.";	
+		$rows[1] = 0;
+	}
 	$sth->finish();
 	return ('0'=>1, '1'=>\@rows);
 }
@@ -63,18 +77,29 @@ sub query($ $ $) {
 #
 # by Xenxin@ufqi.com since Sun Jan  1 22:54:18 CST 2017
 sub readSingle($ $ $) {
-	my $idxarr = pop @_;
-	my $hmvars = pop @_;
+	my %rtnhm = ();
+	my $self = shift;
+	my @idxarr = @{pop @_};
+	my %hmvars = %{pop @_};
 	my $sql = pop @_;
 	if(!defined($dbh)){
-		$dbh = _initConnection();	
+		$dbh = $self->_initConnection();	
 	}
-	$sql = _enSafe($sql, $hmvars, $idxarr);
+	$sql = $self->_enSafe($sql, \%hmvars, \@idxarr);
 	$sth = $dbh->prepare($sql);
-	$sth->execute();
+	my $arrsize = scalar @idxarr;
+	for(my $i=0; $i<$arrsize; $i++){
+		$sth->bind_param($i+1, $hmvars{$idxarr[$i]});
+	}
+	my $result = $sth->execute();
 	my @rows = []; 
-	if(my $ref = $sth->fetchrow_hashref()){
-		$rows[0] = $ref;		
+	if($result){
+		if(my $ref = $sth->fetchrow_hashref()){
+			$rows[0] = $ref;		
+		}
+	}
+	else{
+		$rows[0] = ("Query failed for sql:[$sql]. 1701251034.");
 	}
 	$sth->finish();
 	return ('0'=>1, '1'=>\@rows);
@@ -82,19 +107,30 @@ sub readSingle($ $ $) {
 
 # by Xenxin@ufqi.com since  Mon Jan 23 21:07:09 CST 2017
 sub readBatch($ $ $) {
-	my $idxarr = pop @_;
-	my $hmvars = pop @_;
+	my %rtnhm = ();
+	my $self = shift;
+	my @idxarr = @{pop @_};
+	my %hmvars = %{pop @_};
 	my $sql = pop @_;
 	if(!defined($dbh)){
-		$dbh = _initConnection();	
+		$dbh = $self->_initConnection();	
 	}
-	$sql = _enSafe($sql, $hmvars, $idxarr);
+	$sql = $self->_enSafe($sql, \%hmvars, \@idxarr);
 	print "\t\tinc::MySql: readBatch: sql:[$sql]\n";
 	$sth = $dbh->prepare($sql);
-	$sth->execute();
-	my @rows = []; my $i = 0;
-	while(my $ref = $sth->fetchrow_hashref()){
-		$rows[$i++] = $ref;		
+	my $arrsize = scalar @idxarr;
+	for(my $i=0; $i<$arrsize; $i++){
+		$sth->bind_param($i+1, $hmvars{$idxarr[$i]});
+	}
+	my $result = $sth->execute();
+	my @rows = (); my $i = 0;
+	if($result){
+		while(my $ref = $sth->fetchrow_hashref()){
+			$rows[$i++] = $ref;		
+		}
+	}
+	else{
+		$rows[0] = ("Query failed for sql:[$sql]. 1701251041.");
 	}
 	$sth->finish();
 	return ('0'=>1, '1'=>\@rows);
@@ -114,8 +150,8 @@ sub _initConnection {
 
 #
 sub _enSafe($ $ $){
-	my $idxarr = pop @_;
-	my $hmvars = pop @_;
+	my @idxarr = @{pop @_};
+	my %hmvars = %{pop @_};
 	my $sql = pop @_;
 
 		# @todo
