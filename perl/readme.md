@@ -12,7 +12,9 @@ Refer to GWA2 in PHP running in command line mode.
 # Dependencies
 
 JSON
+
 DBI
+
 DBD::mysql
 
 It is better to install these modules via system control panel, e.g.
