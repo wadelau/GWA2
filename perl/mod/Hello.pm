@@ -29,14 +29,16 @@ sub new {
 
 	my %args = ("args"=>$args, "dbconf"=>"MasterDB");
 	inc::WebApp->new(\%args);
+	
+	$self->setTbl('temptbl');
 
 	return $self;
 }
 
 #
 sub sayHi {
-	my $self = shift;
-	my $to = shift;
+	my $self = $_[0];
+	my $to = pop @_;
 	print "\t\ti am in mod::Hello->say: _var:["
 		.($self->{_firstname})
 		."] to:[$to] _var:[$hello_var] parent-ver:["

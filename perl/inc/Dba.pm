@@ -37,15 +37,20 @@ sub new {
 }
 
 #
-sub DESTROY {}
+sub DESTROY {
+
+	# @todo	
+
+}
 
 #
 # Xenxin@ufqi.com, Sun Jan  1 22:51:55 CST 2017
 sub select($ $) {
 	my %rtnhm = ();
+	my $self = shift;
 	my %hmvars = %{pop @_};
 	my $sql = pop @_;		
-	my @idxarr = _sortObject($sql, \%hmvars);
+	my @idxarr = $self->_sortObject($sql, \%hmvars);
 	my %result =  (); 
 	my $haslimit1 = 0;
 	print "\t\tinc::Dba: select: sql:[$sql]\n";
@@ -72,51 +77,53 @@ sub select($ $) {
 #
 sub update($ $) {
 	my %rtnhm = ();
+	my $self = shift;
 	my %hmvars = %{pop @_};
 	my $sql = pop @_;		
-	print "\t\tinc::Dba: update sql:[$sql]\n";
-	my @idxarr = _sortObject($sql, \%hmvars);
+	#print "\t\tinc::Dba: update sql:[$sql]\n";
+	my @idxarr = $self->_sortObject($sql, \%hmvars);
 	my %result =  (); 
 	%result = $dbconn->query($sql, \%hmvars, \@idxarr);
+	my @rows = @{$result{1}};
+	my %tmp = (); 
 	if($result{0}){
 		$rtnhm{0} = 1;
-		my @rows = $result{1};
-		my %tmp = ("affectedrows"=>$rows[0], "insertid"=>$rows[1]);
-		$rtnhm{1} = %tmp;
+		%tmp = ("affectedrows"=>$rows[0], "insertid"=>$rows[1]);
 	}
 	else{
 		$rtnhm{0} = 0;
-		$rtnhm{1} = $result{1};
+		%tmp = ('sayerror'=>$rows[0]);
 	}
+	$rtnhm{1} = \%tmp;
 	return \%rtnhm;
 }
 
 # sort object
 sub _sortObject($ $){
-	my @rtn = ();
+	my @rtn = (); # [] as a ref, same as {} to hash as a ref
+	my $self = shift;
 	my %hmvars = %{pop @_};
 	my $sql = pop @_;
-	my @tmparr = [];
+	my @tmparr = ();
 	my $wherepos = index($sql, " where ");
 	my $selectpos = index($sql, "select ");
 	my %sqloplist = %Sql_Operator_List;
 	my ($k, $ki, $v, $preK, $aftK, $keyLen, $keyPos) = ('', 0, '', '', '', 0, 0);
-	print "\t\tinc::Dba: sortObject:i 000 type of %hmvars:[".(ref %hmvars)."] sql:[$sql]\n";
 	if(1 || ref %hmvars eq ref {}){
 	foreach(keys %hmvars){
 		my $k = $_;
 		my $v = $hmvars{$k};
 		if($k eq ''){
-			continue;	
+			next;	
 		}
-		print "\t\t\tinc::Dba: sortObject: k:$k v:$v\n";
+		#print "\t\t\tinc::Dba: sortObject: k:$k v:$v\n";
 		$keyLen = length($k);
 		$keyPos = index($sql, $k);
 		if($keyPos > -1){
 			while($keyPos > -1){
 				$preK = substr($sql, $keyPos-1, 1);
 				$aftK = substr($sql, $keyPos+$keyLen, 1);
-				if(defined($sqloplist{$preK}) && defined($sqloplist{$aftK})){
+				if(exists($sqloplist{$preK}) && exists($sqloplist{$aftK})){
 					if($selectpos > -1){
 						if($keyPos > $wherepos){
 							$tmparr[$keyPos] = $k;	
@@ -148,7 +155,7 @@ sub _sortObject($ $){
 	my $tmpi = 0;
 	my %kSerial = ();
 	for(my $i=0; $i<$sqlLen; $i++){
-		if(defined($tmparr[$i])){
+		if(exists($tmparr[$i])){
 			$k = $tmparr[$i];
 			$ki = exists($kSerial{$k}) ? $kSerial{$k} : '';
 			$rtn[$tmpi] = $tmparr[$i].($ki eq ''?'':'.'.($ki+1));
@@ -163,9 +170,8 @@ sub _sortObject($ $){
 	my $arrsize = scalar @rtn;
 	for(my $i=0; $i<$arrsize; $i++){
 		print "\t\t\t$i: ".$rtn[$i]."\n";	
-		print join("\n",$rtn[$i]),"\n";
 	}
-	return \@rtn;
+	return @rtn;
 }
 
 1;

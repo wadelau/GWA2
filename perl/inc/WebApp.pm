@@ -1,9 +1,11 @@
 package inc::WebApp;
 
 #
-# Main designs from -GWA2 in -PHP
+# GWA2, General Web Application Architecture
 # By Xenxin@ufqi.com, Wadelau@ufqi.com
+# Main designs from -GWA2 in -PHP, -GWA2 in -Perl
 # Since Sun Jan  1 22:56:46 CST 2017
+# Update Wed Jan 25 11:11:49 CST 2017
 # v0.10
 #
 
@@ -59,6 +61,7 @@ sub DESTROY {
 
 #
 sub get($){
+	#my $self = shift; # no param?
 	my $k = pop @_; # @_[1]; # shift;
 	return $hmf{$k};
 }
@@ -74,13 +77,15 @@ sub set($ $){
 
 # 
 sub getId{
+	#my $self = shift;
 	return get($myId);	
 }
 
 #
 sub setId($){
+	my $self = shift; # why ?
 	my $v = pop @_; # @_[1];
-	set($myId, $v);
+	$self->set($myId, $v);
 	return 1;
 }
 
@@ -92,6 +97,7 @@ sub setMyId($){
 
 #
 sub getTbl{
+	#my $self = shift; # no param?
 	return get(GWA2_TBL);	
 }
 
@@ -106,8 +112,10 @@ sub setTbl($){
 
 #
 # by Xenxin@ufqi.com since Sun Jan  1 22:54:54 CST 2017
-sub getBy($ $ $) {
+sub getBy($ $ $) { # $fields, $conditions, $withCache
+	my %result = (); 
 	print "\t\tinc::WebApp: getBy: argc:".(scalar @_).", argv:@_\n";
+	my $self = $_[0]; # ?
 	my $argc = scalar @_;
 	my ($withCache, $conditions, $fields) = (0, '', ''); # pop @_;
 	if($argc == 3){
@@ -119,17 +127,16 @@ sub getBy($ $ $) {
 		$conditions = pop @_;
 		$fields = pop @_;
 	}
-	my %result = (); 
 	if(1){
 		my $sql = "";
 		my %hm = ();
 		my $haslimit1 = 0;
 		my $pagenum = 1;
 		my $pagesize = 0;
-		if(defined($hmf{'pagenum'})){ $pagenum=$hmf{'pagenum'}; }
-		if(defined($hmf{'pagesize'})){ $pagesize=$hmf{'pagesize'}; }
-		$sql = "select $fields from ".getTbl()." where ";
-		my $idval = getId(); $idval = defined($idval) ? '' : $idval;
+		if(exists($hmf{'pagenum'})){ $pagenum=$hmf{'pagenum'}; }
+		if(exists($hmf{'pagesize'})){ $pagesize=$hmf{'pagesize'}; }
+		$sql = "select $fields from ".$self->getTbl()." where ";
+		my $idval = $self->getId(); $idval = defined($idval) ? '' : $idval;
 		if($conditions eq ""){
 			if($idval ne ""){
 				$sql .= $myId."=? ";
@@ -151,7 +158,7 @@ sub getBy($ $ $) {
 			if($pagesize == 0){ $pagesize = 99999; } # default maxium records per page
 			$sql .= " limit ".(($pagenum-1)*$pagesize).", ".$pagesize;	
 		}
-		print "\t\t\tinc::WebApp: getBy: sql:[$sql] result:".%result."\n";
+		#print "\t\t\tinc::WebApp: getBy: sql:[$sql] result:".%result."\n";
 		my $result = $dba->select($sql, \%hmf);
 		%result = %{$result};
 		print "\t\t\tinc::WebApp: getBy: sql:[$sql] result:".%result."\n";
@@ -160,29 +167,30 @@ sub getBy($ $ $) {
 }
 
 # 
-sub setBy($ $){
+sub setBy($ $){ # $fields, $conditions
 	my %result = (); 
 	print "\t\tinc::WebApp: setBy: argc:".(scalar @_).", argv:@_\n";
 	my $argc = scalar @_;
+	my $self = $_[0]; # ?
 	my ($conditions, $fields) = ('', ''); # pop @_;
 	$conditions = pop @_;
 	$fields = pop @_;
-	my $idval = getId(); $idval = !defined($idval) ? '' : $idval;
+	my $idval = $self->getId(); $idval = !defined($idval) ? '' : $idval;
 	if(1){
 		my $sql = '';
 		my $isupdate = 0;
 		if($idval eq '' && ($conditions eq '')){
-			$sql .= "insert into ".getTbl()." set ";
+			$sql .= "insert into ".$self->getTbl()." set ";
 		}
 		else{
-			$sql .= "update ".getTbl()." set ";	
+			$sql .= "update ".$self->getTbl()." set ";	
 			$isupdate = 1;
 		}
 		my @fieldarr = split(/,/, $fields);
 		my $fieldcount = scalar @fieldarr;
 		my $field = '';
 		for(my $i=0; $i<$fieldcount; $i++){
-			$field = trim($fieldarr[$i]);
+			$field = $self->trim($fieldarr[$i]);
 			if($field eq 'updatetime' || $field eq 'inserttime' || $field eq 'createtime'){
 				$sql .= "$field=NOW(), ";
 				delete $hmf{$field};
@@ -200,7 +208,7 @@ sub setBy($ $){
 			elsif($isupdate == 1){
 				$issqlready = 0;
 				$result{0} = 0;
-				$result{1} = ("error"=>"Unconditional update is forbidden. 1701232229.");
+				$result{1} = ("sayerror"=>"Unconditional update is forbidden. 1701232229.");
 			}
 		}
 		else{
@@ -209,9 +217,99 @@ sub setBy($ $){
 		print "\t\tinc::WebApp: setBy: sql:[$sql]\n";
 		if($issqlready == 1){
 			if($idval ne ''){ $hmf{'pagesize'} = 1; }	
-			%result = $dba->update($sql, \%hmf);
+			my $result = $dba->update($sql, \%hmf);
+			%result = %{$result};
 		}
 	}	
+	return \%result;
+}
+
+#
+sub execBy($ $ $){ # $sql, $conditions, $withCache
+	my %result = (); 
+	print "\t\tinc::WebApp: getBy: argc:".(scalar @_).", argv:@_\n";
+	my $self = $_[0]; # ?
+	my $argc = scalar @_;
+	my ($withCache, $conditions, $sql) = (0, '', ''); # pop @_;
+	if($argc == 3){
+		$conditions = pop @_;
+		$sql = pop @_;
+	}
+	elsif($argc == 4){
+		$withCache = pop @_;
+		$conditions = pop @_;
+		$sql = pop @_;
+	}
+	# withCache? @todo 
+	if(1){
+		if(!defined($conditions)){ $conditions = ''; }
+		my $pos = index($sql, 'select '); # case insensitive?
+		if($pos == -1){
+			$pos = index($sql, 'desc ');
+			if($pos == -1){
+				$pos = index($sql, 'show ');	
+			}
+		}
+		if($conditions ne ''){
+			if(index($sql, 'where ') > -1){
+				$sql .= $conditions;	
+			}	
+			else{
+				$sql .= " where $conditions";	
+			}
+		}
+		print "\t\tinc::WebApp: execBy: sql:[$sql] pos:[$pos]\n";
+		my $result = ();
+		if($pos > -1){
+			$result	= $dba->select($sql, \%hmf);
+		}
+		else{
+			$result = $dba->update($sql, \%hmf);
+		}
+		# with cache? @todo 
+		%result = %{$result};
+	}
+	return \%result;
+}
+
+#
+sub rmBy($){
+	my %result = (); 
+	print "\t\tinc::WebApp: rmBy: argc:".(scalar @_).", argv:@_\n";
+	my $self = $_[0]; # ?
+	my $argc = scalar @_;
+	my ($conditions, $sql) = ('', ''); # pop @_;
+	if($argc == 2){
+		$conditions = pop @_;
+	}
+	# rm from db
+	$sql = "delete from ".$self->getTbl()." ";
+	my $issqlready = 0;
+	if(!defined($conditions) || $conditions eq ''){
+		if($self->getId() ne ''){
+			$sql .= " where $myId=?";
+			$issqlready = 1;
+		}
+		else{
+			my $err = "Unconditional deletion is strictly forbidden. sql:[$sql]. 1701251225.";	
+			$result{0} = 0;
+			my %errhm = ("sayerror"=>$err);
+			$result{1} = \%errhm;
+		}
+	}
+	else{
+		if(index($conditions, 'where ') == -1){
+			$sql .= " where ";	
+		}
+		$sql .= $conditions;	
+		$issqlready = 1;
+	}
+	print "\t\t\tinc::WebApp: rmBy: sql:[$sql]\n";
+	my $result = ();
+	if($issqlready == 1){
+		$result = $dba->update($sql, \%hmf);
+		%result = %{$result};
+	}
 	return \%result;
 }
 
@@ -222,7 +320,7 @@ sub getEnv {
 
 #
 sub trim($){
-	my $s = shift;
+	my $s = pop @_; # shift;
 	$s =~ s/^\s+|\s+$//g;
 	return $s;
 }
