@@ -127,6 +127,8 @@ sub getBy($ $ $) { # $fields, $conditions, $withCache
 		$conditions = pop @_;
 		$fields = pop @_;
 	}
+	# withCache @todo
+	# read from db
 	if(1){
 		my $sql = "";
 		my %hm = ();

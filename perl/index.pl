@@ -26,7 +26,7 @@ binmode( STDERR, ':encoding(utf8)' );
 
 my $mydir = dirname(abs_path($0));
 my $basename = basename($0,(".pl"));
-my $singlerun = 1;
+my $singlerun = 0;
 chdir($mydir);
 print "workdir:[".$mydir."]\tbasename:[".$basename."]\n";
 if($singlerun == 1){
