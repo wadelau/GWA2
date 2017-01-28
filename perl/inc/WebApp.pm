@@ -210,7 +210,8 @@ sub setBy($ $){ # $fields, $conditions
 			elsif($isupdate == 1){
 				$issqlready = 0;
 				$result{0} = 0;
-				$result{1} = ("sayerror"=>"Unconditional update is forbidden. 1701232229.");
+				my %errhm = ("sayerror"=>"Unconditional update is forbidden. 1701232229.");
+				$result{1} = %errhm; 
 			}
 		}
 		else{

@@ -1,6 +1,8 @@
 #!/usr/bin/perl -w
 
 # see desc at the bottom
+# invoke by cli:
+# /path/to/perl -w /path/to/index.pl "?mod=hello&act=say&fmt=json"
 
 use lib '/mnt/hgfs/HostGitHub/GWA2/perl'; # @todo
 use lib './';
@@ -14,9 +16,8 @@ use POSIX qw(strftime);
 use Encode qw(decode_utf8 encode_utf8);
 #use Date::Parse;
 #use JSON;
-#use DBI;
-#use DBD::mysql;
 use autodie;
+use CGI; # @todo
 
 use utf8;
 no warnings 'utf8';
@@ -36,56 +37,54 @@ if($singlerun == 1){
 
 # main body
 
-# comm/header.inc.pl ?
+# header
+require("./comm/header.inc.pl");
 
+my $argvsize = scalar @ARGV;
+my %hmf = (); # runtime container
+%hmf = %{$ARGV[$argvsize-1]}; # return from controller
 print "now is: ".strftime("%Y-%m-%d-%H:%M:%S%z", localtime)."\n";
 
-my $i = 1612071942;
-my $hmf;
-my %hmf = (); # runtime container
-my $_ctrl_var_a = "I:[$i] am a var from $0, index.";
-my $ctrl = "index"; # hello
-my $argvsize = @ARGV;
+my $i = $hmf{'i'};
+my $mod = $hmf{'mod'}; # hello
+my $act = $hmf{'act'}; 
+my $r = $hmf{'r'}; # CGI
+my $out = $hmf{'out'};
+$out .= "\tI am now traveling into index. @".time()."\n\n";
 
-$hmf{'var_a'} = $_ctrl_var_a;
-$hmf{'i'} = $i;
-$hmf{'mod'} = $ctrl;
-$hmf{'arr1'} = ['a', 'b', 'c']; # ('a', 'b');
-$ARGV[$argvsize] = \%hmf; # $hmf; prepare for controller
+$hmf{'out'} = $out;
+$ARGV[$argvsize-1] = \%hmf; # $hmf; prepare for controller
+if($mod eq ''){ $mod = 'index'; }
 
-print "ARGV:\n";
+print "index: ARGV:\n";
 for(my $i=0; $i<@ARGV; $i++){
 	my $v = $ARGV[$i];
-	print "\ti:$i v:[".$v."]\n";
+	print "\tindex: i:$i v:[".$v."]\n";
 }
 
-print "bfr var-a:[$_ctrl_var_a] in index\n"; 
+# mod, ctrl
+require "./ctrl/$mod.pl";
 
-require "./ctrl/$ctrl.pl";
-
-_exec_in_child_(); # child's func
+#_exec_in_child_(); # child's func
 
 #_exec_(); # this func
 
-print "\naft var-a:[$_ctrl_var_a] in index.\n\n";
-
+print "index: ARGV after ctrl:\n";
 for(my $i=0; $i<@ARGV; $i++){
 	my $v = $ARGV[$i];
-	#print "\ti:$i v:[".$v."]\n";
+	print "\tindex: i:$i v:[".$v."]\n";
 }
 
-%hmf = %{$ARGV[$argvsize]}; # return from controller
-#print "var_in_ctrl/index:[".$hmf{'var_in_ctrl/index'}."]\n";
-#print "i_in_ctrl/index:[".$hmf{'i_in_ctrl/index'}."]\n\n";
-
+# sub
 sub _exec_ {
 	my $hello = mod::Hello->new($ARGV[0], $ARGV[1]);
-	print "\tindex: I am a func from $0 in index:[".$ARGV[0]."] i:$i.\n";	
+	print "\tindex: I am a func from $0 in index:[".$ARGV[0]."].\n";	
 	$hmf{'var_in__exec_in_index'} = "_exec_index_: time: ".localtime();
 	$hello->sayHi($0);
 }
 
-# comm/footer.inc.pl ?
+# footer
+require("./comm/footer.inc.pl");
 
 if($singlerun == 1){
 	close(LOCK);
