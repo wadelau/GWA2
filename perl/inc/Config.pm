@@ -17,9 +17,9 @@ my %conf = (
 	# db info
 	'dbhost' => '127.0.0.1',
 	'dbport' => '3306',
-	'dbuser' => 'bizsft',
-	'dbpassword' => 'bizsftJan102016',
-	'dbname' => 'bizsftdb',
+	'dbuser' => '',
+	'dbpassword' => '',
+	'dbname' => '',
 	'dbdriver' => 'mysql',
 	'dbsock' => '/www/bin/mysql/mysql.sock',
 	'db_enable_utf8_affirm' => 1,
