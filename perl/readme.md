@@ -24,8 +24,8 @@ It is better to install these modules via system control panel, e.g.
 YaST for openSuSE.
 
 
-# First success with database access
-with GWA2 in Perl was made on 
+# Features
+First success with Database access with GWA2 in Perl was made on 
 Sun Jan  1 22:59:36 CST 2017
 
 # More
