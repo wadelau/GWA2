@@ -54,6 +54,7 @@ $out .= "\tI am now traveling into index. @".time()."\n\n";
 
 $hmf{'out'} = $out;
 $ARGV[$argvsize-1] = \%hmf; # $hmf; prepare for controller
+if(!defined($mod)){ $mod = ''; }
 if($mod eq ''){ $mod = 'index'; }
 
 print "index: ARGV:\n";

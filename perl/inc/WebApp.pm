@@ -46,6 +46,7 @@ sub new {
 	print "\t\tclass:[$class] args:[".\%args."]\n";
 	my $self = {@_};
 	if(1){
+		if(!defined($args{'dbconf'})){ $args{'dbconf'} = 'MasterDB';  }
 		$dba = inc::Dba->new($args{'dbconf'});	
 	}
 
