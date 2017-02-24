@@ -244,7 +244,7 @@ function redirect($url, $time=0, $msg='') {
 	}
 	if($time < 10){ $time = $time * 1000; } # in case of milliseconds
 	$hideMsg = "<!DOCTYPE html><html><head>";
-	$hideMsg .= "<meta http-equiv=\"refresh\" content=\"{$time};URL='{$url}'\">";
+	$hideMsg .= "<meta http-equiv=\"refresh\" content=\"".($time/1000).";url='$url'\">";
 	$hideMsg .= "</head><body>";  # remedy Mon Nov 23 22:03:24 CST 2015
     if (empty($msg)){
         #$msg = "系统将在{$time}秒之后自动跳转到{$url}！";
