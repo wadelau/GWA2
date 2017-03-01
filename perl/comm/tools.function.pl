@@ -15,7 +15,8 @@ my $out = $hmf{'out'};
 my $fmt = $hmf{'fmt'};
 my $r = $hmf{'r'};
 
-# functions across the whole application
+# functions being used across the whole application
+# see behaviours in -GWA2 in -PHP, -GWA2 in -Java
 # Mon Feb 27 22:08:08 CST 2017
 # refer: http://perldoc.perl.org/functions/ref.html
 sub debug{ # ($ $)
