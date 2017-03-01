@@ -174,7 +174,7 @@ sub getBy($ $ $) { # $fields, $conditions, $withCache
 		%result = %{$result};
 		print "\t\t\tinc::WebApp: getBy: sql:[$sql] result:".%result."\n";
 	}	
-	else{
+	else{ # read from object
 		my %conditions = %{$conditions};
 		my $type = $fields;
 		%result = %{$self->readObject($type, \%conditions)};		
