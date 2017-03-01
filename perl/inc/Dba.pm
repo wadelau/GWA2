@@ -28,9 +28,12 @@ sub new {
 
 	$conf = shift;
 	if($conf ne ""){ $conf = "inc::Conn::$conf"; }
-	print "\t\t\tinc::Dba: conf:[$conf] in inc::Dba\n";
+	else{ $conf = 'MasterDB'; }
+	#print "\t\t\tinc::Dba: conf:[$conf] in inc::Dba\n";
 	my $confo = $conf->new();
-	$dbconn = inc::MySQL->new($confo); # swith to other drivers @todo
+	if(1){ # assume default is mysql
+		$dbconn = inc::MySQL->new($confo); # swith to other drivers @todo
+	}
 
 	bless $self, $class;
 	return $self;
@@ -53,7 +56,7 @@ sub select($ $) {
 	my @idxarr = $self->_sortObject($sql, \%hmvars);
 	my %result =  (); 
 	my $haslimit1 = 0;
-	print "\t\tinc::Dba: select: sql:[$sql]\n";
+	#print "\t\tinc::Dba: select: sql:[$sql]\n";
 	if((defined($hmvars{'pagesize'}) && $hmvars{'pagesize'} == 1)
 		|| index($sql, 'limit 1') > -1){
 		%result = $dbconn->readSingle($sql, \%hmvars, \@idxarr);	
@@ -70,7 +73,7 @@ sub select($ $) {
 		$rtnhm{0} = 0;
 		$rtnhm{1} = $result{1};
 	}
-	print "\t\t\tinc::Dba: ret:".%rtnhm."\n";
+	#print "\t\t\tinc::Dba: ret:".%rtnhm."\n";
 	return \%rtnhm;
 }
 
@@ -166,11 +169,11 @@ sub _sortObject($ $){
 			# no such index num	
 		}
 	}
-	print "\t\tinc::Dba: sortObject: rtn:[@rtn], sql:[$sql]\n";
+	#print "\t\tinc::Dba: sortObject: rtn:[@rtn], sql:[$sql]\n";
 	my $arrsize = scalar @rtn;
-	for(my $i=0; $i<$arrsize; $i++){
-		print "\t\t\t$i: ".$rtn[$i]."\n";	
-	}
+	#for(my $i=0; $i<$arrsize; $i++){
+	#	print "\t\t\t$i: ".$rtn[$i]."\n";	
+	#}
 	return @rtn;
 }
 

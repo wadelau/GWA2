@@ -216,7 +216,7 @@ class PageNavi extends WebApp{
        	   		if(isset($_REQUEST[$field]) && $_REQUEST[$field] != $v){
        	   			$v = $_REQUEST[$field];	
        	   		}
-       	   		if(startsWith($v, '%')){
+       	   		if(strlen($v) > 3 && startsWith($v, '%')){
        	   			$v = urldecode($v);
        	   		}
                 if(strpos($v,"tbl:") === 0){ #http://ufqi.com:81/dev/gtbl/ido.php?tbl=hss_dijietbl&tit=%E5%AF%BC%E6%B8%B8%E8%A1%8C%E7%A8%8B&db=&pnsktuanid=tbl:hss_findaoyoutbl:id=2 

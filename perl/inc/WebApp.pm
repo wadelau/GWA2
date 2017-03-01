@@ -23,10 +23,12 @@ binmode( STDERR, ':encoding(utf8)' );
 use parent 'inc::WebInterface';
 use inc::Config qw(GConf);
 use inc::Dba;
+use inc::Filea;
 
 my $_ROOT_ = dirname(abs_path($0));
 use constant VER => 0.01;
 my $dba = {};
+my $filea = {};
 my %hm = (); # [];
 my %hmf = ();
 my $isdbg = 1;
@@ -35,19 +37,26 @@ use constant {
 	GWA2_ERR => 'gwa2_tag_error',
 	GWA2_ID => 'gwa2_tag_id',
 	GWA2_TBL => 'gwa2_tag_tbl',
+	DBL_TBL => "\t\t",
 };
 my $GWA2_Rumtime_Env_List = ();
+
+my $gconf = inc::Config->new();
 
 #
 sub new {
 	my $class = shift @_;
 	my $args = shift; # @_ may be omitted.
 	my %args = %{$args};
-	print "\t\tclass:[$class] args:[".\%args."]\n";
+	#print "\t\tclass:[$class] args:[".\%args."]\n";
 	my $self = {@_};
 	if(1){
 		if(!defined($args{'dbconf'})){ $args{'dbconf'} = 'MasterDB';  }
 		$dba = inc::Dba->new($args{'dbconf'});	
+	}
+	if(1){
+		if(!defined($args{'fileconf'})){ $args{'fileconf'} = 'FileSystem';  }
+		$filea = inc::Filea->new($args{'fileconf'});	
 	}
 
 	bless $self, $class;
@@ -57,7 +66,7 @@ sub new {
 #
 sub DESTROY {
 	# @todo	
-	print "\t\t\tI am runing away from inc::WebApp->DESTROY...\n";
+	#print "\t\t\tI am runing away from inc::WebApp->DESTROY...".time()."\n";
 }
 
 #
@@ -105,8 +114,8 @@ sub getTbl{
 #
 sub setTbl($){
 	my $v = pop @_; # @_[1];
-	my $tblpre = inc::Config::get('tblpre'); # use qw ?
-	print "\t\tinc::WebApp: setTbl: tblpre:[$tblpre]\n";
+	my $tblpre = $gconf->{'tblpre'};getConf('tblpre'); # use qw ?
+	#print "\t\tinc::WebApp: setTbl: tblpre:[$tblpre]\n";
 	set(GWA2_TBL, $v);
 	return 1;
 }
@@ -115,8 +124,8 @@ sub setTbl($){
 # by Xenxin@ufqi.com since Sun Jan  1 22:54:54 CST 2017
 sub getBy($ $ $) { # $fields, $conditions, $withCache
 	my %result = (); 
-	print "\t\tinc::WebApp: getBy: argc:".(scalar @_).", argv:@_\n";
 	my $self = $_[0]; # ?
+	#print "\t\tinc::WebApp: getBy: argc:".(scalar @_).", argv:@_ upld:[".$gconf->{'uploaddir'}."]\n";
 	my $argc = scalar @_;
 	my ($withCache, $conditions, $fields) = (0, '', ''); # pop @_;
 	if($argc == 3){
@@ -130,7 +139,7 @@ sub getBy($ $ $) { # $fields, $conditions, $withCache
 	}
 	# withCache @todo
 	# read from db
-	if(1){
+	if(!($fields=~/:/)){
 		my $sql = "";
 		my %hm = ();
 		my $haslimit1 = 0;
@@ -161,25 +170,28 @@ sub getBy($ $ $) { # $fields, $conditions, $withCache
 			if($pagesize == 0){ $pagesize = 99999; } # default maxium records per page
 			$sql .= " limit ".(($pagenum-1)*$pagesize).", ".$pagesize;	
 		}
-		#print "\t\t\tinc::WebApp: getBy: sql:[$sql] result:".%result."\n";
 		my $result = $dba->select($sql, \%hmf);
 		%result = %{$result};
 		print "\t\t\tinc::WebApp: getBy: sql:[$sql] result:".%result."\n";
 	}	
+	else{
+		my %conditions = %{$conditions};
+		my $type = $fields;
+		%result = %{$self->readObject($type, \%conditions)};		
+	}
 	return \%result;
 }
 
 # 
-sub setBy($ $){ # $fields, $conditions
+sub setBy($ $){ # $$ # $fields, $conditions
 	my %result = (); 
-	print "\t\tinc::WebApp: setBy: argc:".(scalar @_).", argv:@_\n";
-	my $argc = scalar @_;
+	#print "\t\tinc::WebApp: setBy: argc:".(scalar @_).", argv:@_\n";
 	my $self = $_[0]; # ?
-	my ($conditions, $fields) = ('', ''); # pop @_;
-	$conditions = pop @_;
-	$fields = pop @_;
+	my $conditions = pop @_;
+	my $fields = pop @_;
 	my $idval = $self->getId(); $idval = !defined($idval) ? '' : $idval;
-	if(1){
+	# write to db
+	if(!($fields=~/:/)){
 		my $sql = '';
 		my $isupdate = 0;
 		if($idval eq '' && ($conditions eq '')){
@@ -221,9 +233,17 @@ sub setBy($ $){ # $fields, $conditions
 		print "\t\tinc::WebApp: setBy: sql:[$sql]\n";
 		if($issqlready == 1){
 			if($idval ne ''){ $hmf{'pagesize'} = 1; }	
-			my $result = $dba->update($sql, \%hmf);
+			my $result = (); # @todo $dba->update($sql, \%hmf);
 			%result = %{$result};
 		}
+	}	
+	else{ # write to object
+		my %conditions = %{$conditions};
+		#foreach my $k(keys %conditions){
+		#	print "\t\tinc::WebApp::setBy: k:$k v:[".$conditions{$k}."]\n";	
+		#}
+		my $type = $fields;
+		%result = %{$self->writeObject($type, \%conditions)};	
 	}	
 	return \%result;
 }
@@ -231,7 +251,7 @@ sub setBy($ $){ # $fields, $conditions
 #
 sub execBy($ $ $){ # $sql, $conditions, $withCache
 	my %result = (); 
-	print "\t\tinc::WebApp: getBy: argc:".(scalar @_).", argv:@_\n";
+	#print "\t\tinc::WebApp: execBy: argc:".(scalar @_).", argv:@_\n";
 	my $self = $_[0]; # ?
 	my $argc = scalar @_;
 	my ($withCache, $conditions, $sql) = (0, '', ''); # pop @_;
@@ -317,8 +337,65 @@ sub rmBy($){
 	return \%result;
 }
 
+# 
+sub readObject($ $){
+	my %result = (); 
+	#print "\t\tinc::WebApp: readObject: argc:".(scalar @_).", argv:@_\n";
+	my $argc = scalar @_;
+	my $self = $_[0];
+	my ($type, $args) = ('', undef); # pop @_;
+	$args = pop @_;
+	$type = pop @_;
+	my %args = %{$args};
+	if($type=~/file:/){
+		my $target = $args{'target'}; 
+		delete $args{'target'};
+		%result = %{$filea->read($target, \%args)};
+	}
+	else{
+		%result = (0=>0, 1=>"Unsupported readObject:[$type]. 201703012218.");	
+	}
+	return \%result;
+
+}
+
+#
+sub writeObject($ $){
+	my %result = (); 
+	#print "\t\tinc::WebApp: writeObject: argc:".(scalar @_).", argv:@_\n";
+	my $argc = scalar @_;
+	my $self = $_[0]; # ?
+	my ($type, $args) = ('', undef); # pop @_;
+	$args = pop @_;
+	$type = pop @_;
+	my %args = %{$args};
+	if($type=~/file:/){
+		#foreach my $k (keys %args){
+		#	print "\t\tinc::WebApp::writeObject: k:$k v:".$args{$k}."\n";	
+		#}
+		my $target = $args{'target'}; my $content = $args{'content'};
+		delete $args{'target'}; delete $args{'content'};
+		%result = %{$filea->write($target, $content, \%args)};
+	}
+	else{
+		%result = (0=>0, 1=>"Unsupported writeObject:[$type]. 201702162109.");	
+	}
+	return \%result;
+}
+
 #
 sub getEnv {
+	#print "\t\tinc::WebApp::getEnv: argc:[".@_."]\n";
+	#for(my $i=0; $i<@_; $i++){
+		#print "\t\tinc::WebApp::getEnv: i:$i v:[".$_[$i]."]\n";
+	#}
+	my $self = shift;
+	my $aref = pop @_;
+	if(!defined($aref)){ 
+		$aref = {}; # ();
+	}
+	else{ }
+	my %pararef = %{$aref}; # for debug	
 	return "ver:[".VER."] root:[".$_ROOT_."]";	
 }
 
@@ -327,6 +404,14 @@ sub trim($){
 	my $s = pop @_; # shift;
 	$s =~ s/^\s+|\s+$//g;
 	return $s;
+}
+
+#
+sub getConf($){
+	my $k = pop @_;
+	#print "\t\tinc::WebApp::getConf: k:$k\n";
+	#return inc::Config::get($k); # use qw ?
+	return $gconf->{$k}; # ?
 }
 
 1;

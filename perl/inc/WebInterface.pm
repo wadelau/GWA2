@@ -20,8 +20,8 @@ sub setId($){};
 sub getId(){};
 
 sub setBy($ $){};
-sub getBy($ $){};
-sub execBy($ $){};
+sub getBy($ $ $){};
+sub execBy($ $ $){};
 sub rmBy($){};
 
 sub toString($){};

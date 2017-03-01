@@ -30,7 +30,7 @@ sub new {
 	my $conf = shift;
 	my %conf = %{$conf};
 	$self->{m_host} = $m_host = $conf{'mDbHost'};
-	print "\t\t\tinc::MySQL: m_host:$m_host\n";
+	#print "\t\t\tinc::MySQL: m_host:$m_host\n";
 	$self->{m_port} = $m_port = $conf{'mDbPort'};
 	$self->{m_user} = $m_user = $conf{'mDbUser'};
 	$self->{m_password} = $m_password = $conf{'mDbPassword'};
@@ -63,7 +63,8 @@ sub query($ $ $) {
 	my @rows = (); # [] as a ref to array
 	if($result){
 		$rows[0] = $sth->rows; # affected rows
-		$rows[1] = $dbh->last_insert_id(undef, undef, undef, undef); # refer to http://search.cpan.org/~timb/DBI-1.636/DBI.pm#execute 
+		$rows[1] = $dbh->last_insert_id(undef, undef, undef, undef); 
+		# refer to http://search.cpan.org/~timb/DBI-1.636/DBI.pm#execute 
 		#print "\t\t\tinc::MySql: update: lastid:[".$rows[1]."] affectedrows:[".$rows[0]."].\n";
 	}
 	else{
@@ -116,11 +117,12 @@ sub readBatch($ $ $) {
 		$dbh = $self->_initConnection();	
 	}
 	$sql = $self->_enSafe($sql, \%hmvars, \@idxarr);
-	print "\t\tinc::MySql: readBatch: sql:[$sql]\n";
+	#print "\t\tinc::MySql: readBatch: sql:[$sql] vars:[".%hmvars."]\n";
 	$sth = $dbh->prepare($sql);
 	my $arrsize = scalar @idxarr;
 	for(my $i=0; $i<$arrsize; $i++){
 		$sth->bind_param($i+1, $hmvars{$idxarr[$i]});
+		#print "binding: i:$i k:[".$idxarr[$i]."] v:[".$hmvars{$idxarr[$i]}."]\n";
 	}
 	my $result = $sth->execute();
 	my @rows = (); my $i = 0;
@@ -139,12 +141,13 @@ sub readBatch($ $ $) {
 # 
 # Xenxin@ufqi.com, Sun Jan  1 22:52:34 CST 2017
 sub _initConnection {
-	$dbh = DBI->connect("DBI:mysql:database=$m_name;host=$m_host", 
+	$dbh = DBI->connect("DBI:mysql:database=$m_name;host=$m_host;port=$m_port", 
 		$m_user, 
 		$m_password, 
-		{'RaiseError'=>1, 'mysql_enable_utf8'=>1, 'AutoCommit'=>1}) or warn "cannot connect to mysql server. errno:["
+		{'RaiseError'=>1, 'mysql_enable_utf8'=>1, 'AutoCommit'=>1}) 
+		or warn "cannot connect to mysql server. errno:["
 			.$dbh->err."] errmsg:[".$dbh->errstr."]. 17011201556.";		
-	print "\t\t\tinc::MySQL: initConnection....".time()."\n";
+	#print "\t\t\tinc::MySQL: initConnection....".time()."\n";
 	return $dbh;
 }
 
