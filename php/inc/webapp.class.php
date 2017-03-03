@@ -408,7 +408,8 @@ class WebApp implements WebAppInterface{
 	private function _setAll(){
 		$isinclude = 0;
 		if($this->getId() != ''){
-			$tmphm = $this->getBy('*',null);
+			$tmphm = $this->getBy('*',null,
+			        $withCache=array('key'=>$this->getTbl().'-id'.$this->getId().'-select'));
 			#debug(__FILE__.": _setAll: rtn: ");
 			#debug($tmphm);
 			if($tmphm[0]){
@@ -774,7 +775,11 @@ class WebApp implements WebAppInterface{
 		return false;
 	}
 
-	//-
+	//-  remedy by wadelau@ufqi.com, Wed Jun 15 19:56:17 CST 2016
+	public function getMyId(){
+		return $this->myId;
+	}
+
 	//-- setCache
 	private function _setCache($hm, $fields){
 		# cache successful resultset
