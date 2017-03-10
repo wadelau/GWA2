@@ -433,7 +433,7 @@ class WebApp implements WebAppInterface{
 		}
 		else{
 			#error_log('/inc/webapp.class.php: _setAll: failed for empty id.');
-			$this->set('er', 1);
+			$this->set(self::GWA2_ERR, 1);
 			return false;
 		}
 		$this->set(self::GWA2_ERR, 1);
