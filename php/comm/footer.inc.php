@@ -8,6 +8,11 @@ if($isoput){
 }
 
 //- content output
+$isOB = 0;
+if(ob_start('ob_gzhandler')){ $isOB = 1; }
+else if(ob_start()){
+    $isOB = 1;
+}
 if($smttpl != ''){
 
 	$data['smttpl'] = $smttpl;
@@ -57,30 +62,21 @@ if($smttpl != ''){
 	}
 	# for conflicts between smarty {} and javascript {}, using {literal}{/literal}
 	if($display_style == $_CONFIG['display_style_index']){
-		
 		$smttpl = $smttpl.".tmp";
 		$smt->assign('smttpl', $smttpl);
-		$smt->display('index.html.tmp'); # use index.html, $smttpl would be embedded in index.html by smarty, updated on Sun Jul 29 09:59:29 CST 2012
-
+		$smt->display('index.html.tmp'); 
+		# use index.html, $smttpl would be embedded in index.html by smarty, updated on Sun Jul 29 09:59:29 CST 2012
 	}
 	else if($display_style == $_CONFIG['display_style_smttpl']){
-
 		//$smt ->assign('respobj', $data['respobj']);
 		$smt->display($smttpl.".tmp"); # use template file only
 		//var_dump($data);
-	
 	}
 	else{
-		error_log(__FILE__.": Something wrong with display style and smttpl:$smttpl .");				
+		debug(__FILE__.": Something wrong with display style and smttpl:$smttpl .");				
 	}
 }
 else{
-
-	$isOB = 0;
-	if(ob_start('ob_gzhandler')){ $isOB = 1; }
-	else if(ob_start()){ 
-		$isOB = 1; 
-	}
 	if(isset($fmt) && $fmt != ''){
 		if($fmt == 'json'){
 			header("Content-type: application/json;charset=utf-8");
@@ -114,8 +110,8 @@ else{
 		#error_log(__FILE__.": smttpl is empty. not display with Smarty.req:[".$_SERVER['REQUEST_URI']);
 		print $out;
 	}
-	if($isOB){ ob_end_flush(); }
 }
+if($isOB){ ob_end_flush(); }
 
 #error_log(__FILE__.": out:[".$out."]");
 #error_log(date("m-d H:i:s").": ".__FILE__.": request:[".$_SERVER['REQUEST_URI']."] query_string:[".$_SERVER['QUERY_STRING']."] smttpl:[$smttpl] userid:[$userid] ismaishou:[".$data['ismaishou']."]");
