@@ -38,6 +38,18 @@ sub new {
 	$self->{m_sock} = $m_sock = $conf{'mDbSock'};
 
 	bless $self, $class;
+	
+	my $conftag = 'cftg';
+	foreach my $ck (keys %conf){
+		$conftag .= ':'.$conf{$ck};	
+	}
+	$dbh = $datasource{$conftag};
+	if(!defined($dbh)){
+		$dbh = $self->_initConnection();	
+		$datasource{$conftag} = $dbh;
+	}
+	print "inc::MySQL::new: args:[@_] dbh:[$dbh] conf:[".$conf."] conftag:[$conftag]\n";
+	
 	return $self;
 }
 
@@ -93,17 +105,23 @@ sub readSingle($ $ $) {
 		$sth->bind_param($i+1, $hmvars{$idxarr[$i]});
 	}
 	my $result = $sth->execute();
-	my @rows = []; 
+	my @rows = []; my $rtnresult = 0;
 	if($result){
 		if(my $ref = $sth->fetchrow_hashref()){
-			$rows[0] = $ref;		
+			$rows[0] = $ref;
+			$rtnresult = 1;
+		}
+		else{
+			my %hmtmp = (fail=>'No data for sql:['.$sql.']. 1703192107.');
+			$rows[0] = \%hmtmp;
 		}
 	}
 	else{
-		$rows[0] = ("Query failed for sql:[$sql]. 1701251034.");
+		my %hmtmp = (fail=>"Query failed for sql:[$sql]. 1701251034.");
+		$rows[0] = \%hmtmp;
 	}
 	$sth->finish();
-	return ('0'=>1, '1'=>\@rows);
+	return ('0'=>$rtnresult, '1'=>\@rows);
 }
 
 # by Xenxin@ufqi.com since  Mon Jan 23 21:07:09 CST 2017
@@ -130,18 +148,26 @@ sub readBatch($ $ $) {
 		while(my $ref = $sth->fetchrow_hashref()){
 			$rows[$i++] = $ref;		
 		}
+		if($i == 0){
+			my %hmtmp = ('fail','No data for sql:['.$sql.']. 1703192105.');
+			$rows[0] = \%hmtmp;
+		}
+		else{
+			$rtnresult = 1;
+		}
 	}
 	else{
-		$rows[0] = ("Query failed for sql:[$sql]. 1701251041.");
+		my %hmtmp = ("fail", "Query failed for sql:[$sql]. 1701251041.");
+		$rows[0] = \%hmtmp;
 	}
 	$sth->finish();
-	return ('0'=>1, '1'=>\@rows);
+	return ('0'=>$rtnresult, '1'=>\@rows);
 }
 
 # 
 # Xenxin@ufqi.com, Sun Jan  1 22:52:34 CST 2017
 sub _initConnection {
-	$dbh = DBI->connect("DBI:mysql:database=$m_name;host=$m_host;port=$m_port", 
+	$dbh = DBI->connect_cached("DBI:mysql:database=$m_name;host=$m_host;port=$m_port", 
 		$m_user, 
 		$m_password, 
 		{'RaiseError'=>1, 'mysql_enable_utf8'=>1, 'AutoCommit'=>1}) 

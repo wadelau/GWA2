@@ -104,8 +104,10 @@ sub writef($ $ $){
 	# @todo reuse
 
 	if(1){
-		close($fh);	
-		$isclosed = 1;
+		if(defined($fh)){
+			close($fh);	
+			$isclosed = 1;
+		}
 	}	
 	%result = ('0'=>1, '1'=>{'content'=>'success'});
 	
@@ -154,7 +156,9 @@ sub openf($ $){
 #
 sub closef(){
 	if(!$isclosed){
-		close($fh) or warn '';
+		if(defined($fh)){
+			close($fh) or warn '';
+		}
 	}
 	#print "\t\tinc::FileSys::closef: $fh is closing.\n";
 }

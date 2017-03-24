@@ -13,11 +13,11 @@ our @ISA = qw(inc::WebApp); # for what?
 # @override new of WebApp
 sub new {
 	my $class = shift;
-	my $args = shift;
 	my $self = {};
-
+	my $args = pop @_;
 	bless $self, $class;
-	my %args = ("args"=>$args);
+	
+	my %args = %{$args};
 	inc::WebApp->new(\%args);
 	
 	$self->setTbl('un_offers');
