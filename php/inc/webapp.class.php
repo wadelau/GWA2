@@ -493,7 +493,10 @@ class WebApp implements WebAppInterface{
         $obj = '';
         if($type == 'cache:'){
             //- cache service
-            $obj = $this->cachea->get($args['key']);
+            $obj = array(0=>true);
+            if($this->cachea != null){
+                $obj = $this->cachea->get($args['key']);
+            }
             if(!$obj[0]){
                 $obj = array(true, $obj[1]);
             }
@@ -651,6 +654,8 @@ class WebApp implements WebAppInterface{
         $obj = null;
         if($type == 'cache:'){
 			//- cache service
+			$obj = array(0=>true);
+			if($this->cachea != null){
 			if(is_null($args['value'])){
 				$obj = $this->cachea->rm($args['key']);
 			}
@@ -664,6 +669,7 @@ class WebApp implements WebAppInterface{
 				}
 				#debug(__FILE__.": writeObject: type:[$type] args:[".$this->toString($args)."] cache result:");
 				#debug($obj);
+			}
 			}
 			if(!$obj[0]){
 				$obj = array(true, $obj[1]);
