@@ -539,8 +539,11 @@ class WebApp implements WebAppInterface{
                     $enableZip = true;
                 }
                 $paraStr = '';
-                if($args['parameter']){
+                if(is_array($args['parameter'])){
                     $paraStr = http_build_query($args['parameter']);
+                }
+                else{
+                    $paraStr = $args['parameter'];
                 }
                 $header .= "Content-Length: ".strlen($paraStr)."\n";
                 #debug(__FILE__.": header:[$header]");

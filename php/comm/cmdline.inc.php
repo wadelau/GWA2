@@ -37,10 +37,15 @@ if(1){ # in some scenarios, this should be set as 0 to disable this function glo
 		
 		# set utf-8 for environment
 		$myCharset = 'UTF-8';
-		mb_internal_encoding($myCharset);
-		mb_http_output($myCharset);
-		mb_http_input($myCharset);
-		mb_regex_encoding($myCharset);
+		if(function_exists('mb_internal_encoding')){
+		    mb_internal_encoding($myCharset);
+		    mb_http_output($myCharset);
+		    mb_http_input($myCharset);
+		    mb_regex_encoding($myCharset);
+		}
+		else{
+		    error_log(__FILE__." cli mode with no mb_internal_encoding. 1705112102.");
+		}
 		
 		# $_SERVER
 		empty( $_SERVER['HTTP_HOST'] ) && $_SERVER['HTTP_HOST'] = 'localhost';
