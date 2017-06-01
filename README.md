@@ -6,9 +6,9 @@ GWA2 is General Web Application Architecture. 通用網絡應用架構
 
 * Speak in Java, PHP, Perl and Aspx
 
-*From Interface to Interactions*
+* From Interface to Interactions
 
-*From Demand to Design*
+* From Demand to Design
 
 ***Three Layers***
 ----
@@ -141,3 +141,4 @@ view/default/signin.html
 ###4. Define routing, 在入口定义路由
 /index.php?mod=user&act=xxxx
 
+#
