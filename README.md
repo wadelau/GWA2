@@ -4,9 +4,11 @@ GWA2 is General Web Application Architecture. 通用網絡應用架構
 ----
 [-NatureDNS](http://ufqi.com/naturedns) : [-GWA2](http://ufqi.com/naturedns/search?q=-gwa2) , [-吉娃兔](http://ufqi.com/naturedns/search?q=-吉娃兔)
 
-*From Interface to Interactions*
+* Speak in Java, PHP, Perl and Aspx
 
-*From Demand to Design*
+* From Interface to Interactions
+
+* From Demand to Design
 
 ***Three Layers***
 ----
@@ -139,3 +141,4 @@ view/default/signin.html
 ###4. Define routing, 在入口定义路由
 /index.php?mod=user&act=xxxx
 
+#
