@@ -5,6 +5,12 @@
 use strict;
 use warnings;
 
+use utf8;
+no warnings 'utf8';
+binmode( STDIN,  ':encoding(utf8)' );
+binmode( STDOUT, ':encoding(utf8)' );
+binmode( STDERR, ':encoding(utf8)' );
+
 use mod::Hello;
 
 # refer: 
