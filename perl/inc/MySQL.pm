@@ -20,7 +20,7 @@ use inc::Config;
 my $_ROOT_ = dirname(abs_path($0));
 my ($m_host, $m_port, $m_user, $m_password, $m_name, $_link, $m_sock)
 	= ('', '', '', '', '', '', '');
-my ($dbh, $sth, $sql, $rs, $row) = (undef, undef, 0, 0, 0);
+my ($dbh, $sth, $sql, $rs, $row, %datasource) = (undef, undef, 0, 0, 0, ());
 my $isdbg = 1;
 
 #
@@ -143,7 +143,7 @@ sub readBatch($ $ $) {
 		#print "binding: i:$i k:[".$idxarr[$i]."] v:[".$hmvars{$idxarr[$i]}."]\n";
 	}
 	my $result = $sth->execute();
-	my @rows = (); my $i = 0;
+	my @rows = (); my $i = 0; my $rtnresult = 0;
 	if($result){
 		while(my $ref = $sth->fetchrow_hashref()){
 			$rows[$i++] = $ref;		

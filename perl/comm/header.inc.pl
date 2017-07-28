@@ -37,6 +37,7 @@ for($i=0; $i<$param_size; $i++){
 	print "\t\t".__FILE__.": i:$i v:".$v."\n";	
 	if($v=~/=/){
 		my @v2 = split(/=/, $v);
+		$v2[1] = defined($v2[1])?$v2[1]:'';
 		$hmf{$v2[0]} = $v2[1];
 	}
 }

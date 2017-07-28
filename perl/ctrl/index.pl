@@ -32,7 +32,7 @@ $hmf{'i_in_ctrl/index'} = $i;
 
 #_exec_in_child_(); # this func
 
-_exec_(); # parent's func
+#_exec_(); # parent's func
 
 print "\tctrl/index: i:[$i] am now at the end of ctrl/index.\n";
 
