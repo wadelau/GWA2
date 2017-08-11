@@ -453,12 +453,17 @@ function debug($obj, $tag='', $output=null){
 		else{ $ip = "Unknown";}
 
 		if (($ip == "Unknown" or $ip == "127.0.0.1"
-				or strpos( $ip, "172.31." ) === 0)
+		        or strpos( $ip, "192.168." ) === 0
+		        or strpos( $ip, "172.31." ) === 0
+		        or strpos( $ip, "10." ) === 0)
 			and @$_SERVER["HTTP_X_REAL_IP"]){
 			
 			$ip = $_SERVER["HTTP_X_REAL_IP"];
 		}
-		if (($ip == "Unknown" or $ip == "127.0.0.1" or strpos( $ip, "172.31." ) === 0)
+		if (($ip == "Unknown" or $ip == "127.0.0.1" 
+		        or strpos( $ip, "192.168." ) === 0
+		        or strpos( $ip, "172.31." ) === 0
+		        or strpos( $ip, "10." ) === 0)
 				and @$_SERVER["HTTP_X_FORWARDED_FOR"]) {
 			
 			$ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
