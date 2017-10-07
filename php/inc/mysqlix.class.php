@@ -43,7 +43,11 @@ class MYSQLIX {
 			if(GConf::get('db_enable_utf8_affirm')){
 				$this->query("SET NAMES 'utf8'", null, null);
 			}
-			
+		}
+		if($this->m_link->connect_errno > 0){
+				print "Database connection error. 201710071225.";
+				debug($this->m_link);
+				exit(0);
 		}
 		return $this->m_link;
 		
@@ -60,7 +64,7 @@ class MYSQLIX {
 		
 		#debug(__FILE__.": query: sql:[".$sql."]");
 		try{
-		  $result = $this->m_link->query($sql) or $this->sayErr("[$sql] 201605240944.");		
+		  $result = $this->m_link->query($sql); # or $this->sayErr("[$sql] 201605240944.");		
 		}
 		catch(Exception $e){
 		    debug(__FILE__.": $sql, exec failed. ".$e->getMessage());
@@ -97,7 +101,7 @@ class MYSQLIX {
 			$sql .= " limit 1 ";
 		} 
 		#debug(__FILE__.": readSingle: sql:[".$sql."]");
-        $result = $this->m_link->query($sql) or $this->sayErr("[$sql] query failed. 201605220716.");
+        $result = $this->m_link->query($sql); # or $this->sayErr("[$sql] query failed. 201605220716.");
         		
 		if($result){
 			if($row = $result->fetch_array(MYSQLI_ASSOC) ){
@@ -134,7 +138,7 @@ class MYSQLIX {
 		
 		#debug(__FILE__.": readBatch: sql:[".$sql."]");
 		$rtnarr = array();	
-		$result = $this->m_link->query($sql) or $this->sayErr("[$sql] query failed. 201605220717.");
+		$result = $this->m_link->query($sql); # or $this->sayErr("[$sql] query failed. 201605220717.");
 		
    		if($result && !is_bool($result)){
 			$i = 0;

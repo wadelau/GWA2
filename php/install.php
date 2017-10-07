@@ -143,7 +143,7 @@ function dir_writeable($dir) {
 # exec in bg
 function execInBackground($cmd) { 
 	
-	#print "cmd:[$cmd]";
+	print "cmd:[$cmd]";
 	if (substr(php_uname(), 0, 7) == "Windows"){ 
 		pclose(popen("start /B ". $cmd, "r"));  
 	} 
@@ -194,7 +194,11 @@ $footer_html = "<p>&nbsp;</p><p>&nbsp;</p></body></html>";
 $config_file = './inc/config.class.php';
 $has_installed = 0;
 $f = "GWA2-master.zip";
-$d = substr($f, 0, strlen($f)-4);
+$d = dirname(__FILE__); # substr($f, 0, strlen($f)-4);
+if(true){
+	$dArr = explode('/', $d);
+	$d = $dArr[count($dArr)-1];
+}
 
 if(!in_array($step, $steps)){ $step = ''; }
 
@@ -224,8 +228,8 @@ if($step == ''){
 		$out .= xForm($file.'&step=dolicense', array('hasagree'=>array('type'=>'checkbox', 'dispname'=>'我已阅读使用协议并同意')));
 	}
 	else{
-		$out .= "<br/>感谢选择 -GWA2 ! 在 ".$rtvdir."  已经安装有 -GWA2 . 重新安装将覆盖之前所有的程序和数据. 请先备份或者切换目 请先备份或者切换目录.";
-		$out .= xForm($file.'&step=dolicense', array('hasagree'=>array('type'=>'checkbox', 'dispname'=>'我已备份数据, 确认重新安装.')));
+		$out .= "<br/>感谢选择 -GWA2 ! 在 ".$rtvdir."  已经安装有 -GWA2 . 重新安装将覆盖之前所有的程序和数据. 请先备份或者切换目录.";
+		$out .= xForm($file.'&step=dolicense', array('hasagree'=>array('type'=>'checkbox', 'dispname'=>'我已备份数据, 确认重新安装')));
 	}
 }
 else if($step == 'dolicense'){
@@ -258,7 +262,8 @@ else if($step == 'env'){
 # part-2, main source
 else if($step == 'getsrc'){
 	# retrieve source
-	$testf = "$d/README.md";
+	$extractDir = str_replace('.zip', '', $f);
+	$testf = "$extractDir/README.md";
 
 	if($istep == ''){
 		$cmd = "rm -f ./$f; rm -rf ./$d";
@@ -273,16 +278,18 @@ else if($step == 'getsrc'){
 			$cmd = "unzip -u -o '$f'";
 			execInBackground($cmd);
 		}
-		if(!is_dir($d) || !is_file($testf)){
+		if(!is_dir($extractDir) || !is_file($testf)){
 			$out .= "<br/><br/>Srcfile not ready..., waiting ".date("H:i:s", time());
 			redirect($file."&step=getsrc&istep=waitdir", 6 , $header.$out.$footer);
 		}
 		else{
-			$cmd = "mv -fu $d/php/* ./";
+			$cmd = "mv -fu $extractDir/php/* ./";
+			execInBackground($cmd);
+			$cmd = "rsync -a -v --remove-source-files $extractDir/php/* ./";
 			execInBackground($cmd);
 
 			if(is_file($testf)){
-				$cmd = "rm -rf $d";
+				$cmd = "rm -rf $extractDir";
 				execInBackground($cmd);
 				$cmd = "rm -f $f";
 				execInBackground($cmd);
@@ -310,7 +317,8 @@ else if($step == 'getsrc'){
 else if($step == 'db'){
 	if($istep == ''){
 		# connect db
-		$out .= xForm($file."&step=db&istep=testdb", array('db_host'=>array('dispname'=>'数据库主机', 'type'=>'text', 'value'=>'localhost'),
+		$out .= xForm($file."&step=db&istep=testdb", array(
+			'db_host'=>array('dispname'=>'数据库主机', 'type'=>'text', 'value'=>'127.0.0.1'),
 			'db_port'=>array('dispname'=>'数据库端口', 'value'=>'3306'),
 			'db_name'=>array('dispname'=>'数据库名称'),
 			'db_user'=>array('dispname'=>'数据库访问用户名'),
@@ -325,7 +333,9 @@ else if($step == 'db'){
 			$dbhost=$_REQUEST['db_host']; $dbport=$_REQUEST['db_port']; $dbname=$_REQUEST['db_name']; 
 			$dbuser=$_REQUEST['db_user']; $dbpwd=$_REQUEST['db_pwd'];
 			$mysqlmode = function_exists('mysql_connect') ? 'mysql' : 'mysqli';
-			$link = ($mysqlmode == 'mysql') ? @mysql_connect($dbhost.":".$dbport, $dbuser, $dbpwd) : new mysqli($dbhost.":".$dbport, $dbuser, $dbpwd);
+			$link = ($mysqlmode == 'mysql') 
+				? @mysql_connect($dbhost.":".$dbport, $dbuser, $dbpwd) 
+				: new mysqli($dbhost.":".$dbport, $dbuser, $dbpwd);
 			$err = '';
 			if(!$link) {
 				$errno = ($mysqlmode == 'mysql') ? mysql_errno() : mysqli_errno();
@@ -341,12 +351,16 @@ else if($step == 'db'){
 				}
 			}
 			else{
-				if($query = (($mysqlmode == 'mysql') ? @mysql_query("SHOW TABLES FROM $dbname") : $link->query("SHOW TABLES FROM $dbname"))) {
+				if($query = (($mysqlmode == 'mysql') 
+					? @mysql_query("SHOW TABLES FROM $dbname") 
+					: $link->query("SHOW TABLES FROM $dbname"))) {
 					if(!$query){
 						$err = 'database_query_fail';
 					}
 					else{
-						while($row = (($mysqlmode == 'mysql') ? mysql_fetch_row($query) : $query->fetch_row())) {
+						while($row = (($mysqlmode == 'mysql') 
+							? mysql_fetch_row($query) 
+							: $query->fetch_row())) {
 							$out .= "<br/>".$row[0];	
 						}
 					}
@@ -357,7 +371,6 @@ else if($step == 'db'){
 				redirect($file."&step=db&istep=testdb", 10, $header.$out.$footer);
 			}
 			else{
-
 				replace_in_file($config_file, 'DB_HOST', $dbhost);
 				replace_in_file($config_file, 'DB_PORT', $dbport);
 				replace_in_file($config_file, 'DB_NAME', $dbname);
@@ -365,7 +378,8 @@ else if($step == 'db'){
 				replace_in_file($config_file, 'DB_PASSWORD', $dbpwd);
 
 				$out .= "<br/>MySQL 数据库功能正常, 继续进行下一步.";
-				$out .= xForm($file."&step=db&istep=createtable", array('tablepre'=>array('dispname'=>'数据表前缀', 'value'=>'gwa2')));
+				$out .= xForm($file."&step=db&istep=createtable", 
+					array('tablepre'=>array('dispname'=>'数据表前缀', 'value'=>'gwa2')));
 				#redirect($file."&step=db&istep=createtable", 10, $header.$out.$footer);
 			}
 		}
@@ -378,22 +392,26 @@ else if($step == 'db'){
 		#print $tblpre;
 		if($tblpre != '' && $tblpre != 'gwa2_'){
 			replace_in_file($config_file, 'TABLE_PRE', $tblpre);
-			replace_in_file('./gwa2-tables.sql', 'gwa2_', $tblpre);
+			#replace_in_file('./gwa2-tables.sql', 'gwa2_', $tblpre);
 			sleep(2);
 		}
  
  		$sql = 'use '.$_CONFIG['dbname'].''; #source '.$appdir.'/gwa2-tables.sql;';
 		$mysqlmode = function_exists('mysql_connect') ? 'mysql' : 'mysqli';
-		$link = ($mysqlmode == 'mysql') ? @mysql_connect($_CONFIG['dbhost'].":".$_CONFIG['dbport'], $_CONFIG['dbuser'], $_CONFIG['dbpassword']) : new mysqli($_CONFIG['dbhost'].":".$_CONFIG['dbport'], $_CONFIG['dbuser'], $_CONFIG['dbpassword']);
+		$link = ($mysqlmode == 'mysql') 
+			? @mysql_connect($_CONFIG['dbhost'].":".$_CONFIG['dbport'], $_CONFIG['dbuser'], $_CONFIG['dbpassword']) 
+			: new mysqli($_CONFIG['dbhost'].":".$_CONFIG['dbport'], $_CONFIG['dbuser'], $_CONFIG['dbpassword']);
 		$query = (($mysqlmode == 'mysql') ? @mysql_query($sql) : $link->query($sql));
 		
-		$sqlstr = file_get_contents("./gwa2-tables.sql");;
+		$sqlstr = ''; # file_get_contents("./gwa2-tables.sql");;
 		#print "<br/>sqlstr:[$sqlstr]";
 		$sqlarr = explode(';', $sqlstr);
 		foreach($sqlarr as $k=>$v){
 			$sql = $v;
-			$query = (($mysqlmode == 'mysql') ? @mysql_query($sql) : $link->query($sql));
-			#print "<br/>sql-".($i++).": ".$v." result:[$query]";	
+			if($sql != ''){
+				$query = (($mysqlmode == 'mysql') ? @mysql_query($sql) : $link->query($sql));
+				#print "<br/>sql-".($i++).": ".$v." result:[$query]";
+			}			
 		}
 		
 		$sql = 'show tables'; # from '.$_CONFIG['dbname'];
@@ -430,13 +448,15 @@ else if($step == 'init'){
  		$sql = 'use '.$_CONFIG['dbname'].''; #source '.$appdir.'/gwa2-tables.sql;';
 		$mysqlmode = function_exists('mysql_connect') ? 'mysql' : 'mysqli';
 		#print "<br/>mysqlmode:[$mysqlmode]";
-		$link = ($mysqlmode == 'mysql') ? @mysql_connect($_CONFIG['dbhost'].":".$_CONFIG['dbport'], $_CONFIG['dbuser'], $_CONFIG['dbpassword']) : new mysqli($_CONFIG['dbhost'].":".$_CONFIG['dbport'], $_CONFIG['dbuser'], $_CONFIG['dbpassword']);
+		$link = ($mysqlmode == 'mysql') 
+			? @mysql_connect($_CONFIG['dbhost'].":".$_CONFIG['dbport'], $_CONFIG['dbuser'], $_CONFIG['dbpassword']) 
+			: new mysqli($_CONFIG['dbhost'].":".$_CONFIG['dbport'], $_CONFIG['dbuser'], $_CONFIG['dbpassword']);
 		$query = (($mysqlmode == 'mysql') ? @mysql_query($sql) : $link->query($sql));
-
-		$sql = "insert into ".$_CONFIG['usertbl']." set email='".trim($_REQUEST['rootemail'])."', password='".sha1(trim($_REQUEST['rootpwd']))."', inserttime=NOW(), branchoffice=''";
-		#print $sql;
-		$query = (($mysqlmode == 'mysql') ? @mysql_query($sql) : $link->query($sql));
-		
+		if(false){
+			$sql = "insert into ".$_CONFIG['usertbl']." set email='".trim($_REQUEST['rootemail'])."', password='".sha1(trim($_REQUEST['rootpwd']))."', inserttime=NOW(), branchoffice=''";
+			#print $sql;
+			$query = (($mysqlmode == 'mysql') ? @mysql_query($sql) : $link->query($sql));
+		}
 		$out .= "<br/>Settings have been saved. ";
 
 		$out .= xForm($file."&step=finalize", null);
@@ -452,14 +472,15 @@ else if($step == 'init'){
 # part-5, finilized and enter
 else if($step == 'finalize'){
 	# clearance
+	$extractDir = str_replace('.zip', '', $f);
 	if($istep == ''){
 		$cmd = "rm -f ./$f";
 		execInBackground($cmd);
-		$cmd = "rm -rf ./$d";
+		$cmd = "rm -rf ./$extractDir";
 		execInBackground($cmd);
 		
 		$rd = rand(1000, 9999999);
-		$cmd = "mv ./".$_SERVER['PHP_SELF']." ./".$_SERVER['PHP_SELF'].".$rd.php";
+		$cmd = "mv ./install.php ./install.$rd.php";
 		#print $cmd;
 		execInBackground($cmd);
 		
