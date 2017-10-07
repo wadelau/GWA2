@@ -141,4 +141,7 @@ view/default/signin.html
 ###4. Define routing, 在入口定义路由
 /index.php?mod=user&act=xxxx
 
-#
+
+# Install
+
+Please put all files under a sub directory and init from the script ./install.php
