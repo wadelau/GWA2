@@ -143,7 +143,7 @@ function dir_writeable($dir) {
 # exec in bg
 function execInBackground($cmd) { 
 	
-	print "cmd:[$cmd]";
+	#print "cmd:[$cmd]";
 	if (substr(php_uname(), 0, 7) == "Windows"){ 
 		pclose(popen("start /B ". $cmd, "r"));  
 	} 
