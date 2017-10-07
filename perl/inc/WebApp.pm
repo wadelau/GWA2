@@ -137,6 +137,9 @@ sub getBy($ $ $) { # $fields, $conditions, $withCache
 		$conditions = pop @_;
 		$fields = pop @_;
 	}
+	else{
+		print "\t\tinc::WebApp::getBy: need parameters >= 3. 201709231051.";
+	}
 	# withCache @todo
 	# read from db
 	if(!($fields=~/:/)){
@@ -233,7 +236,7 @@ sub setBy($ $){ # $$ # $fields, $conditions
 		print "\t\tinc::WebApp: setBy: sql:[$sql]\n";
 		if($issqlready == 1){
 			if($idval ne ''){ $hmf{'pagesize'} = 1; }	
-			my $result = (); # @todo $dba->update($sql, \%hmf);
+			my $result = $dba->update($sql, \%hmf);
 			%result = %{$result};
 		}
 	}	
@@ -255,7 +258,10 @@ sub execBy($ $ $){ # $sql, $conditions, $withCache
 	my $self = $_[0]; # ?
 	my $argc = scalar @_;
 	my ($withCache, $conditions, $sql) = (0, '', ''); # pop @_;
-	if($argc == 3){
+	if($argc == 2){
+		$sql = pop @_;
+	}
+	elsif($argc == 3){
 		$conditions = pop @_;
 		$sql = pop @_;
 	}
