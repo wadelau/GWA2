@@ -36,6 +36,7 @@ class WebApp implements WebAppInterface{
 	const GWA2_ERR = 'gwa2_error_TAG';
 	const GWA2_ID = 'gwa2_id_TAG';
 	const GWA2_TBL = 'gwa2_tbl_TAG';
+	const Read_Object_Timeout = 300; # 5 * 60 seconds
 	var $ssl_verify_ignore = false;
 	var $http_enable_gzip = false;
 	var $GWA2_Runtime_Env_List = null;
@@ -551,7 +552,8 @@ class WebApp implements WebAppInterface{
 					'http'=>array(
 						'method'=>'POST',
 						'header'=>$header,
-						'content'=> $paraStr
+						'content'=> $paraStr,
+						'timeout' => self::Read_Object_Timeout,
 						)
 					); # $args: 'method', 'header', 'content'...
 				if($this->ssl_verify_ignore){
@@ -607,6 +609,7 @@ class WebApp implements WebAppInterface{
                         'http'=>array(
 							'method'=>'GET',
 							'header'=>$header,
+							'timeout' => self::Read_Object_Timeout,
                         )
                     ); # $args: 'method', 'header', 'content'...
 				if($this->ssl_verify_ignore){
