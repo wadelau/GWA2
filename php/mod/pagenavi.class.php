@@ -364,6 +364,13 @@ class PageNavi extends WebApp{
             $tmpval = $varr2[2];
             $tmpval = "(".$this->addQuote($tmpval).")";
        }
+       # remedy for tablename.fieldname, Tue Nov 28 22:25:17 CST 2017
+       # e.g. pnskstate=1&pnskunion=in::tbl:unioninfo.unionname:allowx=1&pnsm=1&oppnskunion=in
+       if(inString('.', $varr[1])){
+           $varr3 = explode('.', $varr[1]);
+           $varr[1] = $varr3[0];
+           $field = $varr3[1];
+       }
        $condition .= "select $field from ".$varr[1]." where ".$varr2[0]." ".$tmpop." ".$tmpval." order by id desc";
        return $condition;
    }
