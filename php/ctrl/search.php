@@ -47,13 +47,11 @@ if($act == 'do'){
 		$user2->set('pagesize', $pagesize);
 		$hm = $user2->getBy('*', "usertype=1 and id in (".getIdList($data['searchlist'], 'id').")");
 		$hm = $hm[0]?$hm[1]:array();
-			//获取粉丝数
-			foreach($hm as $key => $value)
-			{
-				$hm[$key]['fanscount'] = $user2 ->getFansCount($value['id']);
-				//获取的买家与当前用户的关系
-				$hm[$key]['relation'] = $objfollow ->getRelationWithCurrent($value['id']);
-			}
+		
+		foreach($hm as $key => $value){
+			$hm[$key]['fanscount'] = $user2 ->getFansCount($value['id']);
+			$hm[$key]['relation'] = $objfollow ->getRelationWithCurrent($value['id']);
+		}
 		$data['userlist'] = $hm;
 		//var_dump($data['userlist']);
 		/*
@@ -73,14 +71,11 @@ if($act == 'do'){
 		}
 		$data['productlist'] = $hmTmp;
 
-		if($kw == '')
-		{
+		if($kw == ''){
 			$user2->set('orderby','id desc'); $user2->set('pagesize', $pagesize);
 			$hm = $user2->getBy('*', "usertype=1 and id in ($userIds)");
 			$hm = $hm[0]?$hm[1]:array();
-			//获取粉丝数
-			foreach($hm as $key => $value)
-			{
+			foreach($hm as $key => $value){
 				$hm[$key]['fanscount'] = $user2 ->getFansCount($value['id']);
 				$hm[$key]['relation'] = $objfollow ->getRelationWithCurrent($value['id']);
 			}
@@ -106,13 +101,14 @@ if($act == 'do'){
 		$adplace = 'live_search_upper';
 		include_once("include/ads.php");
 
-
 		# tpl 
 		if($kw == ''){ 
 			include("include/area.php");
 			$smttpl = 'zb-faxianmaishou.html'; 
 		}		
-		else{ $smttpl = 'zb-search.html'; }
+		else{ 
+		    $smttpl = 'zb-search.html'; 
+		}
 	}
 	else if($scope == 'product'){
 			

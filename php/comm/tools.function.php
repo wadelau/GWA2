@@ -5,17 +5,6 @@
 # update 09:56 Tuesday, November 24, 2015
 #
 
-/* get Smarty template file name
-   wadelau, Wed Feb 15 09:18:27 CST 2012
-   */
-function getSmtTpl($file, $act){
-    $scriptname = explode("/",$file);
-    $scriptname = $scriptname[count($scriptname)-1];
-    $scriptname = explode(".",$scriptname);
-    $scriptname = $scriptname[0];
-    return $smttpl = $scriptname.'_'.($act==''?'main':$act).'.html';
-}
-
 /**
  * Send a POST requst using cURL, refer to http://www.php.net/manual/en/function.curl-exec.php
  * @param string $url to request
@@ -27,16 +16,19 @@ function getSmtTpl($file, $act){
  */
 function curlPost($url, array $post = NULL, array $options = array()){
     $defaults = array(
-            CURLOPT_POST => 1,
-            CURLOPT_HEADER => 0,
-            CURLOPT_URL => $url,
-            CURLOPT_FRESH_CONNECT => 1,
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_FORBID_REUSE => 1,
-            CURLOPT_TIMEOUT => 4,
-            CURLOPT_POSTFIELDS => http_build_query($post)
-            );
-
+		CURLOPT_POST => 1,
+		CURLOPT_HEADER => 0,
+		CURLOPT_URL => $url,
+		CURLOPT_FRESH_CONNECT => 1,
+		CURLOPT_RETURNTRANSFER => 1,
+		CURLOPT_FORBID_REUSE => 1,
+		CURLOPT_TIMEOUT => 4,
+		CURLOPT_POSTFIELDS => http_build_query($post)
+		);
+	if($_CONFIG['ssl_verify_ignore']){
+		$defaults[CURLOPT_SSL_VERIFYHOST] = 0;
+		$defaults[CURLOPT_SSL_VERIFYPEER] = 0;
+	}
     $ch = curl_init();
     curl_setopt_array($ch, ($options + $defaults));
     if( ! $result = curl_exec($ch))
@@ -48,7 +40,7 @@ function curlPost($url, array $post = NULL, array $options = array()){
 }
 
 /**
- * send mail by system built-in sendmail commands
+ * send mail by system built-in sendmail commands or extra mailer.class
  * @para string $to, receiver's email address
  * @para string $subject, email's subject
  * @para string $body, message body
@@ -79,12 +71,13 @@ function sendMail($to,$subject,$body, $from='', $local=0){
         include($_CONFIG['appdir']."/mod/mailer.class.php");
 
         $_CONFIG['mail_smtp_server'] = "smtp.163.com";
-        $_CONFIG['mail_smtp_username'] = "wadelau@163.com";
-        $_CONFIG['mail_smtp_password'] = "my.minina.123456";
+        $_CONFIG['mail_smtp_username'] = "";
+        $_CONFIG['mail_smtp_password'] = "";
         $_CONFIG['isauth'] = true;
         $_CONFIG['mail_smtp_fromuser'] = $_CONFIG['mail_smtp_username'];
 
-        $mail = new Mailer($_CONFIG['mail_smtp_server'],25,$_CONFIG['isauth'],$_CONFIG['mail_smtp_username'],$_CONFIG['mail_smtp_password']);
+        $mail = new Mailer($_CONFIG['mail_smtp_server'],25,$_CONFIG['isauth'],$_CONFIG['mail_smtp_username'],
+                $_CONFIG['mail_smtp_password']);
 
         $mail->debug = true;;
         $from==''?'bangco@'.$_CONFIG['agentname']:$from;
@@ -93,7 +86,6 @@ function sendMail($to,$subject,$body, $from='', $local=0){
         }
 
         #print __FILE__.": from:$from";
-        
         $rtnarr[0] = $mail->sendMail($to, $from, $subject, $body, 'HTML');
 
     }
@@ -101,14 +93,13 @@ function sendMail($to,$subject,$body, $from='', $local=0){
     return $rtnarr;
 }
 
-function startsWith($haystack, $needle)
-{
+//- string utils
+function startsWith($haystack, $needle){
     $length = strlen($needle);
     return (substr($haystack, 0, $length) === $needle);
 }
 
-function endsWith($haystack, $needle)
-{
+function endsWith($haystack, $needle){
     $length = strlen($needle);
     $start  = $length * -1; //negative
     return (substr($haystack, $start) === $needle);
@@ -122,6 +113,25 @@ function inList($needle, $haystack){
 function inString($needle, $haystack){
     $pos = stripos($haystack, $needle);
     return ($pos === false ? false : true);
+}
+
+function substr_unicode($str, $s, $l = null) {
+	return join("", array_slice(preg_split("//u", $str, -1, PREG_SPLIT_NO_EMPTY), $s, $l));
+}
+
+function shortenStr($str, $len = 0) {
+    $newstr = '';
+    if ($len == 0) {
+        $len = 10;
+    }
+    if(strlen($str) <= $len){
+        $newstr = $str;
+    }
+    else{
+        $newstr = substr_unicode ( $str, 0, $len );
+    }
+    $str = null;
+    return $newstr;
 }
 
 function mkUrl($file, $_REQU){
@@ -147,30 +157,26 @@ function mkUrl($file, $_REQU){
 
 }
 
-function substr_unicode($str, $s, $l = null) {
-    return join("", array_slice(preg_split("//u", $str, -1, PREG_SPLIT_NO_EMPTY), $s, $l));
-}
-
-function shortenStr($str, $len=0){
-    $newstr = '';
-    if($len == 0){
-        $len = 10;
-    }
-    $newstr = substr_unicode($str, 0, $len);
-
-    return $newstr;
-
-}
-
-function base62x($s,$dec=0,$numType=''){
+function base62x($s, $dec=0, $numType=null){
     # e.g. base62x('abcd', 0, '8');
     # e.g. base62x('abcd', 1, '16');
     $type = "-enc";
     if($dec == 1){
         $type = "-dec";
     }
-    return $s=exec('/www/webroot/tools/base62x '.$type.($numType==''?'':' -n '.$numType).' \''.$s.'\'');
+    $s2 = '';
+    require_once($_CONFIG['appdir']."/mod/base62x.class.php");
+    if($type == "-enc"){
+        $s2 = Base62x::encode($s, $numType);
+    }
+    else{
+        $s2 = Base62x::decode($s, $numType);
+    }
+    return $s2;
 }
+
+
+//--- page navigator utils
 
 /**
  *	alert
@@ -232,15 +238,17 @@ function redirect($url, $time=0, $msg='') {
     //multi URL addr support ?
     $url = str_replace(array("\n", "\r"), '', $url);
 	if(!inString('://', $url)){ # relative to absolute path
-		$url = "//".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].$url;
+	    if($_SERVER['SERVER_NAME'] != '' && $_SERVER['SERVER_NAME'] != '_'){ # case of nginx
+	        $url = "//".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].$url;
+	    }
 	}
 	if($time < 10){ $time = $time * 1000; } # in case of milliseconds
 	$hideMsg = "<!DOCTYPE html><html><head>";
-	$hideMsg .= "<meta http-equiv=\"refresh\" content=\"{$time};URL='{$url}'\">";
+	$hideMsg .= "<meta http-equiv=\"refresh\" content=\"".($time/1000).";url='$url'\">";
 	$hideMsg .= "</head><body>";  # remedy Mon Nov 23 22:03:24 CST 2015
     if (empty($msg)){
         #$msg = "系统将在{$time}秒之后自动跳转到{$url}！";
-		$hideMsg = $hideMsg." <a href=\"".$url."\">系统将在{$time}秒之后自动跳转</a> <!-- {$url}！--> ...";
+		$hideMsg = $hideMsg." <a href=\"".$url."\">系统将在{$time}秒之后自动跳转</a> ...";
 	}
 	else{
 		$hideMsg = $hideMsg . $msg;
@@ -250,7 +258,7 @@ function redirect($url, $time=0, $msg='') {
     if (!headers_sent()) {
         // redirect
         if (0 === $time) {
-            header("Location: " . $url);
+            header("Location: " . $url, true, 302);
 			print $hideMsg;
         }
         else {
@@ -269,7 +277,7 @@ function isImg($file){
 	$isimg = 0;
 	if($file != ''){
 		$tmpfileext = substr($file, strlen($file)-4);
-		if(in_array($tmpfileext,array("jpeg",".jpg",".png",".gif",".bmp"))){
+		if(in_array(strtolower($tmpfileext),array("jpeg",".jpg",".png",".gif",".bmp"))){
 			$isimg = 1;
 		}
 	}
@@ -289,7 +297,7 @@ function isEmail($email){
 # get Ids list from array|hash
 # by wadelau@ufqi.com, Sat Jul 11 09:21:13 CST 2015
 function getIdList($iarray, $ikey){
-	$tmpIds = "999999,";
+	$tmpIds = "99999999,";
 
 	foreach($iarray as $k=>$v){
 		$tmpIds .= $v[$ikey].",";
@@ -362,41 +370,7 @@ function debug($obj, $tag='', $output=null){
 	
 }
 
-//- client ip read
-function getIp() {
-	
-	$ip = '';
-	
-	if (@$_SERVER["REMOTE_ADDR"]){ $ip = $_SERVER["REMOTE_ADDR"]; }
-	else if (@$_SERVER["HTTP_X_FORWARDED_FOR"]){ $ip = $_SERVER["HTTP_X_FORWARDED_FOR"]; }
-	else if (@$_SERVER["HTTP_CLIENT_IP"]){ $ip = $_SERVER["HTTP_CLIENT_IP"]; }
-	else if (@getenv( "HTTP_X_FORWARDED_FOR" )){ $ip = getenv( "HTTP_X_FORWARDED_FOR" ); }
-	else if (@getenv( "HTTP_CLIENT_IP" )){ $ip = getenv( "HTTP_CLIENT_IP" ); }
-	else if (@getenv( "REMOTE_ADDR" )){ $ip = getenv( "REMOTE_ADDR" ); }
-	else{ $ip = "Unknown";}
 
-	if (($ip == "Unknown" or $ip == "127.0.0.1"
-			or strpos( $ip, "172.31." ) === 0)
-		and @$_SERVER["HTTP_X_REAL_IP"]){
-		
-		$ip = $_SERVER["HTTP_X_REAL_IP"];
-	}
-	if (($ip == "Unknown" or $ip == "127.0.0.1" or strpos( $ip, "172.31." ) === 0)
-			and @$_SERVER["HTTP_X_FORWARDED_FOR"]) {
-		
-		$ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
-		if (($tmppos=strrpos($ip," "))>0){
-			$ip=substr($ip,$tmppos+1);
-		}
-		if (($tmppos=strrpos($ip,","))>0){
-			$ip=substr($ip,$tmppos+1);
-		}
-	}
-	
-	return $ip;
-	
- }
- 
  // Wht: Web and/or HTTP Tools
  // get/set data from input and/or out and filter as expected
  // added by wadelau@ufqi.com
@@ -421,10 +395,10 @@ function getIp() {
  			$rtn = serialize ( $src );
  		}
  		else {
- 			$rtn = $src [$k];
+ 			$rtn = trim($src[$k]);
  		}
  
- 		if (! $rtn && $defaultValue != null) {
+ 		if (!$rtn && $defaultValue != null) {
  			$rtn = $defaultValue;
  		}
  
@@ -438,7 +412,6 @@ function getIp() {
  	# set output to dest
  	public static function set($dest, $k, $v) {
  		// dest=setHeader, setStatus, setCookie ...
- 
  		self::$hmt['set'][$dest] = array($k, $v);
  
  	}
@@ -465,7 +438,58 @@ function getIp() {
  		}
  
  	}
+	
+	//- client ip read
+	public static function getIp() {
+	
+		$ip = '';
+		
+		if (@$_SERVER["REMOTE_ADDR"]){ $ip = $_SERVER["REMOTE_ADDR"]; }
+		else if (@$_SERVER["HTTP_X_FORWARDED_FOR"]){ $ip = $_SERVER["HTTP_X_FORWARDED_FOR"]; }
+		else if (@$_SERVER["HTTP_CLIENT_IP"]){ $ip = $_SERVER["HTTP_CLIENT_IP"]; }
+		else if (@getenv( "HTTP_X_FORWARDED_FOR" )){ $ip = getenv( "HTTP_X_FORWARDED_FOR" ); }
+		else if (@getenv( "HTTP_CLIENT_IP" )){ $ip = getenv( "HTTP_CLIENT_IP" ); }
+		else if (@getenv( "REMOTE_ADDR" )){ $ip = getenv( "REMOTE_ADDR" ); }
+		else{ $ip = "Unknown";}
+
+		if (($ip == "Unknown" or $ip == "127.0.0.1"
+		        or strpos( $ip, "192.168." ) === 0
+		        or strpos( $ip, "172.31." ) === 0
+		        or strpos( $ip, "10." ) === 0)
+			and @$_SERVER["HTTP_X_REAL_IP"]){
+			
+			$ip = $_SERVER["HTTP_X_REAL_IP"];
+		}
+		if (($ip == "Unknown" or $ip == "127.0.0.1" 
+		        or strpos( $ip, "192.168." ) === 0
+		        or strpos( $ip, "172.31." ) === 0
+		        or strpos( $ip, "10." ) === 0)
+				and @$_SERVER["HTTP_X_FORWARDED_FOR"]) {
+			
+			$ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
+			if (($tmppos=strrpos($ip," "))>0){
+				$ip=substr($ip,$tmppos+1);
+			}
+			if (($tmppos=strrpos($ip,","))>0){
+				$ip=substr($ip,$tmppos+1);
+			}
+		}
+		
+		return $ip;
+		
+	 }
  
+ }
+ 
+ /* get Smarty template file name
+  wadelau, Wed Feb 15 09:18:27 CST 2012
+  */
+ function getSmtTpl($file, $act){
+ 	$scriptname = explode("/",$file);
+ 	$scriptname = $scriptname[count($scriptname)-1];
+ 	$scriptname = explode(".",$scriptname);
+ 	$scriptname = $scriptname[0];
+ 	return $smttpl = $scriptname.'_'.($act==''?'main':$act).'.html';
  }
  
  

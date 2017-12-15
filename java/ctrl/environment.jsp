@@ -51,7 +51,15 @@ if(true){
 	}
 }
 
+//- list class loader
+if(true){
+	ClassLoader loaderx = Wht.class.getClassLoader(); 
+	while (loaderx != null) { 
+		outx.append("\nclassloader: "+loaderx.toString()+"\n"); 
+		loaderx = loaderx.getParent(); 
+	}
 
+}
 
 
 %><%@include file="./ctrlfooter.inc.jsp"%><%

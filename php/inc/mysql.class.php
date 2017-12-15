@@ -44,13 +44,13 @@ class MYSQL {
 		if ($this->m_link==0){
 			$real_host = $this->m_host.":".$this->m_port;
 			$this->m_link = mysql_connect($real_host,$this->m_user,$this->m_password) 
-				or die($this->sayErr("mysql connect")); 
+				or die($this->sayErr("mysql connect failed.")); 
 			
 			if("" != $this->m_name){
 				mysql_select_db($this->m_name, $this->m_link) or die($this->sayErr("use ".$this->m_name));
 			}
 			
-			if(Gconf::get('db_enable_utf8_affirm')){
+			if(GConf::get('db_enable_utf8_affirm')){
 				$this->query("SET NAMES 'utf8'", null, null);
 			}
 		}
@@ -65,8 +65,12 @@ class MYSQL {
 			$this->_initConnection();
 		}
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
-		$result = mysql_query($sql,$this->m_link) or $this->sayErr($sql); 
-		
+		try {
+		  $result = mysql_query($sql,$this->m_link) or $this->sayErr($sql); 
+		}
+		catch(Exception $e){
+		    debug(__FILE__.": $sql, exec failed. ".$e->getMessage());
+		}
 		if($result){
 			$hm[0] = true;
 			$hm[1] = $result;
@@ -170,8 +174,8 @@ class MYSQL {
 	function _enSafe($sql,$idxarr,$hmvars){
 		
 		$sql = $origSql = trim($sql);
-		if($hmvars[Gconf::get('no_sql_check')]){
-			$hmvars[Gconf::get('no_sql_check')] = false; # valid only once
+		if($hmvars[GConf::get('no_sql_check')]){
+			$hmvars[GConf::get('no_sql_check')] = false; # valid only once
 			return $origSql;
 		}
 		else{
@@ -378,13 +382,16 @@ class MYSQL {
 			$str .= "<font color=red>sayError information : </font><br>&nbsp;&nbsp;".$this->getError();
 		}
 		else{
-			$str .= "<div id=\"sayErrdiv_201210131751\" style=\"color:red;z-index:99;position:absolute\">Found internal Error when process your transaction..., please report this to wadelau@gmail.com . [2007211253]</div>\n";
-			error_log(__FILE__.": MYSQL_sayErrOR: sayErr_no:[".$this->getErrno()."] sayErr_info:[".$this->getError()."] sayErr_sql:[".serialize($sql)."] [07211253]");
+			$str .= "<div id=\"sayErrdiv_201210131751\" style=\"color:red;z-index:99;position:absolute\">
+				Found internal Error when process your transaction..., please report this to wadelau@gmail.com . [2007211253]</div>\n";
+			error_log(__FILE__.": MYSQL_sayErrOR: sayErr_no:[".$this->getErrno()."] sayErr_info:[".$this->getError()
+				."] sayErr_sql:[".serialize($sql)."] [07211253]");
 		}
 		debug($sql);
-		$html = GConf::get('html_resp'); $html = str_replace("RESP_TITLE","sayError!", $html); $html = str_replace("RESP_BODY", $str, $html);
+		$html = GConf::get('html_resp'); $html = str_replace("RESP_TITLE","sayError!", $html); 
+		$html = str_replace("RESP_BODY", $str, $html);
 		print $html;
-		exit(1);
+		#exit(1);
 		
 	} 
 	

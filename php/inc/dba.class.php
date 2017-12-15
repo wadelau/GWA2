@@ -6,8 +6,6 @@
  * Thu Sep 11 16:34:20 CST 2014
  */
 
-ini_set("memory_limit","256M");
-
 require(__ROOT__."/inc/conn.class.php");
 include(__ROOT__."/inc/mysql.class.php");
 include(__ROOT__."/inc/mysqlix.class.php");
@@ -19,6 +17,7 @@ class DBA {
 	
 	var $conf = null; 
 	var $dbconn = null;
+	var $sql_operator_list = array(); # first chars of ansi sql operators
 
 	//-construct
 	function __construct($dbconf=null){
@@ -27,9 +26,11 @@ class DBA {
 		//-
 		$this->conf = new $dbconf; //- need to be changed to Config_zoneli when sync to product enviro.
 		#$this->dbconn = new MySQLDB($this->conf);
-		$dbDriver = Gconf::get('dbdriver');
+		$dbDriver = GConf::get('dbdriver');
 		$this->dbconn = new $dbDriver($this->conf);
-			
+		$this->sql_operator_list = array(' '=>1,'^'=>1,'~'=>1,':'=>1,'!'=>1,'/'=>1,
+				'*'=>1,'&'=>1,'%'=>1,'+'=>1,'='=>1,'|'=>1,
+				'>'=>1,'<'=>1,'-'=>1,'('=>1,')'=>1,','=>1);
 	}	
 
 	/* 
@@ -62,26 +63,22 @@ class DBA {
 		$idxarr = $this->hm2idxArray($sql,$hmvars);
     	#print_r($idxarr);
 		$haslimit1 = 0;
-		if(strpos($sql,"limit 1 ") != false ||(array_key_exists('pagesize',$hmvars) && $hmvars['pagesize'] == 1))
-		{
-			$result = $this->dbconn->readSingle($sql, $hmvars,$idxarr); # why need this?
+		if((array_key_exists('pagesize',$hmvars) && $hmvars['pagesize'] == 1) || strpos($sql,"limit 1 ") != false){
+			$result = $this->dbconn->readSingle($sql, $hmvars,$idxarr); # why need this? @todo need to be removed.
 			$haslimit1 = 1;
 		}
-		else
-		{
+		else{
 			$result = $this->dbconn->readBatch($sql, $hmvars,$idxarr);
 		}
-		if($result[0])
-		{
+		if($result[0]){
 			$hm[0] = true;
 			$hm[1] = $result[1]; # single-dimension or double-dimension array
 		}
-		else
-		{
+		else{
 			$hm[0] = false;
 			$hm[1] = $result[1];
 		}
-    	#print_r($hmvars);
+    	#debug(__FILE__.": vars in dba::select: ".debug($hmvars));
 		#error_log(__FILE__.": select sql:[".$sql."] result:[".$hm[0]."]");
 		return $hm;
 	}
@@ -89,94 +86,83 @@ class DBA {
 	# added on Sun Jul 17 22:19:15 UTC 2011 by wadelau@gmail.com
 	# sort the parameter in order
 	# return sorted array 
-	function hm2idxArray($sql, $hmvars)
-	{
+	function hm2idxArray($sql, $hmvars){
 		$idxarr = array();
 		$tmparr = array();
 		$tmpposarr = array();
         $wherepos = strpos($sql, " where ");
         $selectpos = strpos($sql, "select ");
+		$sqloplist = $this->sql_operator_list;
         #print_r($hmvars);
 		if(is_array($hmvars)){
 			foreach($hmvars as $k => $v){
-				$hasK = strpos($sql, $k."="); 
-				if($hasK === false){ $hasK = strpos($sql, $k." "); }
-				if($hasK !== false ){
-					$spacek = " ".$k;
-					$sql = str_replace("(".$k, "(".$spacek, $sql);
-					$sql = str_replace(",".$k, ",".$spacek, $sql);
-					$kpos = strpos($sql,$spacek."=");
-					$kpos = $kpos === false ? strpos($sql,$spacek." ") : $kpos;
-					if($kpos !== false)
-					{
-			   			if($selectpos !== false && $kpos > $wherepos){
-							$tmparr[$kpos] = $k;	# in case "select a, b, c where a = ?"; # by wadelau on Sat Nov  3 20:35:46 CST 2012
-							$tmpposarr[$k] = 2;
-			   			}
-						else if($selectpos === false){
-							$tmparr[$kpos] = $k;	# in case "select a, b, c where a = ?"; # by wadelau on Sat Nov  3 20:35:46 CST 2012
-							$tmpposarr[$k] = 2;
-			   			} 
-
-						#$tmparr[$kpos] = $k;	
-						#$tmpposarr[$k] = 2;
-						$nextpos = strpos($sql,$spacek."=",$kpos+1);
-			  			$nextpos = $nextpos === false ? strpos($sql,$spacek." ",$kpos+1) : $nextpos;
-
-						while($nextpos !== false){
-							
-							$tmparr[$nextpos] = $k.(count($tmpposarr)>0?".".$tmpposarr[$k]:""); 
-							/* 
-							 *  Attention: 
-							 *      one field matches more than two values, 
-							 *      name it as "field.2","field.3", "field.N", etc, as hash key
-							 *  e.g. in sql: "... where age > ? and age < ? and gender=? ", settings go like:
-							 *      $Obj->set('age', 20);
-							 *      $obj->set('age.2', 30); # for the second match of 'age'
-							 *  Sun Jul 24 21:18:00 UTC 2011
-							 *  !!!Need space before > or < in this case, Thu Sep 11 16:29:03 CST 2014
-							 */
-							$nextpos = strpos($sql,$spacek,$nextpos+1);
-							$tmpiposarr[$k]++;
-						}
-					}
-					else
-					{
-						#print "<br/>/inc/class.dba.php:  hm2idxArray NOT exist k:[".$k."] sql:[".$sql."] ";
-						#print_r($tmparr); 
-					}
-				}
-				else{
-					#error_log(__FILE__.": not found k:[$k] v:[$v] in sql:[$sql]");	
-				}
-			}
+		        if($k == ''){
+		            #debug(__FILE__.": found n/a k:[$k], skip.");
+		            continue;
+		        }
+		        $keyLen = strlen($k);
+		        $keyPos = strpos($sql, $k);
+		        if($keyPos !== false){
+		            while($keyPos !== false){
+        		        $preK = substr($sql, $keyPos-1, 1);
+        		        $aftK = substr($sql, $keyPos+$keyLen, 1);
+        		        #debug(__FILE__.": sql:[$sql] k:[$k] pos:[$keyPos] prek:[$preK] aftk:[$aftK]");
+        		        if(isset($sqloplist[$preK]) && isset($sqloplist[$aftK])){
+        		            if($selectpos !== false){
+        		                if($keyPos > $wherepos){
+        		                    $tmparr[$keyPos] = $k;
+        		                }
+        		                else{
+        		                    # select fields
+        		                }
+        		            }
+        		            else{
+        		                $tmparr[$keyPos] = $k;
+        		            }
+        		        }
+        		        else{
+        		            #debug(__FILE__.": found illegal key preset. k:[$k] pos:[$keyPos] 
+        		            #        prek:[$preK] aftk:[$aftK]");
+        		        }
+        		        $keyPos = strpos($sql, $k, $keyPos+$keyLen);
+		            }
+		        }
+		        else{
+		            #debug(__FILE__.": no such key:[$k] in sql:[$sql]");
+		        }
+		    }
 		}
 		else{
 			error_log(__FILE__.": illegal array found with hmvars.");				
 		}
-		$sqllen = strlen($sql);
+		$sqlLen = strlen($sql);
 		$tmpi = 0;
-		for($i=0;$i<$sqllen;$i++){
-			if(array_key_exists($i,$tmparr))
-			{
-				$idxarr[$tmpi] = $tmparr[$i];
-				$tmpi++;
-			}
-			else
-			{
-				#print "<br/>/inc/class.dba.php: hm2idxArray NOT exist i:[".$i."]";
-			}
+		$kSerial = array();
+		for($i=0;$i<$sqlLen;$i++){
+		    if(array_key_exists($i, $tmparr)){
+		        $k = $tmparr[$i];
+		        $ki = isset($kSerial[$k]) ? $kSerial[$k] : ''; 
+		        $idxarr[$tmpi] = $tmparr[$i].($ki=='' ? '' : '.'.($ki+1));
+		        $tmpi++;
+		        $kSerial[$k]++;
+		    }
+		    else{
+		        # @todo;
+		    }
 		}
-		#print_r($idxarr);
 		return $idxarr;
 	}
 
-	function showDb()
-	{
+	//-
+	function showDb(){
 		$this->dbconn->showConf();
-
 	}
 
+	//-
+	function close(){
+	    # @todo, long conn?
+	    return true;
+	}
 }
 
 ?>

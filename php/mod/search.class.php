@@ -21,8 +21,8 @@ class Search extends WebApp{
 
 	//-
 	function __construct(){
-		$this->dba = new DBA();
-		# no tables set 
+		
+		parent::__construct();
 		
 	}
 
@@ -44,7 +44,7 @@ class Search extends WebApp{
 					$sql .= "$k2 as $v2,"; 		
 				}
 			}
-			$sql = substr($sql, 0, strlen($sql)-1)." from ".Gconf::get('tblpre').$k." ";
+			$sql = substr($sql, 0, strlen($sql)-1)." from ".GConf::get('tblpre').$k." ";
 			$sql .= "where ".$v['searchkey']." like '%$kw%' ";
 			$sql .= "union all ";
 		}

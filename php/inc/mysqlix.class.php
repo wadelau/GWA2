@@ -16,7 +16,8 @@ class MYSQLIX {
 	var $m_user; 
 	var $m_password; 
 	var $m_name; 
-	var $m_link; 
+	var $m_link;
+	var $m_sock;
 	var $isdebug = 0; # debug mode
 
 	# 
@@ -26,23 +27,27 @@ class MYSQLIX {
 		$this->m_port     = $config->mDbPort; 
 		$this->m_user     = $config->mDbUser; 
 		$this->m_password = $config->mDbPassword; 
-		$this->m_name     = $config->mDbDatabase; 
+		$this->m_name     = $config->mDbDatabase;
+		$this->m_sock     = $config->mDbSock;
 		$this->m_link = null;
 		
 	} 
 
 	//-
-	function _initConnection(){
+	private function _initConnection(){
 		
 		if (!is_object($this->m_link)){
-			$real_host = $this->m_host.":".$this->m_port;
-			$this->m_link = new mysqli($this->m_host, $this->m_user, 
-				$this->m_password, $this->m_name, $this->m_port);
+		    $this->m_link = new mysqli($this->m_host, $this->m_user, 
+				$this->m_password, $this->m_name, $this->m_port, $this->m_sock);
 			
-			if(Gconf::get('db_enable_utf8_affirm')){
+			if(GConf::get('db_enable_utf8_affirm')){
 				$this->query("SET NAMES 'utf8'", null, null);
 			}
-			
+		}
+		if($this->m_link->connect_errno > 0){
+				print "Database connection error. 201710071225.";
+				debug($this->m_link);
+				exit(0);
 		}
 		return $this->m_link;
 		
@@ -57,9 +62,13 @@ class MYSQLIX {
 		}
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
 		
-		#debug($sql);
-		$result = $this->m_link->query($sql) or $this->sayErr("[$sql] 201605240944.");		
-		
+		#debug(__FILE__.": query: sql:[".$sql."]");
+		try{
+		  $result = $this->m_link->query($sql); # or $this->sayErr("[$sql] 201605240944.");		
+		}
+		catch(Exception $e){
+		    debug(__FILE__.": $sql, exec failed. ".$e->getMessage());
+		}
 		if($result){
 			$hm[0] = true;
 			$hm[1] = $result;
@@ -82,7 +91,6 @@ class MYSQLIX {
 	 * Sun Jul 24 21:20:04 UTC 2011, wadelau@ufqi.com
 	 */
 	function readSingle($sql,$hmvars,$idxarr){
-		
 		$hm = array();
 		if (!$this->m_link){
 			$this->_initConnection();
@@ -92,8 +100,8 @@ class MYSQLIX {
 		if( strpos($sql,"limit")===false && strpos($sql,"show tables")===false){
 			$sql .= " limit 1 ";
 		} 
-		#debug($sql);
-        $result = $this->m_link->query($sql) or $this->sayErr('[$sql] query failed. 201605220716.');
+		#debug(__FILE__.": readSingle: sql:[".$sql."]");
+        $result = $this->m_link->query($sql); # or $this->sayErr("[$sql] query failed. 201605220716.");
         		
 		if($result){
 			if($row = $result->fetch_array(MYSQLI_ASSOC) ){
@@ -128,9 +136,9 @@ class MYSQLIX {
 		}
 		$sql = $this->_enSafe($sql,$idxarr,$hmvars);
 		
-		#debug($sql);
+		#debug(__FILE__.": readBatch: sql:[".$sql."]");
 		$rtnarr = array();	
-		$result = $this->m_link->query($sql) or $this->sayErr('[$sql] query failed. 201605220717.');
+		$result = $this->m_link->query($sql); # or $this->sayErr("[$sql] query failed. 201605220717.");
 		
    		if($result && !is_bool($result)){
 			$i = 0;
@@ -141,7 +149,7 @@ class MYSQLIX {
 			//--- refined by tim's advice on 20060804 by wadelau
 			mysqli_free_result($result);
 		} 
-		if( count($rtnarr)>0 ){
+		if(count($rtnarr)>0 ){
 			$hm[0] = true;
 			$hm[1] = $rtnarr;
 		}	
@@ -168,19 +176,19 @@ class MYSQLIX {
 	}
 	
 	#
-	function _enSafe($sql,$idxarr,$hmvars){
+	private function _enSafe($sql,$idxarr,$hmvars){
 		
 		$sql = $origSql = trim($sql);
-		if($hmvars[Gconf::get('no_sql_check')]){
-			$hmvars[Gconf::get('no_sql_check')] = false; # valid only once
+		if($hmvars[GConf::get('no_sql_check')]){
+			$hmvars[GConf::get('no_sql_check')] = false; # valid only once
 			return $origSql;
 		}
 		else{
 			$newsql = "";
 			$wherepos = strpos($sql, " where ");
-			if( (strpos($sql,"delete ")!==false || strpos($sql,"update ")!==false) 
+			if( (strpos($sql,"delete ")===0 || strpos($sql,"update ")===0)
 				&& $wherepos === false){
-				$this->sayErr("table action [update, delete] need [where] clause.sql:[".$sql."]");
+				$this->sayErr("table action [update, delete] need [where] clause. sql:[".$sql."]");
 			}
 			else{
 				$a = strpos($sql,"?");
@@ -191,10 +199,13 @@ class MYSQLIX {
 						$this->sayErr("_enSafe, fields not matched with vars.sql:[".$origSql."] i:[".$i."] n:[".$n."].");
 					}
 					$t = substr($sql,0,$a+1);
-					#print __FILE__.": t:[".$t."] i:[".$i."] vars:[".$idxarr[$i]."] hmv:[".$hmvars[$idxarr[$i]]."]\n";
+					#debug(__FILE__.": t:[".$t."] i:[".$i."] vars:[".$idxarr[$i]."] hmv:[".$hmvars[$idxarr[$i]]."]\n");
 					if(!array_key_exists($idxarr[$i], $hmvars)){
-						# in case that, field was not set by $obj->set but written in sql with '?', Sat Apr  2 23:54:48 CST 2016
-						debug(__FILE__.": found unmatched field:[$t].");
+						# in case that, field was not set by $obj->set but written in sql with '?', 
+						# Sat Apr  2 23:54:48 CST 2016
+						debug(__FILE__.": found unmatched field:[$t], i:[$i], n:[$n], a:[$a].");
+						debug($idxarr);
+						debug($hmvars);
 						$sql = substr($sql,$a+1);
 						$a = strpos($sql,"?");
 						$newsql .= str_replace("?", '\'\'', $t);
@@ -202,14 +213,16 @@ class MYSQLIX {
 					else{
 						$sql = substr($sql,$a+1);
 						$a = strpos($sql,"?");
-						$newsql .= str_replace("?",$this->_quoteSafe($hmvars[$idxarr[$i]]),$t);
+						$newsql .= str_replace("?", $this->_quoteSafe($hmvars[$idxarr[$i]]), $t);
 					}
 					$i++;
 				}
 				if($sql!=""){
 					$newsql .=  $sql ;
 				}
-				#print __FILE__."\n: sql:[".$sql."] sql_new:[".$newsql."]\n";
+				#debug(__FILE__."\n: sql:[".$sql."] sql_new:[".$newsql."]\n");
+				#debug($idxarr);
+				#debug($hmvars);
 				return $newsql;
 			}
 		}
@@ -217,7 +230,7 @@ class MYSQLIX {
 	}
 
 	//--- for sql injection remedy, added on 20061113 by wadelau
-	function _quoteSafe($value, $defaultValue=null){
+	private function _quoteSafe($value, $defaultValue=null){
 
 		if (!is_numeric($value)) {
 			$value = "'".mysqli_real_escape_string($this->m_link, $value)."'";
@@ -301,7 +314,7 @@ class MYSQLIX {
 	}
 
 	#
-	function sayErr($sql = ""){
+	private function sayErr($sql = ""){
 		
 		global $HTTP_HOST;
 		global $REMOTE_ADDR;
@@ -316,19 +329,20 @@ class MYSQLIX {
 			$str .= "<font color=red>sayError information : </font><br>&nbsp;&nbsp;".$this->getError();
 		}
 		else{
-			$str .= "<div id=\"sayErrdiv_201210131751\" style=\"color:red;z-index:99;position:absolute\">Found internal Error when process your transaction..., please report this to wadelau@gmail.com . [2007211253]</div>\n";
-			error_log(__FILE__.": MYSQL_sayErrOR: sayErr_no:[".$this->getErrno()."] sayErr_info:[".$this->getError()."] sayErr_sql:[".serialize($sql)."] [07211253]");
+			$str .= "<div id=\"sayErrdiv_201210131751\" style=\"color:red;z-index:99;position:absolute\">"
+					."Found internal Error when process your transaction..., please report this to wadelau@gmail.com . [2007211253]</div>\n";
+			error_log(__FILE__.": MYSQL_sayErrOR: sayErr_no:[".$this->getErrno()."] sayErr_info:[".$this->getError()."] sayErr_sql:["
+					.serialize($sql)."] [07211253]");
 		}
 		debug($sql);
 		$html = GConf::get('html_resp'); $html = str_replace("RESP_TITLE","sayError!", $html); $html = str_replace("RESP_BODY", $str, $html);
 		print $html;
-		exit(1);
+		#exit(1);
 		
 	} 
 	
 	//- for test purpose, wadelau@gmail.com, Wed Jul 13 19:21:37 UTC 2011
 	function showConf(){
-		
 		print __FILE__.":[".$this->m_name."].";
 		
 	}	

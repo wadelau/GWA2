@@ -7,11 +7,6 @@
  * @ver: 0.2
  */
 
-//package com.ufqi.gwa2;
-
-
-//import javax.servlet.http.HttpServletRequest;
-
 %><%!
 
 public final static class Wht{
@@ -262,6 +257,20 @@ public final static class Wht{
 		return matched;
 
 	}
+	
+	//-
+	//- check whether a class has been loaded
+	public boolean isClass(String className){
+	
+		try{
+			Class.forName(className);
+			return true;
+		}
+		catch (final ClassNotFoundException e){
+			return false;
+		}
+		
+}
 
 }
 

@@ -24,9 +24,14 @@ class CacheA {
 		
 		$cacheConf = ($cacheConf==null ? 'Cache_Master' : $cacheConf);
 		$this->conf = new $cacheConf;
-		$cacheDriver = Gconf::get('cachedriver');
+		$cacheDriver = GConf::get('cachedriver');
 		$this->cacheconn = new $cacheDriver($this->conf);
 		
+	}
+	
+	//-
+	function __destruct(){
+		$this->close();
 	}
 
 	# get
@@ -62,5 +67,12 @@ class CacheA {
 		return strlen($k)>32 ? md5($k) : $k;
 	}
  	
+	//-
+	function close(){
+	    # @todo, long conn?
+	    # need sub class to override with actual close handler
+	    $this->cacheconn->close();
+	    return true;
+	}
  }
 ?>

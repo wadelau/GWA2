@@ -18,14 +18,16 @@ class Config_Master{
 	var $mDbPassword = ""; 
 	var $mDbPort     = "";	
 	var $mDbDatabase = "";
+	var $mDbSock = '';
 	
 	function __construct(){
-		$gconf = new Gconf();
+		$gconf = new GConf();
 		$this->mDbHost = $gconf->get('dbhost');
 		$this->mDbPort = $gconf->get('dbport');
 		$this->mDbUser = $gconf->get('dbuser');
 		$this->mDbPassword = $gconf->get('dbpassword');
 		$this->mDbDatabase = $gconf->get('dbname');
+		$this->mDbSock = $gconf->get('dbsock');
 
 	} 
 }
@@ -37,36 +39,47 @@ class Config_Slave{
 	var $mDbPassword = ""; 
 	var $mDbPort     = "";	
 	var $mDbDatabase = "";
+	var $mDbSock = '';
 	
 	function __construct(){
-		$gconf = new Gconf();
+		$gconf = new GConf();
 		$this->mDbHost = $gconf->get('dbhost_slave');
 		$this->mDbPort = $gconf->get('dbport_slave');
 		$this->mDbUser = $gconf->get('dbuser_slave');
 		$this->mDbPassword = $gconf->get('dbpassword_slave');
 		$this->mDbDatabase = $gconf->get('dbname_slave');
+		$this->mDbSock = $gconf->get('dbsock');
 
 	} 
 }
-
 
 # cache master
 class Cache_Master{
 	
 	var $chost = '';
 	var $cport = '';
-	var $expireTime = 30 * 60; 
+	var $expireTime = 1800; # 30 * 60; 
 	
 	function __construct(){
-		
-		$this->chost = Gconf::get('cachehost');
-		$this->cport = Gconf::get('cacheport');
-		$this->expireTime = Gconf::get('cacheexpire');
+		$this->chost = GConf::get('cachehost');
+		$this->cport = GConf::get('cacheport');
+		$this->expireTime = GConf::get('cacheexpire');
 		
 	}
 	
 }
 
+# file sys
+class File_System{
+	var $uplddir = '';
+	var $reuse = false;
+	
+	function __construct(){
+		$this->uplddir = GConf::get('upld');
+		$this->reuse = GConf::get('enable_filehandle_share');
+	}
+	
+}
 
 //-- Todo
 

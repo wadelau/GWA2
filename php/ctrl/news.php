@@ -6,7 +6,7 @@ include_once($appdir."/mod/news.class.php");
 
 # some other stuff
 
-//增加广告展示数据
+//- ads info
 #$adplace = 'news';
 #include('include/ads.php');
 

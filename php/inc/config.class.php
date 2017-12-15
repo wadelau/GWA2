@@ -1,6 +1,9 @@
 <?php
 ############
 # global constant configurations
+
+ini_set("memory_limit","512M"); # memory limit avoding crush
+
 if(true){
 	
 	$conf = array();
@@ -28,20 +31,26 @@ if(true){
 	$conf['display_style_smttpl']		= 1; 
 
 	# db info
-	$conf['dbhost'] 	= 'DB_HOST';
+	$conf['dbhost'] 	= 'DB_HOST'; # use 127.0.0.1 instead of localhost
 	$conf['dbport'] 	= 'DB_PORT';
 	$conf['dbuser'] 	= 'DB_USER';
 	$conf['dbpassword'] 	= 'DB_PASSWORD';
 	$conf['dbname'] 	= 'DB_NAME';
 	$conf['dbdriver']	= 'MYSQL'; # 'MYSQL', 'MYSQLIX', 'PDOX', 'SQLSERVER', 'ORACLE' in support, UPCASE only
 	$conf['db_enable_utf8_affirm'] = false; # append utf-8 affirm after db connection established, should be false in a all-utf-8 env.
-
+	$conf['dbsock'] = '/www/bin/mysql/mysql.sock'; # use only if dbhost=localhost since php7.0+
+	
 	# cache server
 	$conf['enable_cache'] = 1; # or true for 1, false for 0
 	$conf['cachehost'] = '127.0.0.1'; # '/www/bin/memcached/memcached.sock'; #  ip, domain or .sock
 	$conf['cacheport'] = '11211'; # empty or '0' for linux/unix socket 
 	$conf['cachedriver'] = 'MEMCACHEDX'; # REDISX, XCACHEX
-	$conf['cacheexpire'] = 30 * 60;
+	$conf['cacheexpire'] = 1800; # 30 * 60;
+	
+	# file system
+	$conf['enable_file'] = 1; # true for 1, false for 0 to init at entry stage
+	$conf['filedriver'] = 'FileSystem'; # files operations, since 2016-11-05
+	$conf['enable_filehandle_share'] = 1; # 17:31 10 November 2016
 	
 	# misc
 	$conf['is_debug'] = 1;
@@ -58,18 +67,21 @@ if(true){
 	$conf['welcometbl']	= $tblpre.'info_welcometbl';
 	$conf['operatelogtbl']	= $tblpre.'fin_operatelogtbl';
 	
+	$conf['ssl_verify_ignore'] = true;
+	$conf['http_enable_gzip'] = false;
+	
 	# set to global container
-	Gconf::setConf($conf);
+	GConf::setConf($conf);
 	
 }
 ############
 
 global $_CONFIG;
-$_CONFIG = Gconf::getConf();
+$_CONFIG = GConf::getConf();
 
 # configuration container
 
-class Gconf{
+class GConf{
 
 	private static $conf = array();
 

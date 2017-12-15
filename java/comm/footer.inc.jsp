@@ -7,8 +7,7 @@ outx.append("\n\toutput in comm/footer: "+(new Date())+" smttpl:["+smttpl+"]\n")
 
 if(fmt.equals("")){
 
-	//- set header
-	//- #todo
+	//- @todo
 
 	if(smttpl.equals("")){
 		
@@ -23,7 +22,7 @@ if(fmt.equals("")){
 		//- tpl engine
 		Engine smartyEngine = new Engine();
 
-		smartyEngine.setTemplatePath(appdir);
+		smartyEngine.setTemplatePath(appdir); 
 		smartyEngine.setEncoding("utf-8");
 		smartyEngine.setDebug(true);
 		Template mytpl = null;
@@ -58,29 +57,23 @@ if(fmt.equals("")){
 		}
 
 		//- @todo cache replaced tpl ?
-
-		out.println("<!--" + outx +"  -->" + tplcont);
-
+		out.println("<!--" + outx +" \n -->" + tplcont);
+	
 	}
 }
 else{
 
 	if(fmt.equals("json")){
-	
-		//- set header
-		//- #todo
-
 		data.put("outx", outx);
 		//- out put json
-
+		
 
 	}
 	else{
-		outx.append("Unknown fmt:["+fmt+"]. 1606261946.");	
+		outx.append("<!-- Unknown fmt:["+fmt+"]. 1606261946. -->");
+		out.println(outx.toString());
 	}
 
 }
-
-
 
 %><%@include file="./aftfooter.inc.jsp"%>

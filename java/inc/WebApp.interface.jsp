@@ -14,10 +14,10 @@ public interface WebAppInterface{
 	public void setId(String iId);
 	public String getId();
 
-	/*
-	public HashMap execBy(String fields, HashMap conditions);
-	public void rmBy(HashMap conditions);
+	public HashMap execBy(String fields, String conditions);
+	public HashMap rmBy(String conditions);
 	
+	/*
 	public String toString(Object obj);
 	*/
 	

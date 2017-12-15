@@ -3,6 +3,7 @@ if(!defined('__ROOT__')){
     define('__ROOT__', dirname(dirname(__FILE__)));
 }
 require_once(__ROOT__.'/inc/webapp.class.php');
+require_once(__ROOT__.'/mod/base62x.class.php');
 
 class Poll extends WebApp{
 
@@ -10,17 +11,17 @@ class Poll extends WebApp{
 
 	# construct
 	function __construct(){
-
-        $this->dba = new DBA();
-        
+     
 		if($_SESSION['language'] && $_SESSION['language'] == "en_US"){
-			#$this->setTbl(Gconf::get('tblpre').'indextbl_en');
 			# disable multiple languages for now
-            $this->setTbl(Gconf::get('tblpre').'polltbl');
+            $this->setTbl(GConf::get('tblpre').'polltbl');
 		}
 		else{
-			$this->setTbl(Gconf::get('tblpre').'polltbl');
+			$this->setTbl(GConf::get('tblpre').'polltbl');
 		}
+		
+		parent::__construct();
+		 
     }
 
     function md5B62x($s){
@@ -38,7 +39,14 @@ class Poll extends WebApp{
         if($dec == 1){
             $type = "-dec";
         }
-        return $s=exec('/www/webroot/tools/base62x '.$type.($numType==''?'':' -n '.$numType).' \''.$s.'\'');
+        $s2 = '';
+        if($type == "-enc"){
+            $s2 = Base62x::encode($s, $numType);
+        }
+        else{
+            $s2 = Base62x::decode($s, $numType);
+        }
+        return $s2;
     }
 
  	# get latest item

@@ -1,5 +1,4 @@
 <%
-
 //import java.util.HashMap;
 
 /* DB Administration, handling all db transations across the site.
@@ -9,16 +8,9 @@
  * Thu Sep 11 16:34:20 CST 2014
  * Ported into Java by wadelau@ufqi.com, June 28, 2016s
  */
+ 
 
-//package com.ufqi.gwa2;
-
-
-//import java.util.HashMap;
-
-//import com.ufqi.gwa2.Conn;
-//import com.ufqi.gwa2.MySql;
-
-%><%@page import="java.sql.Connection,java.sql.SQLException,java.sql.Statement,java.sql.ResultSetMetaData"%><%
+%><%@page import="java.sql.Connection,java.sql.SQLException,java.sql.Statement,java.sql.ResultSetMetaData,java.util.HashSet"%><%
 %><%@include file="./MySql.class.jsp"%><%
 %><%!
 
@@ -27,7 +19,13 @@ public final class Dba { //- db administrator
 	protected DbConn dbConf;
 	
 	protected DbDriver dbDrv;
-
+	private final HashSet<String> Sql_Operator_List = new HashSet<String>(
+			java.util.Arrays.asList(new String[]{
+				" ","^","~",":","!","/",
+				"*","&","%","+","=","|",
+				">","<","-","(",")",","
+				}
+			));
 
 	//- constructor	
 	public Dba(String hmconf){
@@ -65,14 +63,14 @@ public final class Dba { //- db administrator
 			tmpHm = this.dbDrv.readBatch(sql, args, idxArr);
 		}
 		
-		if((boolean)tmpHm.get("0")){ //- what's for?
-			hm.put("0", true);
+		if((boolean)tmpHm.get(0)){ //- what's for?
+			hm.put(0, true);
 			try{
 				if(hasLimitOne){
-					hm.put("1", getInfo((ResultSet)tmpHm.get("1")));	
+					hm.put(1, tmpHm.get(1));	
 				}
 				else{
-					hm.put("1", getRs((ResultSet)tmpHm.get("1")));
+					hm.put(1, tmpHm.get(1));
 				}
 			}
 			catch(Exception ex){
@@ -80,8 +78,8 @@ public final class Dba { //- db administrator
 			}
 		}
 		else{
-			hm.put("0", false);
-			hm.put("1", tmpHm.get("1"));
+			hm.put(0, false);
+			hm.put(1, tmpHm.get(1));
 		}
 		tmpHm = null; idxArr = null;
 		hm.put("read-in-Dba", (new Date()));	
@@ -100,16 +98,16 @@ public final class Dba { //- db administrator
 		
 		HashMap tmpHm = this.dbDrv.query(sql, args, idxArr);
 		
-		if((boolean)tmpHm.get("0")){
-			hm.put("0", true);
+		if((boolean)tmpHm.get(0)){
+			hm.put(0, true);
 			HashMap inHm = new HashMap();
-			inHm.put("insertid", tmpHm.get("1"));
-			inHm.put("affectedrows", tmpHm.get("1"));
-			hm.put("1", inHm);
+			inHm.put("insertid", tmpHm.get(1));
+			inHm.put("affectedrows", tmpHm.get(1));
+			hm.put(1, inHm);
 		}
 		else{
-			hm.put("0", false);
-			hm.put("1", tmpHm.get("1"));
+			hm.put(0, false);
+			hm.put(1, tmpHm.get(1));
 		}
 
 		tmpHm = null; idxArr = null;
@@ -124,145 +122,228 @@ public final class Dba { //- db administrator
 	//--
 	public Object[] sortObject(String sqlstr, HashMap hmvar){
 		
-		int hmsize=1;
-		Object[] obj = new Object[hmsize];
-		
+		Object[] obj = new Object[1];
 		if(hmvar != null){
 			int ki=0;
 			String k=null;
-			hmsize=hmvar.size();
-			obj=new Object[hmsize];
-			//int whlen=newwh.length();
-			sqlstr=" "+sqlstr;
-			if(sqlstr.indexOf("insert")>-1 || sqlstr.indexOf("update")>-1){
-				sqlstr=sqlstr.replaceAll(",",", ");
-			}
+			int hmsize=hmvar.size();
+			obj=new Object[hmsize+1];
+			int sqlLen=sqlstr.length();
+			Object[] tmpobj=new Object[sqlLen];
 			
-			int whlen=sqlstr.length();
-			Object[] tmpobj=new Object[whlen];
-			int tmpindex=-1; HashMap posHm = new HashMap(); 
-			int tmpindex2=-1;
-			int tmpindex1=-1;
-			int tmpki=1;
 			int tmpidx=0;
 			int selectPos = sqlstr.indexOf("select ");
 			int wherePos = sqlstr.indexOf(" where ");
-			//Set set=hmvar.keySet();
+			HashSet sqloplist = this.Sql_Operator_List;
+			int keyLen = 0;
+			int keyPos = -1;
+			String preK = null;
+			String aftK = null;
+			
 			Iterator itr=hmvar.keySet().iterator();
 			while(itr.hasNext()){
 				k=(String)itr.next();
 				k = k==null ? "" : k;
-				if(k.equals("") || k.equals("orderby") || k.equals("pagesize") 
-					|| k.equals("pagenum") || k.equals("groupby")){
-					continue;
+				if(k.equals("")){
+					continue; 
 				}
-				else{
-					tmpki=1;
-					tmpidx=0;
-					/* instance: com.ufqi.exp.EXP.java: getRelatedSubject
-					 *	Attention: 
-					 *		one field matches more than two values, 
-					 *		name it as "field.2","field.3", "field.N", etc, as hash key
-					 */
-					tmpindex1=sqlstr.indexOf("("+k);	
-					tmpindex2=sqlstr.indexOf(" "+k);
-					while((tmpindex1!=-1 || tmpindex2!=-1)){
-						if(tmpindex1==-1){
-							tmpindex=tmpindex2;
-						}
-						else if(tmpindex2==-1){
-							tmpindex=tmpindex1;
-						}
-						else if(tmpindex1!=-1 && tmpindex2!=-1){
-							tmpindex = tmpindex1>tmpindex2 ? tmpindex2 : tmpindex1;
-						}
-						if(tmpindex!=-1){
-							boolean hasExist = posHm.get(tmpindex)==null ? false : (boolean)posHm.get(tmpindex);
-							if(hasExist){
-								//System.out.println("com.ufqi.base.DBACT.java: sortObject-0, k:["
-								//	+k+"] tmpindex:["+tmpindex+"] obj:["+tmpobj[tmpindex]+"] tmpki:["
-								//	+tmpki+"], existed pos, continue.");	
-								tmpindex1=sqlstr.indexOf("("+k, tmpindex1+1);
-								tmpindex2=sqlstr.indexOf(" "+k, tmpindex2+1);
-								continue;
-							}
-							if(selectPos > -1 && tmpindex < wherePos){
-								//System.out.println("com.ufqi.base.DBACT.java: sortObject-1, k:["
-								//	+k+"] tmpindex:["+tmpindex+"] obj:["+tmpobj[tmpindex]+"] tmpki:["+tmpki+"] continue.");	
-								posHm.put(tmpindex, true);
-								tmpindex1=sqlstr.indexOf("("+k, tmpindex1+1);
-								tmpindex2=sqlstr.indexOf(" "+k, tmpindex2+1);
-								continue; //- skip in case "select a, b, c where a = ?"; # by wadelau on Sat Nov  3 20:35:46 CST 2012
-							}
-							if(hmvar.containsKey(k+"."+tmpki)){
-								tmpobj[tmpindex]=hmvar.get(k+"."+tmpki);
-								/* 
-								 *  Attention: 
-								 *      one field matches more than two values, 
-								 *      name it as "field.2","field.3", "field.N", etc, as hash key
-								 *  e.g. in sql: "... where age > ? and age < ? and gender=? ", settings go like:
-								 *      $Obj->set('age', 20);
-								 *      $obj->set('age.2', 30); # for the second match of 'age'
-								 *  Sun Jul 24 21:18:00 UTC 2011
-								 *  !! Need space before > or < in this case, Thu Sep 11 16:29:03 CST 2014
-								 *  ----- Another Example, 19:48 06 July 2016	
-								 *	this.set("pagesize", 10);
-									this.set("email", "%hotmail%");
-									this.set("email.2", "%163%");
-									this.set("realname", "%");
-									HashMap userInfo = this.getBy("id, email, updatetime", "(email like ?  or email like ?) and realname like ?");
-								 */
-							}
-							else{
-								tmpobj[tmpindex]=hmvar.get(k);
-							}
-							posHm.put(tmpindex, true);
-							//System.out.println("com.ufqi.base.DBACT.java: sortObject-2, k:["
-							//		+k+"] tmpindex:["+tmpindex+"] obj:["+tmpobj[tmpindex]+"] tmpki:["+tmpki+"] tidx1:["
-							//		+tmpindex1+"] tidx2:["+tmpindex2+"]");	
-							tmpki++;
-							tmpidx=tmpindex;
-							//tmpindex=-1;
-							if(tmpindex1>tmpindex){
-								tmpindex=tmpindex1;
-							}
-							else if(tmpindex2>tmpindex){
-								tmpindex=tmpindex2;
-							}
-							if(tmpindex!=tmpidx){
-								if(hmvar.containsKey(k+"."+tmpki)){
-									tmpobj[tmpindex]=hmvar.get(k+"."+tmpki);
+				keyLen = k.length();
+				keyPos = sqlstr.indexOf(k);
+				if(keyPos > -1){
+					while(keyPos != -1){
+						preK = sqlstr.substring(keyPos-1, keyPos);
+						tmpidx = keyPos + keyLen; tmpidx = tmpidx>=sqlLen ? sqlLen-1 : tmpidx;
+						aftK = sqlstr.substring(tmpidx, tmpidx+1);
+						if(sqloplist.contains(preK) && sqloplist.contains(aftK)){
+							if(selectPos > -1){
+								if(keyPos > wherePos){
+									tmpobj[keyPos] = k;
 								}
 								else{
-									tmpobj[tmpindex]=hmvar.get(k);
+									//- select fields
 								}
-								posHm.put(tmpindex, true);
-								//System.out.println("com.ufqi.base.DBACT.java: sortObject-3, k:["+
-								//		k+"] tmpindex:["+tmpindex+"] obj:["+tmpobj[tmpindex]+"] tmpki:["+tmpki+"]  last.");	
-								tmpki++;
+							}
+							else{
+								tmpobj[keyPos] = k;
 							}
 						}
-						tmpindex1=sqlstr.indexOf("("+k, tmpindex1+1); //- tmpindex1 + 1
-						tmpindex2=sqlstr.indexOf(" "+k, tmpindex2+1); //- tmpindex2 + 1
+						else{
+							//System.out.println("Dba.sortObject: found illegal key preset. k:["+k+"] pos:["
+							//		+keyPos+"] preK:["+preK+"] aftK:["+aftK+"] sql:["+sqlstr+"]");
+						}
+						keyPos = sqlstr.indexOf(k,  tmpidx);
 					}
+				}
+				else{
+					//System.out.println("Dba.sortObject: no such key:["+k+"] in sql:["+sqlstr+"]");
 				}
 			}
 			
+			int tmpi = 0; Object kiso = null; String kis = null;
+			HashMap<String, Integer> kSerial = new HashMap<String, Integer>();
+			for(int i=0; i<sqlLen; i++){
+				k = (String)tmpobj[i];
+				if(k != null){
+					kiso = kSerial.get(k);
+					kis = kiso==null ? "" : kiso.toString();
+					if(kis.equals("")){
+						obj[tmpi] = k;
+						kSerial.put(k, 1);
+					}
+					else{
+						ki = Integer.valueOf(kis);
+						obj[tmpi] = k + "." + (ki+1);
+						kSerial.put(k, ki+1);
+					}
+					tmpi++;
+					//System.out.println("tmpi:["+tmpi+"] k:["+k+"]");
+				}
+			}
+			
+			/* old codes bgn
 			tmpindex=0;
 			for(ki=0;ki<tmpobj.length;ki++){
 				if(tmpobj[ki] != null){
 					obj[tmpindex]=tmpobj[ki];
 					//System.out.println("Dba.sortObj: ki:["+ki+"] idx:["+tmpindex+"] obj-i:["+obj[tmpindex]
-					//		+"] hmvar:["+hmvar.toString()+"]");
+					//		+"] hmvar:["+hmvar.toString()+"] sqlstr:["+sqlstr+"]");
 					tmpindex++;
 				}
 				
 			}
 			//set=null;
+			 * old coded end
+			 */
 			itr=null;
 			tmpobj=null;
 			
 		}
+		
+		/* old codes bgn */
+		/* old codes bgn 
+		//int whlen=newwh.length();
+		sqlstr=" "+sqlstr;
+		if(sqlstr.indexOf("insert")>-1 || sqlstr.indexOf("update")>-1){
+			sqlstr=sqlstr.replaceAll(",", ", ");
+		}
+		
+		int whlen=sqlstr.length();
+		Object[] tmpobj=new Object[whlen];
+		int tmpindex=-1; HashMap posHm = new HashMap(); 
+		int tmpindex2=-1;
+		int tmpindex1=-1;
+		int tmpki=1;
+		int tmpidx=0;
+		int selectPos = sqlstr.indexOf("select ");
+		int wherePos = sqlstr.indexOf(" where ");
+		//Set set=hmvar.keySet();
+		Iterator itr=hmvar.keySet().iterator();
+		while(itr.hasNext()){
+			k=(String)itr.next();
+			k = k==null ? "" : k;
+			if(k.equals("")){ 
+				
+				continue; 
+			}
+			int tmpKpos = sqlstr.indexOf(k);
+			if(k.equals("") || "oderby,groupby,pagesize,pagenum,".indexOf(k+",") > -1 
+				|| tmpKpos < 0 ){
+				//System.out.println("Dba.sortObj: ki:["+ki+"] k:["+k+"] skip.");
+				continue;
+			}
+			else{
+				tmpki=1;
+				tmpidx=0;
+				*//* instance: com.ufqi.exp.EXP.java: getRelatedSubject
+				 *	Attention: 
+				 *		one field matches more than two values, 
+				 *		name it as "field.2","field.3", "field.N", etc, as hash key
+				 *//*
+				tmpindex1=sqlstr.indexOf("("+k);	
+				tmpindex2=sqlstr.indexOf(" "+k);
+				while((tmpindex1!=-1 || tmpindex2!=-1)){
+					if(tmpindex1==-1){
+						tmpindex=tmpindex2;
+					}
+					else if(tmpindex2==-1){
+						tmpindex=tmpindex1;
+					}
+					else if(tmpindex1!=-1 && tmpindex2!=-1){
+						tmpindex = tmpindex1>tmpindex2 ? tmpindex2 : tmpindex1;
+					}
+					if(tmpindex!=-1){
+						boolean hasExist = posHm.get(tmpindex)==null ? false : (boolean)posHm.get(tmpindex);
+						if(hasExist){
+							//System.out.println("com.ufqi.base.DBACT.java: sortObject-0, k:["
+							//	+k+"] tmpindex:["+tmpindex+"] obj:["+tmpobj[tmpindex]+"] tmpki:["
+							//	+tmpki+"], existed pos, continue.");	
+							tmpindex1=sqlstr.indexOf("("+k, tmpindex1+1);
+							tmpindex2=sqlstr.indexOf(" "+k, tmpindex2+1);
+							continue;
+						}
+						if(selectPos > -1 && tmpindex < wherePos){
+							//System.out.println("com.ufqi.base.DBACT.java: sortObject-1, k:["
+							//	+k+"] tmpindex:["+tmpindex+"] obj:["+tmpobj[tmpindex]+"] tmpki:["+tmpki+"] continue.");	
+							posHm.put(tmpindex, true);
+							tmpindex1=sqlstr.indexOf("("+k, tmpindex1+1);
+							tmpindex2=sqlstr.indexOf(" "+k, tmpindex2+1);
+							continue; //- skip in case "select a, b, c where a = ?"; # by wadelau on Sat Nov  3 20:35:46 CST 2012
+						}
+						if(hmvar.containsKey(k+"."+tmpki)){
+							tmpobj[tmpindex]=hmvar.get(k+"."+tmpki);
+							*//* 
+							 *  Attention: 
+							 *      one field matches more than two values, 
+							 *      name it as "field.2","field.3", "field.N", etc, as hash key
+							 *  e.g. in sql: "... where age > ? and age < ? and gender=? ", settings go like:
+							 *      $Obj->set('age', 20);
+							 *      $obj->set('age.2', 30); # for the second match of 'age'
+							 *  Sun Jul 24 21:18:00 UTC 2011
+							 *  !! Need space before > or < in this case, Thu Sep 11 16:29:03 CST 2014
+							 *  ----- Another Example, 19:48 06 July 2016	
+							 *	this.set("pagesize", 10);
+								this.set("email", "%hotmail%");
+								this.set("email.2", "%163%");
+								this.set("realname", "%");
+								HashMap userInfo = this.getBy("id, email, updatetime", "(email like ?  or email like ?) and realname like ?");
+							 *//*
+						}
+						else{
+							tmpobj[tmpindex]=hmvar.get(k);
+						}
+						posHm.put(tmpindex, true);
+						//System.out.println("com.ufqi.base.DBACT.java: sortObject-2, k:["
+						//		+k+"] tmpindex:["+tmpindex+"] obj:["+tmpobj[tmpindex]+"] tmpki:["+tmpki+"] tidx1:["
+						//		+tmpindex1+"] tidx2:["+tmpindex2+"]");	
+						tmpki++;
+						tmpidx=tmpindex;
+						//tmpindex=-1;
+						if(tmpindex1>tmpindex){
+							tmpindex=tmpindex1;
+						}
+						else if(tmpindex2>tmpindex){
+							tmpindex=tmpindex2;
+						}
+						if(tmpindex!=tmpidx){
+							if(hmvar.containsKey(k+"."+tmpki)){
+								tmpobj[tmpindex]=hmvar.get(k+"."+tmpki);
+							}
+							else{
+								tmpobj[tmpindex]=hmvar.get(k);
+							}
+							posHm.put(tmpindex, true);
+							//System.out.println("com.ufqi.base.DBACT.java: sortObject-3, k:["+
+							//		k+"] tmpindex:["+tmpindex+"] obj:["+tmpobj[tmpindex]+"] tmpki:["+tmpki+"]  last.");	
+							tmpki++;
+						}
+					}
+					tmpindex1=sqlstr.indexOf("("+k, tmpindex1+1); //- tmpindex1 + 1
+					tmpindex2=sqlstr.indexOf(" "+k, tmpindex2+1); //- tmpindex2 + 1
+				}
+			}
+		}
+		old codes end */
+		/* old codes end */
 		
 		return obj;
 	
@@ -270,6 +351,7 @@ public final class Dba { //- db administrator
 	
 	
 	//--- added on 20071124 by wadelau, read single record and save in an hashmap
+	/*
 	public HashMap getInfo( ResultSet rs ) throws SQLException {
 		HashMap hm = null ;
 		
@@ -281,7 +363,7 @@ public final class Dba { //- db administrator
 			String fieldvalue = null  ;
 			for(int i=1; i<=cci;i++){
 				fieldname = rsmd.getColumnName(i) ;
-				fieldvalue = rs.getString(fieldname) ;
+				fieldvalue = rs.getString(i) ; //- fieldname, remedy by wadelau, 13:01 18 July 2016
 				fieldname = fieldname.toLowerCase() ;
 				hm.put( fieldname,fieldvalue ) ;
 			}
@@ -292,9 +374,11 @@ public final class Dba { //- db administrator
 		return hm ;
 	
 	}
-	
+	*/
 
 	//--- added on 20071124 by wadelau, read records and save in an hashmap
+	//- disabled since 21:49 24 July 2016
+	/*
 	public HashMap getRs( ResultSet rs ) throws SQLException{
 		HashMap hm = new HashMap();
 		int count = 0 ;
@@ -307,7 +391,9 @@ public final class Dba { //- db administrator
 			HashMap hmtmp = new HashMap() ;
 			for(int i=1; i<=icc; i++ ){
 				fieldname = rsmd.getColumnName(i) ;
-				fieldvalue = rs.getString(fieldname);
+				
+				fieldvalue = rs.getString(i); // rs.getString(fieldname); remedy by wadelau, Sun Jul 17 22:51:13 CST 2016
+
 				fieldname = fieldname.toLowerCase() ;
 				hmtmp.put(fieldname, fieldvalue);
 			}
@@ -321,7 +407,7 @@ public final class Dba { //- db administrator
 		return hm ;
 	
 	}
-	
+	*/
 	
 }
 
@@ -347,4 +433,5 @@ public interface DbDriver{
 	
 
 }
+
 %>

@@ -3,6 +3,7 @@
  * v0.3
  * wadelau@ufqi.com
  * Tue Jan 24 12:25:56 GMT 2012
+ * bugfix, 21:22 28 February 2017
  */
 
 if(!defined('__ROOT__')){
@@ -15,16 +16,10 @@ class PageNavi extends WebApp{
 
    public function __construct(){
 
-       $this->dba = new DBA(); # added by wadelau@ufqi.com, Wed Jul 11 14:31:52 CST 2012
        $para = array();
-       $pdef = array('pnpn'=>1,'pnps'=>28,'pntc'=>0); # 28 for development
+       $pdef = array('pnpn'=>1,'pnps'=>100,'pntc'=>0); # 28 for development
 
        $file = $_SERVER['PHP_SELF'];
-       #$rawurl =$_SERVER['REQUEST_URI'];
-        #$idxpos = strpos($rawurl,"index.php/") + 9;
-        #$file = substr($rawurl, 0, $idxpos);
-       #$file = $rawurl;
-       #print __FILE__.": file:$file orig:".$_SERVER['REQUEST_URI']."\n";
        $query = $_SERVER['QUERY_STRING'];
        
        if(strpos($query, "act/list-") !== false){
@@ -36,7 +31,6 @@ class PageNavi extends WebApp{
        $url = $file."?".preg_replace("/&pnpn=([0-9]*)/","",$query);
        
        #print __FILE__.": orig_url: $url";
-
        //$url=str_replace("&","/",$url); # for RESTful address
        //$url=str_replace("=","/",$url);
 
@@ -50,6 +44,8 @@ class PageNavi extends WebApp{
             $para[$k] = $para[$k]>0?$para[$k]:$pdef[$k];
             $this->hmf[$k]=$para[$k];
        }
+       
+       parent::__construct();
 
    }
 
@@ -80,10 +76,10 @@ class PageNavi extends WebApp{
            }
 			#print "$i: [$str] totalpage:[$totalpage]\n";
        }
-       $str .= " &nbsp;<b><a href=\"javascript:pnAction('".$para['url']."&pnpn=".$totalpage."');\" title=\"最后一页\">&raquo;|</a> </b> &nbsp; &nbsp; <a href=\"javascript:void(0);\" title=\"改变显示条数\" onclick=\"javascript:var pnps=window.prompt('请输入新的每页显示条数:','".$para['pnps']."'); if(pnps>0){ myurl='".$para['url']."'; myurl=myurl.replace('/pnps/','/opnps/'); doAction(myurl+'&pnps='+pnps);};\"><b>".$para['pnps']."</b>条/页</a> &nbsp; 共 <b>".$para['pntc']."</b>条 / <b>".$totalpage."</b>页 &nbsp;";
+       $str .= " &nbsp;<b><a href=\"javascript:pnAction('".$para['url']."&pnpn=".$totalpage."');\" title=\"最后一页\">&raquo;|</a> </b> &nbsp; &nbsp; <a href=\"javascript:void(0);\" title=\"改变显示条数\" onclick=\"javascript:var pnps=window.prompt('请输入新的每页显示条数:','".$para['pnps']."'); if(pnps>0){ myurl='".$para['url']."'; myurl=myurl.replace('/pnps/','/opnps/'); doAction(myurl+'&pnps='+pnps);};\"><b>".$para['pnps']."</b>条/页</a> &nbsp; 共 <b>".number_format($para['pntc'])."</b>条 / <b>".number_format($totalpage)."</b>页 &nbsp;";
        if($_REQUEST['isheader'] != '0'){
            $str .= "<button name=\"initbtn\" onclick=\"javascript:pnAction('".$this->getInitUrl()."');\">初始页</button>&nbsp;";
-           $str .= "<button name=\"initbtn2\" onclick=\"javascript:doAction('".str_replace("&list","&list-toexcel",$para['url'])."');\">导出xls</button>";
+           $str .= "<button name=\"initbtn2\" onclick=\"javascript:doAction('".str_replace("&list","&list-toexcel",$para['url'])."');\">导出表</button>";
        }
 
        return $str;
@@ -104,22 +100,22 @@ class PageNavi extends WebApp{
        #print_r($this->hmf);
 
        $totalpage = $para['pntc'] % $para['pnps'] == 0 ? ($para['pntc']/$para['pnps']) : ceil($para['pntc']/$para['pnps']);
-       $navilen = 3;
+       $navilen = 10;
 
-		    $pageArr = array('totalpage'=>$totalpage, 'url'=>$para['url']);
+		    $pageArr = array('totalpage'=>$totalpage, 'totalrecord'=>$para['pntc'], 'url'=>$para['url']);
 
         for($i=$para['pnpn']-$navilen; $i<$para['pnpn'] + $navilen && $i<=$totalpage; $i++){
 
             if($i>0){
-
                 if($i == $para['pnpn']){
-                    $pageArr['currentpage'] = $i;
+                    $pageArr['pnpn'] = $i;
                 }
                 $pageArr['pages'][] = $i;
 
             }
             #print "$i: [$str] totalpage:[$totalpage]\n";
         }
+        $pageArr['pnps'] = $para['pnps'];
 
        return $pageArr;
 
@@ -172,8 +168,8 @@ class PageNavi extends WebApp{
    function getCondition($gtbl, $user){
        $condition = "";
        $pnsm = $_REQUEST['pnsm']; $pnsm = $pnsm==''?"or":'and';
-       $hmfield = array(); #  $gtbl->getFieldList(); # for -gMIS
-       if(count($hmfield) < 1){
+       $hmfield = array(); #  $gtbl->getFieldList(); # for -gMIS only
+       if(false && count($hmfield) < 1){
        		$hmfield = array();
        		$tmpHm = $gtbl->execBy("desc ".$gtbl->getTbl());	
 			if($tmpHm[0]){
@@ -208,7 +204,7 @@ class PageNavi extends WebApp{
        #error_log(__FILE__.": req:".$this->toString($_REQUEST));
 
        foreach($_REQUEST as $k=>$v){
-            if(strpos($k,"pnsk") === 0){
+            if($k != 'pnsk' && strpos($k,"pnsk") === 0){
                 $field = substr($k, 4);
                 $linkfield = $field;
                 if(strpos($field,"=") !== false){
@@ -216,58 +212,93 @@ class PageNavi extends WebApp{
                     $field = $arr[0];
                     $linkfield = $arr[1];
                 }
+				# for select 
+       	   		if(isset($_REQUEST[$field]) && $_REQUEST[$field] != $v){
+       	   			$v = $_REQUEST[$field];	
+       	   		}
+       	   		if(strlen($v) > 3 && startsWith($v, '%')){
+       	   			$v = urldecode($v);
+       	   		}
                 if(strpos($v,"tbl:") === 0){ #http://ufqi.com:81/dev/gtbl/ido.php?tbl=hss_dijietbl&tit=%E5%AF%BC%E6%B8%B8%E8%A1%8C%E7%A8%8B&db=&pnsktuanid=tbl:hss_findaoyoutbl:id=2 
                     $condition .= " ".$pnsm." ".$field." in (".$this->embedSql($linkfield,$v).")";
                 
-                }else if(strpos($v,"in::") === 0){ # <hidesk>tuanid=id::in::tbl:hss_tuanduitbl:operatearea=IN=USER_OPERATEAREA</hidesk>
+                }
+				else if(strpos($v,"in::") === 0){ # <hidesk>tuanid=id::in::tbl:hss_tuanduitbl:operatearea=IN=USER_OPERATEAREA</hidesk>
                     error_log(__FILE__.": k:$k, v:$v");
                     $tmparr = explode("::", $v);
                     $tmpop = $tmparr[0];
                     $tmpval = $tmparr[1];
                     if(strpos($tmpval,"tbl:") === 0){
                         $tmpval = $this->embedSql($linkfield, $tmpval);
-                    }else{
+                    }
+					else{
                         $tmpval = $this->addQuote($tmpval);
                     }
                     $condition .= " and $field in ($tmpval)";
-
-                }else{
+                }
+				else{
                     # remedy on Sun Jun 17 07:54:59 CST 2012 by wadelau
+                    
                     $fieldopv = $_REQUEST['oppnsk'.$field]; # refer to ./class/gtbl.class.php: getLogicOp,
                     if($fieldopv == null || $fieldopv == ''){
                         $fieldopv = "=";
                     }
+					else{
+						if(startsWith($fieldopv, '%')){
+							$fieldopv = urldecode($fieldopv);
+						}
+                        $fieldopv = str_replace('&lt;', '<', $fieldopv);
+                    }
                     if($fieldopv == 'inlist'){
                         if($this->isNumeric($hmfield[$field]) && strpos($hmfield[$field],'date') === false){
                             # numeric
-                        }else{
+                        }
+						else{
                             $v = $this->addQuote($v);
                         }
                         $condition .= " ".$pnsm." $field in ($v)";
-                    }else if($fieldopv == 'inrange'){
+                        $gtbl->del($field);
+                    }
+					else if($fieldopv == 'inrange'){
                         $tmparr = explode(",", $v);
                         if(strpos($hmfield[$field],'date') === false){
-                            $condition .= " ".$pnsm." ($field >= ".$tmparr[0]." and $field <= ".$tmparr[1].")";
-                        }else{
-                            $condition .= " ".$pnsm." ($field >= '".$tmparr[0]."' and $field <= '".$tmparr[1]."')";
+                            $condition .= " ".$pnsm." ($field >= ".intval($tmparr[0])
+                                ." and $field <= ".intval($tmparr[1]).")";
                         }
-                    }else if($fieldopv == 'contains'){
+						else{
+                            $condition .= " ".$pnsm." ($field >= ".$this->addQuote($tmparr[0])." and $field <= "
+                                    .$this->addQuote($tmparr[1]).")";
+                        }
+                        $gtbl->del($field);
+                    }
+					else if($fieldopv == 'contains'){
                         $condition .= " ".$pnsm." "."$field like ?";
                         $gtbl->set($field, "%".$v."%");
-                    }else if($fieldopv == 'notcontains'){
+                    }
+					else if($fieldopv == 'notcontains'){
                         $condition .= " ".$pnsm." "."$field not like ?";
                         $gtbl->set($field, "%".$v."%");
-                    }else if($fieldopv == 'startswith'){
+                    }
+					else if($fieldopv == 'startswith'){
                         $condition .= " ".$pnsm." "."$field like ?";
                         $gtbl->set($field, $v."%");
-                    }else if($fieldopv == 'endswith'){
+                    }
+					else if($fieldopv == 'endswith'){
                         $condition .= " ".$pnsm." "."$field like ?";
                         $gtbl->set($field, "%".$v);
-                    }else{ 
+                    }
+					else if($fieldopv == '!='){
+                        $condition .= " ".$pnsm." "."$field <> ?";
+                        $gtbl->set($field, $v);
+                    }
+                    else if($fieldopv == 'notregexp'){
+                        $condition .= " ".$pnsm." "."$field not regexp ?";
+                        $gtbl->set($field, $v);
+                    }
+					else{ 
                         $condition .= " ".$pnsm." $field $fieldopv ?"; # this should be numeric only.
                         $gtbl->set($field, $v);
                     }
-
                 }
             }
        }
@@ -312,11 +343,12 @@ class PageNavi extends WebApp{
            $arr = explode(",", $str);
            $tmpval = '';
            foreach($arr as $k12=>$v12){
-               $tmpval .= "'".$v12."',";
+               $tmpval .= "'".addslashes($v12)."',";
            }
            $tmpval = substr($tmpval, 0, strlen($tmpval)-1);
-       }else{
-           $tmpval = "'".$str."'";
+       }
+       else{
+           $tmpval = "'".addslashes($str)."'";
        }
        return $tmpval;
    }
@@ -332,8 +364,35 @@ class PageNavi extends WebApp{
             $tmpval = $varr2[2];
             $tmpval = "(".$this->addQuote($tmpval).")";
        }
+       # remedy for tablename.fieldname, Tue Nov 28 22:25:17 CST 2017
+       # e.g. pnskstate=1&pnskunion=in::tbl:unioninfo.unionname:allowx=1&pnsm=1&oppnskunion=in
+       if(inString('.', $varr[1])){
+           $varr3 = explode('.', $varr[1]);
+           $varr[1] = $varr3[0];
+           $field = $varr3[1];
+       }
        $condition .= "select $field from ".$varr[1]." where ".$varr2[0]." ".$tmpop." ".$tmpval." order by id desc";
        return $condition;
-   }  
+   }
+   
+   //-
+   //- isNumeric
+   # test whether a field is numeric or not
+   # added on Mon Jun 18 20:43:55 CST 2012
+   public function isNumeric($fieldtype){
+	   	$isNumeric = 0;
+	   	if(strpos($fieldtype, "int") !== false
+	   			|| strpos($fieldtype, "float") !== false
+	   			|| strpos($fieldtype, "double") !== false
+	   			|| strpos($fieldtype, "date") !== false
+	   			|| strpos($fieldtype, "decimal") !== false){
+	   
+	   				$isNumeric = 1;
+	   	}
+	   	return $isNumeric;
+   }
+   
+    
+   
 }
 

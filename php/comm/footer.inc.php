@@ -7,9 +7,12 @@ if($isoput){
 	$out .= "</body></html>";
 }
 
-# page header
-header("Content-type: text/html;charset=utf-8");
-
+//- content output
+$isOB = 0;
+if(ob_start('ob_gzhandler')){ $isOB = 1; }
+else if(ob_start()){
+    $isOB = 1;
+}
 if($smttpl != ''){
 
 	$data['smttpl'] = $smttpl;
@@ -18,15 +21,6 @@ if($smttpl != ''){
 	$data['ses'] = $_SESSION;
 	$data['viewdir'] = $rtvviewdir; # where and why?
 	$data['rtvdir'] = $rtvdir; # refer view/default/include/sitefeedback.html
-	# Fri Jul 10 22:17:09 CST 2015
-	foreach($_REQUEST as $k=>$v){
-		if(!array_key_exists($k, $data)){
-			$data[$k] = $v;	
-		}	
-	}
-	foreach($data as $k=>$v){
-		$smt->assign($k, $v);
-	}
 	
 	# moved in 22:04 10 July 2016 from comm/header
 	require($_CONFIG['smarty']."/Smarty.class.php");
@@ -38,6 +32,16 @@ if($smttpl != ''){
 	$smt->setCompileDir($viewdir.'/compile');
 	$smt->setConfigDir($viewdir.'/config');
 	$smt->setCacheDir($viewdir.'/cache');
+	
+	# Fri Jul 10 22:17:09 CST 2015
+	foreach($_REQUEST as $k=>$v){
+		if(!array_key_exists($k, $data)){
+			$data[$k] = $v;	
+		}	
+	}
+	foreach($data as $k=>$v){ # main point
+		$smt->assign($k, $v);
+	}
 	
 	if(1){
 		$markfile = $appdir."/tmp/tpl_last_modified.tmp"; # todo: cache the modified tpl file
@@ -58,38 +62,28 @@ if($smttpl != ''){
 	}
 	# for conflicts between smarty {} and javascript {}, using {literal}{/literal}
 	if($display_style == $_CONFIG['display_style_index']){
-		
 		$smttpl = $smttpl.".tmp";
 		$smt->assign('smttpl', $smttpl);
-		$smt->display('index.html.tmp'); # use index.html, $smttpl would be embedded in index.html by smarty, updated on Sun Jul 29 09:59:29 CST 2012
-
+		$smt->display('index.html.tmp'); 
+		# use index.html, $smttpl would be embedded in index.html by smarty, updated on Sun Jul 29 09:59:29 CST 2012
 	}
 	else if($display_style == $_CONFIG['display_style_smttpl']){
-
 		//$smt ->assign('respobj', $data['respobj']);
 		$smt->display($smttpl.".tmp"); # use template file only
 		//var_dump($data);
-	
 	}
 	else{
-		error_log(__FILE__.": Something wrong with display style and smttpl:$smttpl .");				
+		debug(__FILE__.": Something wrong with display style and smttpl:$smttpl .");				
 	}
 }
 else{
-	
-	//var_dump($_REQUEST);
-	$isOB = 0;
-	if(ob_start('ob_gzhandler')){ $isOB = 1; }
-	else if(ob_start()){ 
-		$isOB = 1; 
-	}
-	if(isset($fmt)){
+	if(isset($fmt) && $fmt != ''){
 		if($fmt == 'json'){
 			header("Content-type: application/json;charset=utf-8");
 			#print_r($data);
 			#print json_encode($data['respobj']);
 			$data['out'] = $out;
-			$output = json_encode($data);
+			$output = json_encode($data); # main point
 			$jsonerr = json_last_error();
 			if($jsonerr == JSON_ERROR_NONE){
 				print $output;
@@ -109,15 +103,15 @@ else{
 			}		
 		}
         else{
-            print "Unknown fmt:[$fmt] in output.";
+            print $out.="<!-- Unknown fmt:[$fmt] in output, using text/plain as default. 1608032158. -->";
         }
 	}
 	else{
 		#error_log(__FILE__.": smttpl is empty. not display with Smarty.req:[".$_SERVER['REQUEST_URI']);
 		print $out;
 	}
-	if($isOB){ ob_end_flush(); }
 }
+if($isOB){ ob_end_flush(); }
 
 #error_log(__FILE__.": out:[".$out."]");
 #error_log(date("m-d H:i:s").": ".__FILE__.": request:[".$_SERVER['REQUEST_URI']."] query_string:[".$_SERVER['QUERY_STRING']."] smttpl:[$smttpl] userid:[$userid] ismaishou:[".$data['ismaishou']."]");
