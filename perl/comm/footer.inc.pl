@@ -18,8 +18,12 @@ $i = $hmf{'i'};
 
 # main body
 $out = $hmf{'out'};
-$out .= "\tNow reaching into comm/footer. @".time()."\n\n";
+
+print "\t".__FILE__.": finializing..... @".time()."\n";
+print "\t".__FILE__.": <!-- output bgn -->\n";
 
 print $out;
+
+print "\t".__FILE__.": <!-- output end -->\n";
 
 1;

@@ -1,10 +1,8 @@
 <?php
 
-global $sid, $appdir, $siteid, $user, $userid,$isdbg;
+global $sid, $appdir, $siteid, $user, $userid, $isdbg;
 date_default_timezone_set("Asia/Chongqing");
 session_start(); # in developping stage, using php built-in session manager
-
-error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 
 # dir manipulate
 $docroot = $_SERVER['DOCUMENT_ROOT'];
@@ -16,7 +14,8 @@ $appdir = $docroot.$reqdir;
 if($appdir == ''){
     $appdir = $rtvdir;
 }
-#print "docroot:[$docroot] appdir:[$appdir] rtvdir:[$rtvdir] req_uri:[".$_SERVER['REQUEST_URI']."] req_dir:[".substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'))."]";
+#print "docroot:[$docroot] appdir:[$appdir] rtvdir:[$rtvdir] req_uri:[".$_SERVER['REQUEST_URI']
+#."] req_dir:[".substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '/'))."]";
 #exit(0);
 
 require($appdir."/inc/config.class.php");
@@ -24,6 +23,20 @@ require($appdir."/mod/user.class.php");
 require($appdir."/comm/tools.function.php");
 
 $siteid = $_CONFIG['siteid']; $isdbg = $_CONFIG['is_debug'];
+if($isdbg){
+    header("Cache-Control: no-store, no-cache, must-revalidate");
+    header("Expires: Thu, 01 Jan 1970 00:00:00 GMT");
+    error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+    error_reporting(-1);
+    ini_set('error_reporting', E_ALL ^ E_NOTICE);
+    ini_set("display_errors", 1);
+}
+else{
+    header("Cache-Control: max-age=604800"); # a week?
+    error_reporting(E_ERROR | E_PARSE);
+    ini_set('error_reporting', E_ERROR | E_PARSE);
+    ini_set("display_errors", 0);
+}
 
 # user info
 define('UID',$_CONFIG['agentalias'].'_user_id');
@@ -41,7 +54,7 @@ if(!isset($user)){
     $user = new User();
 }
 $userid = '';
-if(array_key_exists(UID,$_SESSION) && $_SESSION[UID] != ''){
+if(array_key_exists(UID, $_SESSION) && $_SESSION[UID] != ''){
 	$userid = $_SESSION[UID];
 	$user->setId($userid);
 	$data['islogin'] = 1;
@@ -83,7 +96,8 @@ foreach($_REQUEST as $k=>$v){
             $k = $matcharr[1];
 			if(is_string($v)){
 				$v = trim($v);
-				if(stripos($v, "<") > -1){ # <script , <embed, <img, <iframe, etc.  Mon Feb  1 14:48:32 CST 2016
+				if(stripos($v, "<") > -1){ 
+				    # <script , <embed, <img, <iframe, etc.  Mon Feb  1 14:48:32 CST 2016
 					$v = str_ireplace("<", "&lt;", $v);
 					$_REQUEST[$k] = $v;
 				}

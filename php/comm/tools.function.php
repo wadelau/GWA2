@@ -238,11 +238,13 @@ function redirect($url, $time=0, $msg='') {
     //multi URL addr support ?
     $url = str_replace(array("\n", "\r"), '', $url);
 	if(!inString('://', $url)){ # relative to absolute path
-		$url = "//".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].$url;
+	    if($_SERVER['SERVER_NAME'] != '' && $_SERVER['SERVER_NAME'] != '_'){ # case of nginx
+	        $url = "//".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].$url;
+	    }
 	}
 	if($time < 10){ $time = $time * 1000; } # in case of milliseconds
 	$hideMsg = "<!DOCTYPE html><html><head>";
-	$hideMsg .= "<meta http-equiv=\"refresh\" content=\"{$time};URL='{$url}'\">";
+	$hideMsg .= "<meta http-equiv=\"refresh\" content=\"".($time/1000).";url='$url'\">";
 	$hideMsg .= "</head><body>";  # remedy Mon Nov 23 22:03:24 CST 2015
     if (empty($msg)){
         #$msg = "系统将在{$time}秒之后自动跳转到{$url}！";
@@ -451,12 +453,17 @@ function debug($obj, $tag='', $output=null){
 		else{ $ip = "Unknown";}
 
 		if (($ip == "Unknown" or $ip == "127.0.0.1"
-				or strpos( $ip, "172.31." ) === 0)
+		        or strpos( $ip, "192.168." ) === 0
+		        or strpos( $ip, "172.31." ) === 0
+		        or strpos( $ip, "10." ) === 0)
 			and @$_SERVER["HTTP_X_REAL_IP"]){
 			
 			$ip = $_SERVER["HTTP_X_REAL_IP"];
 		}
-		if (($ip == "Unknown" or $ip == "127.0.0.1" or strpos( $ip, "172.31." ) === 0)
+		if (($ip == "Unknown" or $ip == "127.0.0.1" 
+		        or strpos( $ip, "192.168." ) === 0
+		        or strpos( $ip, "172.31." ) === 0
+		        or strpos( $ip, "10." ) === 0)
 				and @$_SERVER["HTTP_X_FORWARDED_FOR"]) {
 			
 			$ip = $_SERVER["HTTP_X_FORWARDED_FOR"];

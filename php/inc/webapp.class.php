@@ -36,6 +36,7 @@ class WebApp implements WebAppInterface{
 	const GWA2_ERR = 'gwa2_error_TAG';
 	const GWA2_ID = 'gwa2_id_TAG';
 	const GWA2_TBL = 'gwa2_tbl_TAG';
+	const Read_Object_Timeout = 300; # 5 * 60 seconds
 	var $ssl_verify_ignore = false;
 	var $http_enable_gzip = false;
 	var $GWA2_Runtime_Env_List = null;
@@ -408,7 +409,8 @@ class WebApp implements WebAppInterface{
 	private function _setAll(){
 		$isinclude = 0;
 		if($this->getId() != ''){
-			$tmphm = $this->getBy('*',null);
+			$tmphm = $this->getBy('*',null,
+			        $withCache=array('key'=>$this->getTbl().'-id'.$this->getId().'-select'));
 			#debug(__FILE__.": _setAll: rtn: ");
 			#debug($tmphm);
 			if($tmphm[0]){
@@ -432,7 +434,7 @@ class WebApp implements WebAppInterface{
 		}
 		else{
 			#error_log('/inc/webapp.class.php: _setAll: failed for empty id.');
-			$this->set('er', 1);
+			$this->set(self::GWA2_ERR, 1);
 			return false;
 		}
 		$this->set(self::GWA2_ERR, 1);
@@ -492,7 +494,10 @@ class WebApp implements WebAppInterface{
         $obj = '';
         if($type == 'cache:'){
             //- cache service
-            $obj = $this->cachea->get($args['key']);
+            $obj = array(0=>true);
+            if($this->cachea != null){
+                $obj = $this->cachea->get($args['key']);
+            }
             if(!$obj[0]){
                 $obj = array(true, $obj[1]);
             }
@@ -535,8 +540,11 @@ class WebApp implements WebAppInterface{
                     $enableZip = true;
                 }
                 $paraStr = '';
-                if($args['parameter']){
+                if(is_array($args['parameter'])){
                     $paraStr = http_build_query($args['parameter']);
+                }
+                else{
+                    $paraStr = $args['parameter'];
                 }
                 $header .= "Content-Length: ".strlen($paraStr)."\n";
                 #debug(__FILE__.": header:[$header]");
@@ -544,7 +552,8 @@ class WebApp implements WebAppInterface{
 					'http'=>array(
 						'method'=>'POST',
 						'header'=>$header,
-						'content'=> $paraStr
+						'content'=> $paraStr,
+						'timeout' => self::Read_Object_Timeout,
 						)
 					); # $args: 'method', 'header', 'content'...
 				if($this->ssl_verify_ignore){
@@ -600,6 +609,7 @@ class WebApp implements WebAppInterface{
                         'http'=>array(
 							'method'=>'GET',
 							'header'=>$header,
+							'timeout' => self::Read_Object_Timeout,
                         )
                     ); # $args: 'method', 'header', 'content'...
 				if($this->ssl_verify_ignore){
@@ -650,6 +660,8 @@ class WebApp implements WebAppInterface{
         $obj = null;
         if($type == 'cache:'){
 			//- cache service
+			$obj = array(0=>true);
+			if($this->cachea != null){
 			if(is_null($args['value'])){
 				$obj = $this->cachea->rm($args['key']);
 			}
@@ -663,6 +675,7 @@ class WebApp implements WebAppInterface{
 				}
 				#debug(__FILE__.": writeObject: type:[$type] args:[".$this->toString($args)."] cache result:");
 				#debug($obj);
+			}
 			}
 			if(!$obj[0]){
 				$obj = array(true, $obj[1]);
@@ -774,7 +787,11 @@ class WebApp implements WebAppInterface{
 		return false;
 	}
 
-	//-
+	//-  remedy by wadelau@ufqi.com, Wed Jun 15 19:56:17 CST 2016
+	public function getMyId(){
+		return $this->myId;
+	}
+
 	//-- setCache
 	private function _setCache($hm, $fields){
 		# cache successful resultset

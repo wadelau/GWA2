@@ -31,7 +31,7 @@ if(true){
 	$conf['display_style_smttpl']		= 1; 
 
 	# db info
-	$conf['dbhost'] 	= 'DB_HOST';
+	$conf['dbhost'] 	= 'DB_HOST'; # use 127.0.0.1 instead of localhost
 	$conf['dbport'] 	= 'DB_PORT';
 	$conf['dbuser'] 	= 'DB_USER';
 	$conf['dbpassword'] 	= 'DB_PASSWORD';

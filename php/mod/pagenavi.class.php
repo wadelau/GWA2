@@ -3,6 +3,7 @@
  * v0.3
  * wadelau@ufqi.com
  * Tue Jan 24 12:25:56 GMT 2012
+ * bugfix, 21:22 28 February 2017
  */
 
 if(!defined('__ROOT__')){
@@ -19,11 +20,6 @@ class PageNavi extends WebApp{
        $pdef = array('pnpn'=>1,'pnps'=>100,'pntc'=>0); # 28 for development
 
        $file = $_SERVER['PHP_SELF'];
-       #$rawurl =$_SERVER['REQUEST_URI'];
-        #$idxpos = strpos($rawurl,"index.php/") + 9;
-        #$file = substr($rawurl, 0, $idxpos);
-       #$file = $rawurl;
-       #print __FILE__.": file:$file orig:".$_SERVER['REQUEST_URI']."\n";
        $query = $_SERVER['QUERY_STRING'];
        
        if(strpos($query, "act/list-") !== false){
@@ -35,7 +31,6 @@ class PageNavi extends WebApp{
        $url = $file."?".preg_replace("/&pnpn=([0-9]*)/","",$query);
        
        #print __FILE__.": orig_url: $url";
-
        //$url=str_replace("&","/",$url); # for RESTful address
        //$url=str_replace("=","/",$url);
 
@@ -221,6 +216,9 @@ class PageNavi extends WebApp{
        	   		if(isset($_REQUEST[$field]) && $_REQUEST[$field] != $v){
        	   			$v = $_REQUEST[$field];	
        	   		}
+       	   		if(strlen($v) > 3 && startsWith($v, '%')){
+       	   			$v = urldecode($v);
+       	   		}
                 if(strpos($v,"tbl:") === 0){ #http://ufqi.com:81/dev/gtbl/ido.php?tbl=hss_dijietbl&tit=%E5%AF%BC%E6%B8%B8%E8%A1%8C%E7%A8%8B&db=&pnsktuanid=tbl:hss_findaoyoutbl:id=2 
                     $condition .= " ".$pnsm." ".$field." in (".$this->embedSql($linkfield,$v).")";
                 
@@ -240,11 +238,15 @@ class PageNavi extends WebApp{
                 }
 				else{
                     # remedy on Sun Jun 17 07:54:59 CST 2012 by wadelau
+                    
                     $fieldopv = $_REQUEST['oppnsk'.$field]; # refer to ./class/gtbl.class.php: getLogicOp,
                     if($fieldopv == null || $fieldopv == ''){
                         $fieldopv = "=";
                     }
 					else{
+						if(startsWith($fieldopv, '%')){
+							$fieldopv = urldecode($fieldopv);
+						}
                         $fieldopv = str_replace('&lt;', '<', $fieldopv);
                     }
                     if($fieldopv == 'inlist'){
@@ -346,7 +348,7 @@ class PageNavi extends WebApp{
            $tmpval = substr($tmpval, 0, strlen($tmpval)-1);
        }
        else{
-           $tmpval = addslashes($str);
+           $tmpval = "'".addslashes($str)."'";
        }
        return $tmpval;
    }
@@ -361,6 +363,13 @@ class PageNavi extends WebApp{
             $tmpop = $varr2[1];
             $tmpval = $varr2[2];
             $tmpval = "(".$this->addQuote($tmpval).")";
+       }
+       # remedy for tablename.fieldname, Tue Nov 28 22:25:17 CST 2017
+       # e.g. pnskstate=1&pnskunion=in::tbl:unioninfo.unionname:allowx=1&pnsm=1&oppnskunion=in
+       if(inString('.', $varr[1])){
+           $varr3 = explode('.', $varr[1]);
+           $varr[1] = $varr3[0];
+           $field = $varr3[1];
        }
        $condition .= "select $field from ".$varr[1]." where ".$varr2[0]." ".$tmpop." ".$tmpval." order by id desc";
        return $condition;

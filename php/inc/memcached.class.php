@@ -18,8 +18,10 @@ class MEMCACHEDX {
 	var $cport = '';
 	var $chost = '';
 	var $mcache = null;
-	var $persistConnId = 'GWA2_BUILD_IN_MC';
 	var $expireTime = 1800; # 30 * 60; # 30 minutes
+	const persist_ConnId = 'GWA2_BUILD_IN_MC';
+	const Default_Port = 11211; # Tue, 2 May 2017 19:04:43 +0800
+	const Sock_Tag = '.sock';
 	
  	//- construct
 	function __construct($config=null){
@@ -27,17 +29,22 @@ class MEMCACHEDX {
 		$this->cport = $config->cport;
 		$this->chost = $config->chost;
 		$this->expireTime = $config->expireTime;
-		
+		if($this->cport == 0 || $this->cport == ''){
+		    $this->cport = self::Default_Port; # Memcached
+		}
 		if(class_exists('Memcached')){ # set true/false in production
 			//- use built-in memcached functions
-			$this->mcache = new Memcached($this->persistConnId);
+			$this->mcache = new Memcached(self::persist_ConnId);
+			$this->mcache->setOption(Memcached::OPT_REMOVE_FAILED_SERVERS, true);
+			$this->mcache->setOption(Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
 			$servers = $this->mcache->getServerList(); 
 			$isConnected = 0;
 			if(is_array($servers)) { 
 				foreach ($servers as $server) {
-					if(($server['host'] == $this->chost and $server['port'] == $this->cport)
+					if(($server['host'] == $this->chost 
+					        && $server['port'] == $this->cport)
 						|| ($server['host'] == 'localhost')
-					) {
+					){
 						$isConnected = 1;
 						break;
 					}
@@ -48,7 +55,7 @@ class MEMCACHEDX {
 			}
 		}
 		else{
-			//- open socket, ###todo
+			//- open socket, # @todo
 			#$this->mcache 
 			
 		}
@@ -70,13 +77,16 @@ class MEMCACHEDX {
 	//- init
 	private function _init(){
 		if(!is_object($this->mcache)){
-			$this->mcache = new Memcached($this->persistConnId);
+			$this->mcache = new Memcached(self::persist_ConnId);
+			$this->mcache->setOption(Memcached::OPT_REMOVE_FAILED_SERVERS, true);
+			$this->mcache->setOption(Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
 			$servers = $this->mcache->getServerList(); 
 			if(is_array($servers)) { 
 				foreach ($servers as $server) {
-					if(($server['host'] == $this->chost and $server['port'] == $this->cport)
+					if(($server['host'] == $this->chost 
+					        && $server['port'] == $this->cport)
 						|| ($server['host'] == 'localhost')
-					) {
+					){
 						return $this->mcache;
 					}
 				}

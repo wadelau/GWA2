@@ -11,6 +11,7 @@
  * bugfix, 13:39 13 September 2016
  * bugfix, Thu Sep 29 04:06:26 UTC 2016
  * imprvs on numeric conversion, Fri Oct  7 03:42:59 UTC 2016
+ * bugifx by _decodeByLength, 20:40 28 November 2016
  */
 
 
@@ -54,6 +55,9 @@ class Base62x {
 	public static function encode($input, $ibase=null){
 		
 		$output = null;
+		if($input == null || $input == ''){
+			return $input;
+		}
 
 		$codetype = 0;
 		$xtag = self::XTAG;
@@ -156,6 +160,9 @@ class Base62x {
 	public static function decode($input, $obase=null){
 		
 		$output = "";
+		if($input == null || $input == ''){
+			return $input;
+		}
 
 		$codetype = 1;
 		$xtag = self::XTAG;
@@ -206,13 +213,14 @@ class Base62x {
 				while(++$i < $inputlen);
 			}
 			else{
-				$c0 = 0; $c1 = 0; $c2 = 0;
+				//$c0 = 0; $c1 = 0; $c2 = 0;
 				$tmpArr = array();
 				$bint = array('1'=>1, '2'=>2, '3'=>3);
 				do{
-					$tmpArr = array('\0', '\0', '\0', '\0');
+					#$tmpArr = array('\0', '\0', '\0', '\0');
+					$tmpArr = array(null, null, null, null);
 					$remaini = $inputlen - $i;
-					$k = 0; # what for?
+					//$k = 0; # what for?
 					switch($remaini){
 						case 1:
 							error_log(__FILE__.": found illegal base62x input:[".$inputArr[$i]."]. 1608091042.");
@@ -223,8 +231,9 @@ class Base62x {
 							else{$tmpArr[0] = $rb62x[$inputArr[$i]]; }
 							if($inputArr[++$i] == $xtag){ $tmpArr[1] = $bpos + $bint[$inputArr[++$i]]; }
 							else{$tmpArr[1] = $rb62x[$inputArr[$i]]; }
-							$c0 = $tmpArr[0] << 2 | $tmpArr[1];
-							$op[$m] = chr($c0);
+							$arr = self::_decodeByLength($tmpArr, $op, $m);
+							$op = $arr[0];
+							$m = $arr[1];
 							break;	
 
 						case 3:
@@ -234,10 +243,9 @@ class Base62x {
 							else{$tmpArr[1] = $rb62x[$inputArr[$i]]; }
 							if($inputArr[++$i] == $xtag){ $tmpArr[2] = $bpos + $bint[$inputArr[++$i]]; }
 							else{$tmpArr[2] = $rb62x[$inputArr[$i]]; }
-							$c0 = $tmpArr[0] << 2 | $tmpArr[1] >> 4;
-							$c1 = (($tmpArr[1] << 4) & 0xf0) | $tmpArr[2];
-							$op[$m] = chr($c0);
-							$op[++$m] = chr($c1);
+							$arr = self::_decodeByLength($tmpArr, $op, $m);
+							$op = $arr[0];
+							$m = $arr[1];
 							break;
 
 						default:
@@ -249,12 +257,9 @@ class Base62x {
 							else{$tmpArr[2] = $rb62x[$inputArr[$i]]; }
 							if($inputArr[++$i] == $xtag){ $tmpArr[3] = $bpos + $bint[$inputArr[++$i]]; }
 							else{$tmpArr[3] = $rb62x[$inputArr[$i]]; }
-							$c0 = $tmpArr[0] << 2 | $tmpArr[1] >> 4;
-							$c1 = (($tmpArr[1] << 4) & 0xf0) | ($tmpArr[2] >> 2);
-							$c2 = (($tmpArr[2] << 6) & 0xff) | $tmpArr[3];
-							$op[$m] = chr($c0);
-							$op[++$m] = chr($c1);
-							$op[++$m] = chr($c2);	
+							$arr = self::_decodeByLength($tmpArr, $op, $m);
+							$op = $arr[0];
+							$m = $arr[1];
 					}
 					$m++;
 				}
@@ -293,9 +298,6 @@ class Base62x {
 				$onum = $onum + $tmpi * pow($ibase, ($i - $xnum));	
 				#error_log(__FILE__.": xx2dec i:$i c:".$iArr[$i]." onum:$onum");
 			}
-			#$onum = sprintf("%u", $onum);
-			#$onum = number_format($onum, 0, '', '');
-			#$onum = (int)$onum;
 			if(strpos($onum, 'E') !== false){
 				error_log(__FILE__.": Base62x::xx2dec: lost precision due to too large number:[$onum]. consider using bc math. 1610072145.");
 				$onum = number_format($onum);	
@@ -395,40 +397,14 @@ class Base62x {
 		if($asctype == 1){
 			for($i=0; $i<=$ascmax; $i++){ $ascidx[$i] = -1; }		
 			$idxi = 0;
-			for($i=0; $i<17; $i++){
-				$ascidx[$i] = $asclist[$idxi]; 
-				$ascrlist[$asclist[$idxi]] = $i;
-				$idxi++;
-			}
-			# DC 1-4, skip
-			for($i=21; $i<28; $i++){
-				$ascidx[$i] = $asclist[$idxi]; 
-				$ascrlist[$asclist[$idxi]] = $i;
-				$idxi++;
-			}
-			# FS, GS, RS, US, skip
-			$tmpi = 47; # ord('/');
-			for($i=ord(' '); $i<=$tmpi; $i++){
-				$ascidx[$i] = $asclist[$idxi]; 
-				$ascrlist[$asclist[$idxi]] = $i;
-				$idxi++;
-			}
-			$tmpi = 64; # ord('@');
-			for($i=ord(':'); $i<=$tmpi; $i++){
-				$ascidx[$i] = $asclist[$idxi]; 
-				$ascrlist[$asclist[$idxi]] = $i;
-				$idxi++;
-			}
-			$tmpi = 96; # ord('`');
-			for($i=ord('['); $i<=$tmpi; $i++){
-				$ascidx[$i] = $asclist[$idxi]; 
-				$ascrlist[$asclist[$idxi]] = $i;
-				$idxi++;
-			}
-			for($i=ord('{'); $i<=$ascmax; $i++){
-				$ascidx[$i] = $asclist[$idxi]; 
-				$ascrlist[$asclist[$idxi]] = $i;
-				$idxi++;
+			$bgnArr = array(0, 21, 32, 58, 91, 123);
+			$endArr = array(17, 28, 48, 65, 97, $ascmax+1);
+			foreach($bgnArr as $k=>$v){
+				for($i=$v; $i<$endArr[$k]; $i++){
+					$ascidx[$i] = $asclist[$idxi]; 
+					$ascrlist[$asclist[$idxi]] = $i;
+					$idxi++;
+				}
 			}
 		}
 
@@ -439,7 +415,36 @@ class Base62x {
 
 	}
 
-
+	//- decode with x1, x2, x3
+	//- Mon Nov 28 17:47:45 CST 2016
+	private static function _decodeByLength($tmpArr, $op, $m){
+	    $rtn = $op;
+		$c0 = 0; $c1 = 0; $c2 = 0;
+	    if($tmpArr[3] !== null){
+	        $c0 = $tmpArr[0] << 2 | $tmpArr[1] >> 4;
+	        $c1 = (($tmpArr[1] << 4) & 0xf0) | ($tmpArr[2] >> 2);
+	        $c2 = (($tmpArr[2] << 6) & 0xff) | $tmpArr[3];
+	        $op[$m] = chr($c0);
+	        $op[++$m] = chr($c1);
+	        $op[++$m] = chr($c2);
+	    }
+	    else if($tmpArr[2] !== null){
+	        $c0 = $tmpArr[0] << 2 | $tmpArr[1] >> 4;
+	        $c1 = (($tmpArr[1] << 4) & 0xf0) | $tmpArr[2];
+	        $op[$m] = chr($c0);
+	        $op[++$m] = chr($c1);
+	    }
+	    else if($tmpArr[1] !== null){
+	        $c0 = $tmpArr[0] << 2 | $tmpArr[1];
+	        $op[$m] = chr($c0);
+	    }
+	    else{
+	        $c0 = $tmpArr[0];
+	        $op[$m] = chr($c0);
+	    }
+	    return array($rtn=$op, $m);
+	}
+	
 }
 
 ?>

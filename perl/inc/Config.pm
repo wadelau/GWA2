@@ -15,14 +15,26 @@ my %conf = (
 	'appname' => '-GWA2',
 
 	# db info
-	'dbhost' => '127.0.0.1',
+	'dbhost' => 'localhost',
 	'dbport' => '3306',
-	'dbuser' => '',
+	'dbuser' => "",
 	'dbpassword' => '',
 	'dbname' => '',
 	'dbdriver' => 'mysql',
 	'dbsock' => '/www/bin/mysql/mysql.sock',
+
 	'db_enable_utf8_affirm' => 1,
+
+	# stat db info
+	'dbhost_stat' => 'localhost',
+	'dbport_stat' => '3306',
+	'dbuser_stat' => '',
+	'dbpassword_stat' => '',
+	'dbname_stat' => '',
+	'dbdriver_stat' => 'mysql',
+	'dbsock_stat' => '/www/bin/mysql/mysql.sock',
+
+	'uploaddir'=>'upld',
 
 );
 

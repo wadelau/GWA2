@@ -3,8 +3,10 @@
 # see desc at the bottom
 # invoke by cli:
 # /path/to/perl -w /path/to/index.pl "?mod=hello&act=say&fmt=json"
+# or
+# ./index.pl "?mod=hello&act=say&fmt=json"
 
-use lib '/mnt/hgfs/HostGitHub/GWA2/perl'; # @todo
+use lib '../'; # @todo
 use lib './';
 
 use strict;
@@ -38,14 +40,13 @@ require("./comm/header.inc.pl");
 my $argvsize = scalar @ARGV;
 my %hmf = (); # runtime container
 %hmf = %{$ARGV[$argvsize-1]}; # return from controller
-print "now is: ".strftime("%Y-%m-%d-%H:%M:%S%z", localtime)."\n";
+$hmf{'workdir'} = $mydir;
 
 my $i = $hmf{'i'};
 my $mod = $hmf{'mod'}; # hello
 my $act = $hmf{'act'}; 
 my $r = $hmf{'r'}; # CGI
 my $out = $hmf{'out'};
-$out .= "\tI am now traveling into index. @".time()."\n\n";
 
 # single instance
 my $gotoNext = 1;
@@ -61,32 +62,13 @@ if($singlerun == 1){
 
 $hmf{'out'} = $out;
 $ARGV[$argvsize-1] = \%hmf; # $hmf; prepare for controller
+if(!defined($mod)){ $mod = ''; }
 if($mod eq ''){ $mod = 'index'; }
 
-print "index: ARGV:\n";
-for(my $i=0; $i<@ARGV; $i++){
-	my $v = $ARGV[$i];
-	print "\tindex: i:$i v:[".$v."]\n";
-}
+#debug(\@ARGV);
 
 # mod, ctrl
 require "./ctrl/$mod.pl";
-
-#_exec_(); # this func
-
-print "index: ARGV after ctrl:\n";
-for(my $i=0; $i<@ARGV; $i++){
-	my $v = $ARGV[$i];
-	print "\tindex: i:$i v:[".$v."]\n";
-}
-
-# sub
-sub _exec_ {
-	my $hello = mod::Hello->new($ARGV[0], $ARGV[1]);
-	print "\tindex: I am a func from $0 in index:[".$ARGV[0]."].\n";	
-	$hmf{'var_in__exec_in_index'} = "_exec_index_: time: ".localtime();
-	$hello->sayHi($0);
-}
 
 # footer
 require("./comm/footer.inc.pl");
