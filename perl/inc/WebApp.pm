@@ -27,7 +27,7 @@ use inc::Dba;
 my $_ROOT_ = dirname(abs_path($0));
 use constant VER => 0.01;
 my $dba = {};
-my %hm = (); # [];
+my %hm = (); # []; is a reference
 my %hmf = ();
 my $isdbg = 1;
 my $myId = 'id';

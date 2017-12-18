@@ -29,11 +29,6 @@ my $mydir = dirname(abs_path($0));
 my $basename = basename($0,(".pl"));
 my $singlerun = 0;
 chdir($mydir);
-print "workdir:[".$mydir."]\tbasename:[".$basename."]\n";
-if($singlerun == 1){
-	open(LOCK,">".$mydir."/".$basename.".lock") || die $!;
-	flock(LOCK,LOCK_EX|LOCK_NB) || warn "another $basename is running,exit\n";
-}
 
 # main body
 
@@ -52,6 +47,18 @@ my $r = $hmf{'r'}; # CGI
 my $out = $hmf{'out'};
 $out .= "\tI am now traveling into index. @".time()."\n\n";
 
+# single instance
+my $gotoNext = 1;
+print "workdir:[".$mydir."]\tbasename:[".$basename."]\n";
+if($singlerun == 1){
+	open(LOCK,">".$mydir."/".$basename.".".$mod.".".$act.".lock") || die $!;
+	flock(LOCK,LOCK_EX|LOCK_NB) || warn ("another $basename is running, exit...".($gotoNext=0)."\n");
+	if($gotoNext == 0){
+		print "Script stopping....\n";
+		exit(0);
+	}
+}
+
 $hmf{'out'} = $out;
 $ARGV[$argvsize-1] = \%hmf; # $hmf; prepare for controller
 if($mod eq ''){ $mod = 'index'; }
@@ -64,8 +71,6 @@ for(my $i=0; $i<@ARGV; $i++){
 
 # mod, ctrl
 require "./ctrl/$mod.pl";
-
-#_exec_in_child_(); # child's func
 
 #_exec_(); # this func
 
