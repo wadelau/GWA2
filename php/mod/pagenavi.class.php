@@ -55,6 +55,9 @@ class PageNavi extends WebApp{
             $para['pntc'] = $this->hmf['totalcount'];
             $this->hmf['url'] = preg_replace("/&pntc\/([0-9]*)/","", $this->hmf['url']);
             //$this->hmf['url'] .= "/pntc/".$para['pntc'];
+	    if(!inString('?', $this->hmf['url'])){
+		    $this->hmf['url'] .= "?_0101=1";
+	    }
             $this->hmf['url'] .= "&pntc=".$para['pntc'];
             $para['url'] = $this->hmf['url'];
        }
@@ -93,7 +96,10 @@ class PageNavi extends WebApp{
        if($this->hmf['totalcount'] > 0){
             $para['pntc'] = $this->hmf['totalcount'];
             $this->hmf['url'] = preg_replace("/\/pntc\/([0-9]*)/","", $this->hmf['url']);
-            $this->hmf['url'] .= "&pntc=".$para['pntc'];
+            if(!inString('?', $this->hmf['url'])){
+		    $this->hmf['url'] .= "?_0101=1";
+	    }
+	    $this->hmf['url'] .= "&pntc=".$para['pntc'];
             $para['url'] = $this->hmf['url'];
        }
 
