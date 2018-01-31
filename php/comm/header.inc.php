@@ -123,7 +123,7 @@ if($mod == ""){
 */
 
 ## RESTful handler
-$entry_tag = $_CONFIG['entry_tag'];;
+$entry_tag = $_CONFIG['entry_tag'];
 $paraArr = explode("/", $_SERVER['REQUEST_URI']);
 $found_entry = 0; $query_string = '';
 $paraCount = count($paraArr);
@@ -142,7 +142,13 @@ if($query_string != ''){ $query_string = substr($query_string, 0, strlen($query_
 $_SERVER['REQUEST_URI'] = $_SERVER['SCRIPT_NAME'];
 $_SERVER['QUERY_STRING'] = $query_string;
 
-$url = $rtvdir.'/'.$entry_tag;
+$url = '';
+if($entry_tag != ''){
+	$url = $rtvdir.'/'.$entry_tag;
+}
+else{
+	$url = $rtndir.'?'
+}
 $data['randi'] = rand(10000,999999);
 
 # global variables
@@ -154,10 +160,15 @@ if($isdbg){
         $sid = rand(1000, 999999); $_SESSION['sid'] = $sid;
       }
     }
-	else{
-		$sid = str_replace('<', '&lt;', $sid);
-	}
-    $url .= "/sid/".$sid;
+    else{
+	$sid = str_replace('<', '&lt;', $sid);
+    }
+    if($entry_tag != ''){
+    	$url .= "/sid/".$sid;
+    }
+    else{
+    	$url .= 'sid='.$sid;
+    }
 }
 
 function exception_handler($exception) {
