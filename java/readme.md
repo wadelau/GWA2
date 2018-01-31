@@ -1,5 +1,6 @@
-## GWA2 in Java
+## -GWA2 in -Java
 
+General Web Application Architecture (GWA2) has been implemented in Java, which helps developers make web applications in pure Java Servlet, i.e. Java Server-Side Programming.
 
 ## JDK1.7 required ##
 need jdk1.7+
