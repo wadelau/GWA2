@@ -49,11 +49,11 @@ my $r = $hmf{'r'}; # CGI
 my $out = $hmf{'out'};
 
 # single instance
-my $gotoNext = 1;
 print "workdir:[".$mydir."]\tbasename:[".$basename."]\n";
 if($singlerun == 1){
+	my $gotoNext = 1;
 	open(LOCK,">".$mydir."/".$basename.".".$mod.".".$act.".lock") || die $!;
-	flock(LOCK,LOCK_EX|LOCK_NB) || warn ("another $basename is running, exit...".($gotoNext=0)."\n");
+	flock(LOCK,LOCK_EX|LOCK_NB) || warn ("Another $basename?mod=$mod&act=$act is running, exit...".($gotoNext=0)."\n");
 	if($gotoNext == 0){
 		print "Script stopping....\n";
 		exit(0);
