@@ -112,37 +112,35 @@ foreach($_REQUEST as $k=>$v){
   	}
 }
 
-# re-init global vars, 09:28 Monday, 29 February, 2016
-# re sort code in index, 09:12 10 June 2016
-/*
-$mod = $_REQUEST['mod']; # which mod is requested?
-$act = $_REQUEST['act']; # what act needs to do?
-if($mod == ""){
-  $mod = "index";
-}
-*/
-
 ## RESTful handler
-$entry_tag = $_CONFIG['entry_tag'];;
-$paraArr = explode("/", $_SERVER['REQUEST_URI']);
-$found_entry = 0; $query_string = '';
-$paraCount = count($paraArr);
-for($i=0; $i<$paraCount; $i++){
-	if($paraArr[$i] == $entry_tag){
-		$found_entry = 1;
-	}
-	else{
-		if($found_entry == 1 && $paraArr[$i] != ''){
-			$_REQUEST[$paraArr[$i]] = $paraArr[++$i];
-			$query_string .= $paraArr[$i-1]."=".$paraArr[$i].'&';
+$entry_tag = $_CONFIG['entry_tag'];
+if($entry_tag != ''){
+	$paraArr = explode("/", $_SERVER['REQUEST_URI']);
+	$found_entry = 0; $query_string = '';
+	$paraCount = count($paraArr);
+	for($i=0; $i<$paraCount; $i++){
+		if($paraArr[$i] == $entry_tag){
+			$found_entry = 1;
+		}
+		else{
+			if($found_entry == 1 && $paraArr[$i] != ''){
+				$_REQUEST[$paraArr[$i]] = $paraArr[++$i];
+				$query_string .= $paraArr[$i-1]."=".$paraArr[$i].'&';
+			}
 		}
 	}
+	if($query_string != ''){ $query_string = substr($query_string, 0, strlen($query_string)-1); }
+	$_SERVER['QUERY_STRING'] = $query_string;
 }
-if($query_string != ''){ $query_string = substr($query_string, 0, strlen($query_string)-1); }
 $_SERVER['REQUEST_URI'] = $_SERVER['SCRIPT_NAME'];
-$_SERVER['QUERY_STRING'] = $query_string;
 
-$url = $rtvdir.'/'.$entry_tag;
+$url = '';
+if($entry_tag != ''){
+	$url = $rtvdir.'/'.$entry_tag;
+}
+else{
+	$url = $rtndir.'?_01=10'
+}
 $data['randi'] = rand(10000,999999);
 
 # global variables
@@ -154,10 +152,15 @@ if($isdbg){
         $sid = rand(1000, 999999); $_SESSION['sid'] = $sid;
       }
     }
-	else{
-		$sid = str_replace('<', '&lt;', $sid);
-	}
-    $url .= "/sid/".$sid;
+    else{
+	$sid = str_replace('<', '&lt;', $sid);
+    }
+    if($entry_tag != ''){
+    	$url .= "/sid/".$sid;
+    }
+    else{
+    	$url .= '&sid='.$sid;
+    }
 }
 
 function exception_handler($exception) {
