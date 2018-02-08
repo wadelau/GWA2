@@ -201,6 +201,7 @@ public final class Dba { //- db administrator
 			}
 			
 			/* old codes bgn
+			 *
 			tmpindex=0;
 			for(ki=0;ki<tmpobj.length;ki++){
 				if(tmpobj[ki] != null){
@@ -219,8 +220,8 @@ public final class Dba { //- db administrator
 			
 		}
 		
-		/* old codes bgn */
 		/* old codes bgn 
+		 *
 		//int whlen=newwh.length();
 		sqlstr=" "+sqlstr;
 		if(sqlstr.indexOf("insert")>-1 || sqlstr.indexOf("update")>-1){
@@ -342,8 +343,8 @@ public final class Dba { //- db administrator
 				}
 			}
 		}
-		old codes end */
-		/* old codes end */
+		* old codes end 
+		*/
 		
 		return obj;
 	
