@@ -522,7 +522,7 @@ class WebApp implements WebAppInterface{
         }
         else if($type == 'url:'){
             //-- http(s) request
-            if($args['method'] == 'post'){
+            if(strtolower($args['method']) == 'post'){
                 //- curl or fsockopen, todo
                 //- or file_get_contents with  stream_context_create()
                 $header = '';
@@ -701,7 +701,7 @@ class WebApp implements WebAppInterface{
         }
         else if($type == 'url:'){
             //-- http(s) request
-            if($args['method'] == 'post'){
+            if(strtolower($args['method']) == 'post'){
                 //- curl or fsockopen, todo
                 //- or file_get_contents with  stream_context_create()
                 $header = '';
