@@ -1,5 +1,5 @@
 # GWA2
-GWA2 is General Web Application Architecture. 
+General Web Application Architecture. 
 
 通用網絡應用架構.
 
