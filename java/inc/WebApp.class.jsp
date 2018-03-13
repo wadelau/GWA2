@@ -1,5 +1,7 @@
 <%
-
+/*
+ * imprvs on time fields by Xenxin@ufqi, Tue, 13 Mar, 2018 19:24:12
+*/
 %><%@include file="./WebApp.interface.jsp"%><%
 %><%@include file="./Config.class.jsp"%><%!
 %><%@include file="./Conn.class.jsp"%><%!
@@ -12,6 +14,8 @@ public class WebApp implements WebAppInterface{
 	public HashMap hmf = new HashMap(); //- persistent storage, global
 	private String myId = "id";
 	private String myIdName = "myId";
+	private static final String[] timeFieldArr = new String[]{"inserttime", "createtime", "savetime",
+		"modifytime", "edittime", "updatetime"};
 
 	Dba dba = null;
 	Cachea cachea = null;
@@ -161,11 +165,12 @@ public class WebApp implements WebAppInterface{
 			isUpdate = true;
 		}
 		String[] fieldArr = fields.split(",");
+		String timeFields = Arrays.toString(this.timeFieldArr);
 		for(String f: fieldArr){
 			//String f = fieldArr[i];
 			f = f==null ? "" : f.trim();
-			if(Wht.inString(f, "updatetime,inserttime,createtime")){
-				sqls.append(f).append("=NOW(), ");
+			if(Wht.inString(f, timeFields) && this.get(f).equals("")){
+				sqls.append(f).append("=NOW(), "); // assume MySQL?
 				this.hmf.remove(f);
 			}
 			else{
@@ -243,6 +248,13 @@ public class WebApp implements WebAppInterface{
 				else{
 					pos = sqlx.indexOf("SHOW ");	
 				}
+			}
+		}
+		// remedy for time fields, Mar 13, 2018
+		String nowStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+		for(String timef:this.timeFieldArr){
+			if(sql.indexOf(timef) > -1 && this.get(timef).equals("")){
+				this.set(timef, (nowStr));	
 			}
 		}
 		

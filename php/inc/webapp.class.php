@@ -217,7 +217,7 @@ class WebApp implements WebAppInterface{
 			$fieldarr = explode(",",$fields);
 			foreach($fieldarr as $k => $v){
 				$v = trim($v);
-				if(in_array($v, $this->timeFieldArr)){
+				if(in_array($v, $this->timeFieldArr) && !isset($this->hmf[$v])){
 					$sql .= $v."=NOW(), ";
 					unset($this->hmf[$v]);
 				}
@@ -334,7 +334,8 @@ class WebApp implements WebAppInterface{
 	else{
 		# remedy time fields in sql, Mar 13, 2018
 		foreach($this->timeFieldArr as $k=>$timef){
-			if(inString(' '.$timef, $sql) || inString(','.$timef, $sql)){
+			if(inString(' '.$timef, $sql) || inString(','.$timef, $sql)
+				&& !isset($this->hmf[$timef]) ){
 				$this->set($timef, $timeNow=date("Y-m-d H:i:s", time()));
 				debug("sql:[$sql] found unset timefield:$timef and remedy it by time:$timeNow.");
 			}
