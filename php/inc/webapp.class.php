@@ -6,6 +6,7 @@
  * 08:42 Sunday, June 14, 2015
  * Sat Aug  8 11:22:40 CST 2015
  * v0.2, Wed, 12 Oct 2016 13:07:02 +0800
+ * imprvs on time field, Tue, 13 Mar, 2018 15:12:44
  */
 
 
@@ -40,6 +41,8 @@ class WebApp implements WebAppInterface{
 	var $ssl_verify_ignore = false;
 	var $http_enable_gzip = false;
 	var $GWA2_Runtime_Env_List = null;
+	private $timeFieldArr = array('inserttime', 'createtime', 'savetime',
+		        'modifytime', 'edittime', 'updatetime');
 	
 	//- constructor
 	function __construct($args=null){
@@ -214,7 +217,7 @@ class WebApp implements WebAppInterface{
 			$fieldarr = explode(",",$fields);
 			foreach($fieldarr as $k => $v){
 				$v = trim($v);
-				if($v == "updatetime" || $v == 'inserttime' || $v == 'createtime'){
+				if(in_array($v, $this->timeFieldArr)){
 					$sql .= $v."=NOW(), ";
 					unset($this->hmf[$v]);
 				}
@@ -328,7 +331,14 @@ class WebApp implements WebAppInterface{
                 $hm = $this->execBy($sql, $conditions);
             }
         }
-        else{
+	else{
+		# remedy time fields in sql, Mar 13, 2018
+		foreach($this->timeFieldArr as $k=>$timef){
+			if(inString(' '.$timef, $sql) || inString(','.$timef, $sql)){
+				$this->set($timef, $timeNow=date("Y-m-d H:i:s", time()));
+				debug("sql:[$sql] found unset timefield:$timef and remedy it by time:$timeNow.");
+			}
+		}
             if($conditions == null){
                 $conditions = '';
             }
