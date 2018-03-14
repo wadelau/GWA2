@@ -13,6 +13,8 @@ General Web Application Architecture.
 
 * From Demand to Design
 
+![gwa2-architecture](https://ufqi.com/dev/gwa2/general.webapp.arch-201107.png)
+
 ***Three Layers***
 ----
 *Core Services*, 
