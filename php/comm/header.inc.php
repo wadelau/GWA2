@@ -96,7 +96,7 @@ foreach($_REQUEST as $k=>$v){
             $k = $matcharr[1];
 			if(is_string($v)){
 				$v = trim($v);
-				if(stripos($v, "<") > -1){ 
+				if(stripos($v, "<") > -1){
 				    # <script , <embed, <img, <iframe, etc.  Mon Feb  1 14:48:32 CST 2016
 					$v = str_ireplace("<", "&lt;", $v);
 					$_REQUEST[$k] = $v;
@@ -139,15 +139,15 @@ if($entry_tag != ''){
 	$url = $rtvdir.'/'.$entry_tag;
 }
 else{
-	$url = $rtndir.'?_01=10'
+	$url = $rtndir.'?_01=10';
 }
 $data['randi'] = rand(10000,999999);
 
 # global variables
 if($isdbg){
-    $sid = $_REQUEST['sid'];
+    $sid = Wht::get($_REQUEST, 'sid');
     if($sid == ''){
-      $sid =$_SESSION['sid'];
+      $sid = Wht::get($_SESSION, 'sid');
       if($sid == ''){
         $sid = rand(1000, 999999); $_SESSION['sid'] = $sid;
       }

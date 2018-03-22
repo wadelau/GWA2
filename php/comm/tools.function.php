@@ -395,7 +395,7 @@ function debug($obj, $tag='', $output=null){
  			$rtn = serialize ( $src );
  		}
  		else {
- 			$rtn = trim($src[$k]);
+ 			$rtn = trim(isset($src[$k])?$src[$k]:'');
  		}
  
  		if (!$rtn && $defaultValue != null) {
@@ -460,7 +460,7 @@ function debug($obj, $tag='', $output=null){
 			
 			$ip = $_SERVER["HTTP_X_REAL_IP"];
 		}
-		if (($ip == "Unknown" or $ip == "127.0.0.1" 
+		if (($ip == "Unknown" or $ip == "127.0.0.1"
 		        or strpos( $ip, "192.168." ) === 0
 		        or strpos( $ip, "172.31." ) === 0
 		        or strpos( $ip, "10." ) === 0)

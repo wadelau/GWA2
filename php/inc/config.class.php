@@ -28,7 +28,7 @@ if(true){
 
 	# display style
 	$conf['display_style_index']		= 0;
-	$conf['display_style_smttpl']		= 1; 
+	$conf['display_style_smttpl']		= 1;
 
 	# db info
 	$conf['dbhost'] 	= 'DB_HOST'; # use 127.0.0.1 instead of localhost
@@ -43,7 +43,7 @@ if(true){
 	# cache server
 	$conf['enable_cache'] = 1; # or true for 1, false for 0
 	$conf['cachehost'] = '127.0.0.1'; # '/www/bin/memcached/memcached.sock'; #  ip, domain or .sock
-	$conf['cacheport'] = '11211'; # empty or '0' for linux/unix socket 
+	$conf['cacheport'] = '11211'; # empty or '0' for linux/unix socket
 	$conf['cachedriver'] = 'MEMCACHEDX'; # REDISX, XCACHEX
 	$conf['cacheexpire'] = 1800; # 30 * 60;
 	
@@ -87,12 +87,17 @@ class GConf{
 
 	//-
 	public static function get($key){
-		return self::$conf[$key];
+	    if(isset(self::$conf[$key])){
+	        return self::$conf[$key];
+	    }
+	    else{
+	        return '';
+	    }
 	}
 
 	//-
 	public static function set($key, $value){
-		self::$conf[$key] = $value;	
+		self::$conf[$key] = $value;
 	}
 
 	//-
@@ -104,7 +109,7 @@ class GConf{
 	public static function setConf($conf){
 		foreach($conf as $k=>$v){
 			self::set($k, $v);
-		}	
+		}
 	}
 	
 }
