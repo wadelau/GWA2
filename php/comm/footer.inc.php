@@ -19,7 +19,7 @@ if($smttpl != ''){
 	$data['url'] = $url;	
 	$data['req'] = $_REQUEST; # also see comm/header.inc tag#userdatatovar 
 	$data['ses'] = $_SESSION;
-	$data['viewdir'] = $rtvviewdir; # where and why?
+	$data['viewdir'] = $rtvviewdir = $rtvdir.'/view/'.$siteid; # where and why?
 	$data['rtvdir'] = $rtvdir; # refer view/default/include/sitefeedback.html
 	
 	# moved in 22:04 10 July 2016 from comm/header

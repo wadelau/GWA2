@@ -139,12 +139,12 @@ if($entry_tag != ''){
 	$url = $rtvdir.'/'.$entry_tag;
 }
 else{
-	$url = $rtndir.'?_01=10';
+	$url = $rtndir.'?';
 }
 $data['randi'] = rand(10000,999999);
 
 # global variables
-if($isdbg){
+if(true){
     $sid = Wht::get($_REQUEST, 'sid');
     if($sid == ''){
       $sid = Wht::get($_SESSION, 'sid');
@@ -153,7 +153,7 @@ if($isdbg){
       }
     }
     else{
-	$sid = str_replace('<', '&lt;', $sid);
+        #$sid = str_replace('<', '&lt;', $sid); # remedy on Wht::get
     }
     if($entry_tag != ''){
     	$url .= "/sid/".$sid;
