@@ -10,7 +10,7 @@ if(!defined('__ROOT__')){
   define('__ROOT__', dirname(dirname(__FILE__)));
 }
 
-require_once(__ROOT__.'/inc/webapp.class.php'); 
+require_once(__ROOT__.'/inc/webapp.class.php');
 
 class PageNavi extends WebApp{
 
@@ -50,7 +50,7 @@ class PageNavi extends WebApp{
    }
 
    function getNavi(){
-       $para = $this->hmf;  
+       $para = $this->hmf;
        if($this->hmf['totalcount'] > 0){
             $para['pntc'] = $this->hmf['totalcount'];
             $this->hmf['url'] = preg_replace("/&pntc\/([0-9]*)/","", $this->hmf['url']);
@@ -61,7 +61,19 @@ class PageNavi extends WebApp{
             $this->hmf['url'] .= "&pntc=".$para['pntc'];
             $para['url'] = $this->hmf['url'];
        }
-
+       # in case of POST parameters in request, Mar 28, 2018
+       if(true){
+           $tmpUrl = $para['url'];
+           foreach($_REQUEST as $k=>$v){
+               if(startsWith($k, 'op')
+                       && $v != self::Omit_String
+                       && !inString('&'.$k, $tmpUrl)){
+                           $para['url'] .= "&$k=$v";
+                           $kp = str_replace('op', '', $k);
+                           $para['url'] .= "&$kp=".$_REQUEST[$kp];
+               }
+           }
+       }
        #print __FILE__.":abcdd: ";
        print_r($this->hmf);
 
@@ -72,7 +84,7 @@ class PageNavi extends WebApp{
        for($i=$para['pnpn']-$navilen; $i<$para['pnpn'] + $navilen && $i<=$totalpage; $i++){
            if($i>0){
                if($i == $para['pnpn']){
-                    $str .= " <span id=\"currentpage\" style=\"color:green;font-weight:bold;font-size:18px\">".$i."</span> "; 
+                    $str .= " <span id=\"currentpage\" style=\"color:green;font-weight:bold;font-size:18px\">".$i."</span> ";
                }else{
                     $str .= " <a href=\"javascript:pnAction('".$para['url']."&pnpn=".$i."');\" style=\"font-size:14px\">".$i."</a> ";
                }
@@ -90,7 +102,7 @@ class PageNavi extends WebApp{
    }
 
    function getNaviNum(){
-       $para = $this->hmf; 
+       $para = $this->hmf;
 			 #print __FILE__.":getNavi: ".$this->hmf['url'];
        #print_r($para);
        if($this->hmf['totalcount'] > 0){
@@ -144,7 +156,7 @@ class PageNavi extends WebApp{
        $order = "";
         foreach($_REQUEST as $k=>$v){
             if(strpos($k,"pnob") === 0){
-                $order = substr($k,4); 
+                $order = substr($k,4);
                 break;
             }
         }
@@ -156,19 +168,19 @@ class PageNavi extends WebApp{
        $isasc = 0; # 0: 0->1, asc, 1: 1->0, desc
        if(array_key_exists('isasc',$this->hmf)){
             if($field == '' || ($field != '' && $this->getOrder() == $field)){
-                $isasc = $this->hmf['isasc']; 
+                $isasc = $this->hmf['isasc'];
             }
        }else{
            foreach($_REQUEST as $k=>$v){
                if(($field == '' || $field == substr($k,4)) && strpos($k,"pnob") === 0){
                    if($v == 1){
-                       $isasc = 1; 
+                       $isasc = 1;
                        break;
                    }
                }
            }
        }
-       return $isasc; 
+       return $isasc;
    }
 
    function getCondition($gtbl, $user){
@@ -177,7 +189,7 @@ class PageNavi extends WebApp{
        $hmfield = array(); #  $gtbl->getFieldList(); # for -gMIS only
        if(false && count($hmfield) < 1){
        		$hmfield = array();
-       		$tmpHm = $gtbl->execBy("desc ".$gtbl->getTbl());	
+       		$tmpHm = $gtbl->execBy("desc ".$gtbl->getTbl());
 			if($tmpHm[0]){
 				$tmpHm = $tmpHm[1];
 				foreach($tmpHm as $k=>$v){
@@ -191,12 +203,12 @@ class PageNavi extends WebApp{
 			}
        }
 
-        $objpnps = $gtbl->get("pagesize"); 
+        $objpnps = $gtbl->get("pagesize");
        if($objpnps > 0){
         $this->hmf['pnps'] = $objpnps; # in case that pnps does not exists in URL,  remedy by wadelau, Mon Nov 19 11:18:52 CST 2012
        }
 
-       $hidesk = ""; # $gtbl->getHideSk($user); # for -gMIS only 
+       $hidesk = ""; # $gtbl->getHideSk($user); # for -gMIS only
        if($hidesk != ''){
            $harr = explode("|", $hidesk);
            foreach($harr as $k=>$v){
@@ -218,14 +230,14 @@ class PageNavi extends WebApp{
                     $field = $arr[0];
                     $linkfield = $arr[1];
                 }
-				# for select 
+				# for select
        	   		if(isset($_REQUEST[$field]) && $_REQUEST[$field] != $v){
-       	   			$v = $_REQUEST[$field];	
+       	   			$v = $_REQUEST[$field];
        	   		}
        	   		if(strlen($v) > 3 && startsWith($v, '%')){
        	   			$v = urldecode($v);
        	   		}
-                if(strpos($v,"tbl:") === 0){ #http://ufqi.com:81/dev/gtbl/ido.php?tbl=hss_dijietbl&tit=%E5%AF%BC%E6%B8%B8%E8%A1%8C%E7%A8%8B&db=&pnsktuanid=tbl:hss_findaoyoutbl:id=2 
+                if(strpos($v,"tbl:") === 0){ #http://ufqi.com:81/dev/gtbl/ido.php?tbl=hss_dijietbl&tit=%E5%AF%BC%E6%B8%B8%E8%A1%8C%E7%A8%8B&db=&pnsktuanid=tbl:hss_findaoyoutbl:id=2
                     $condition .= " ".$pnsm." ".$field." in (".$this->embedSql($linkfield,$v).")";
                 
                 }
@@ -301,7 +313,7 @@ class PageNavi extends WebApp{
                         $condition .= " ".$pnsm." "."$field not regexp ?";
                         $gtbl->set($field, $v);
                     }
-					else{ 
+					else{
                         $condition .= " ".$pnsm." $field $fieldopv ?"; # this should be numeric only.
                         $gtbl->set($field, $v);
                     }
@@ -309,7 +321,7 @@ class PageNavi extends WebApp{
             }
        }
 
-       $condition = substr($condition, 4); # first pnsm seg 
+       $condition = substr($condition, 4); # first pnsm seg
        #error_log(__FILE__.":getCondition: condition: $condition");
        $pnsc = $_REQUEST['pnsc'];
        if($pnsc != ''){
@@ -319,21 +331,21 @@ class PageNavi extends WebApp{
             }
        }
        #error_log(__FILE__.":getCondition -2 : condition: $condition");
-       return $condition; 
+       return $condition;
    }
 
-   //- sign a preset condition para, if given a $myk, validate it 
+   //- sign a preset condition para, if given a $myk, validate it
    //- added on Sat May 12 17:46:10 CST 2012
    function signPara($para,$myk=''){
         $sharekey = 'Wadelau_20120512_*(&^&****)';
         $mydate = date("Y-m-d");
         $myk2 = substr(sha1($para.$sharekey.$mydate),0,8);
-        if(!isset($myk) || $myk == ''){ 
+        if(!isset($myk) || $myk == ''){
             $myk = $myk2;
 
         }else{
             if($myk == $myk2){
-                $myk = true;   
+                $myk = true;
 
             }else{
                 $myk = false;
