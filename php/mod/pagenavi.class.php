@@ -73,9 +73,9 @@ class PageNavi extends WebApp{
                            $para['url'] .= "&$kp=".$_REQUEST[$kp];
                }
            }
+           $para['url'] .= '&pnsm='.(isset($_REQUEST['pnsm'])?$_REQUEST['pnsm']:'and');
        }
-       #print __FILE__.":abcdd: ";
-       print_r($this->hmf);
+       #print_r($this->hmf);
 
        $totalpage = $para['pntc'] % $para['pnps'] == 0 ? ($para['pntc']/$para['pnps']) : ceil($para['pntc']/$para['pnps']);
        $navilen = 8;
