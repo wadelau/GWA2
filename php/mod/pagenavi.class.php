@@ -231,7 +231,8 @@ class PageNavi extends WebApp{
                     $linkfield = $arr[1];
                 }
 				# for select
-       	   		if(isset($_REQUEST[$field]) && $_REQUEST[$field] != $v){
+       	   		if(isset($_REQUEST[$field]) && $_REQUEST[$field] != '' 
+					&& $_REQUEST[$field] != $v){
        	   			$v = $_REQUEST[$field];
        	   		}
        	   		if(strlen($v) > 3 && startsWith($v, '%')){
