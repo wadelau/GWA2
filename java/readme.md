@@ -24,3 +24,5 @@ if os language is not set to unicode or utf-8,
 	please append -Dfile.encoding=UTF8 to its start script of appserver,
 	
 	usually in appserver_home/bin
+	
+	see http://ufqi.com/blog/gwa2-java-i18n/ for more details.
