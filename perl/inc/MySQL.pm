@@ -13,6 +13,7 @@ use autodie;
 
 use DBI;
 use DBD::mysql;
+use Try::Tiny;
 
 #use parent 'inc::DBA';
 use inc::Config;
@@ -71,7 +72,13 @@ sub query($ $ $) {
 		#print "\t\tinc::MySQL: query: $i: ".$idxarr[$i]."\n";
 		$sth->bind_param($i+1, $hmvars{$idxarr[$i]});
 	}
-	my $result = $sth->execute();
+	my $result = 0 ;
+	try{
+		$result = $sth->execute();
+	}
+	catch{
+		print "sql:[$sql] read failed in inc/MySQL.... continue?\n";
+	}
 	my @rows = (); # [] as a ref to array
 	my $rtnflag = 0;
 	if($result){
@@ -106,7 +113,13 @@ sub readSingle($ $ $) {
 	for(my $i=0; $i<$arrsize; $i++){
 		$sth->bind_param($i+1, $hmvars{$idxarr[$i]});
 	}
-	my $result = $sth->execute();
+	my $result = 0 ;
+	try{
+		$result = $sth->execute();
+	}
+	catch{
+		print "sql:[$sql] read failed in inc/MySQL.... continue?\n";
+	}
 	my @rows = []; my $rtnflag = 0;
 	if($result){
 		if(my $ref = $sth->fetchrow_hashref()){
@@ -137,14 +150,20 @@ sub readBatch($ $ $) {
 		$dbh = $self->_initConnection();	
 	}
 	$sql = $self->_enSafe($sql, \%hmvars, \@idxarr);
-	#print "\t\tinc::MySql: readBatch: sql:[$sql] vars:[".%hmvars."]\n";
+	print "\t\tinc::MySql: readBatch: sql:[$sql] vars:[".%hmvars."]\n";
 	$sth = $dbh->prepare($sql);
 	my $arrsize = scalar @idxarr;
 	for(my $i=0; $i<$arrsize; $i++){
 		$sth->bind_param($i+1, $hmvars{$idxarr[$i]});
 		#print "binding: i:$i k:[".$idxarr[$i]."] v:[".$hmvars{$idxarr[$i]}."]\n";
 	}
-	my $result = $sth->execute();
+	my $result = 0 ;
+	try{
+		$result = $sth->execute();
+	}
+	catch{
+		print "sql:[$sql] read failed in inc/MySQL.... continue?\n";
+	}
 	my @rows = (); my $i = 0; my $rtnflag = 0;
 	if($result){
 		while(my $ref = $sth->fetchrow_hashref()){
