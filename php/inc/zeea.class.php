@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
  * Zip/Encrypt/Encode (ZEE), with its unzip, decrypt and decode
  * Administator of,
  * v0.1
@@ -89,7 +89,7 @@ class ZeeA {
 	        if(isset($args['header'])){
 	            $headers = $args['header'];
 	            foreach($headers as $k=>$v){
-	                if(strpos($v, 'Content-Encoding') !== false){
+	                if(stripos($v, 'Content-Encoding') !== false){
 	                    if(stripos($v, self::Type_Gzip) !== false){
 	                        $ztype = self::Type_Gzip;
 	                        break;
