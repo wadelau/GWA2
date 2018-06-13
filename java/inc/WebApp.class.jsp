@@ -14,7 +14,7 @@ public class WebApp implements WebAppInterface{
 	public HashMap hmf = new HashMap(); //- persistent storage, global
 	private String myId = "id";
 	private String myIdName = "myId";
-	private static final String[] timeFieldArr = new String[]{"inserttime", "createtime", "savetime",
+	private final String[] timeFieldArr = new String[]{"inserttime", "createtime", "savetime",
 		"modifytime", "edittime", "updatetime"};
 
 	Dba dba = null;

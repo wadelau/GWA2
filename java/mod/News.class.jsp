@@ -18,7 +18,6 @@ public class News extends WebApp{
 		dba = new Dba("");
 		this.setTbl("gwa2_info_usertbl");
 
-
 	}
 
 	//-

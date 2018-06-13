@@ -3,6 +3,8 @@ import="java.util.Date,
 java.util.HashMap,
 java.util.Map,
 java.util.Iterator,
+java.util.Arrays,
+java.text.SimpleDateFormat,
 java.io.File,
 org.lilystudio.smarty4j.Context,
 org.lilystudio.smarty4j.Engine,
@@ -33,6 +35,5 @@ HashMap data; StringBuffer outx; User user; %><%
 data = new HashMap(); //- for tpl data container
 
 outx = new StringBuffer(); //- for $out in -PHP
-
 
 %>
