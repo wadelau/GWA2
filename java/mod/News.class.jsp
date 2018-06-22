@@ -11,11 +11,9 @@
 
 public class News extends WebApp{
 	
-
 	//- constructor ?
 	public News(){
-	
-		dba = new Dba("");
+		
 		this.setTbl("gwa2_info_usertbl");
 
 	}
@@ -29,7 +27,8 @@ public class News extends WebApp{
 		this.set("realname", "%");
 		this.set("orderby", "id desc");
 		
-		HashMap userInfo = this.getBy("id, email, realname, updatetime", "(email like ?  or email like ?) and realname like ?");
+		HashMap userInfo = this.getBy("id, email, realname, updatetime", 
+				"(email like ?  or email like ?) and realname like ?");
 
 		userInfo.put("read-in-User-timestamp", (new Date()) + "userinfo:["+userInfo.toString()+"]");	
 

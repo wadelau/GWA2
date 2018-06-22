@@ -101,19 +101,26 @@ public final static class Wht{
 	public static boolean inString(String needle,String haystack){
 
 		boolean matched=false;
-		String sep = ",";
-		matched = Wht.inString(needle, haystack, sep);
-		//System.out.println("Wht.inString: needle:["+needle+"] hays:["+haystack+"] sep:["+sep+"] matched:["+matched+"]");
+		if( haystack==null || haystack.equals("") || needle==null || needle.equals("")){
+			return matched; 
+		}
+		else{
+			int ipos = haystack.indexOf(needle);
+			if(ipos > -1){
+				matched = true;
+			}
+			//System.out.println("Wht.inString: needle:["+needle+"] hays:["+haystack+"] matched:["+matched+"]");
+		}
 		return matched;
 
 	}
 
 	/*
-	 * inString, find where the needle in haystack, which separated by separator
+	 * inList, find where the needle in haystack, which separated by separator
 	 * @param String haystack, the string list
 	 * @reurn boolean true|false, if yes true, then false
 	 */
-	public static boolean inString(String needle,String haystack, String sep){
+	public static boolean inList(String needle,String haystack, String sep){
 
 		boolean matched=false;
 		if( haystack==null || haystack.equals("") || needle==null || needle.equals("")){

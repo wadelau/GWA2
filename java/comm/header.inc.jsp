@@ -19,16 +19,17 @@ if(true){
 		appdir += "" + rtvdir;
 	}
 }
-outx.append("\n\tcomm/header: requestURL:["+request.getRequestURL()+"] servletPath:["+request.getServletPath()+"] rtvdir:["
+outx.append("\n\tcomm/header: requestURL:["+request.getRequestURL()+"] servletPath:["+request.getServletPath()
+		+"] rtvdir:["
 		+rtvdir+"] appdir:["+appdir+"] 1607100803.\n"); //- appdir:["+appdir+"] 
 
 rtvdir = rtvdir.equals("") ? "." : rtvdir;
 
-url = rtvdir + "/?sid=" + (new java.util.Random()).nextInt(999999); 
+sid = Wht.get(request, "sid");
+if(sid.equals("")){ sid = (new java.util.Random()).nextInt(999999); }
+url = rtvdir + "/?sid=" + sid; 
 
 user = new User();
-
-smttpl = "";
 
 fmt = Wht.get(request, "fmt");
 //- set header according to fmt
@@ -47,6 +48,8 @@ else{
 		debug("comm/header: unsupported fmt:["+fmt+"]");
 	}
 }
+
+smttpl = "";
 
 %><%!
 /*

@@ -13,13 +13,15 @@
 
 public class User extends WebApp{
 	
-
+	private static final String User_Db_Alias = "myuserdb";
+	
 	//- constructor ?
 	public User(){
-	
-		dba = new Dba("");
+		//- call super Constructor with args if applicable, e.g. different DbAlias
+		//- i.e. WebApp->Contructor(HashMap hmcfg);
+ 		//super((HashMap)(new HashMap<String, String>(){{put("dbconf", User_Db_Alias);}}));
+		
 		this.setTbl("gwa2_info_usertbl");
-
 
 	}
 
@@ -27,7 +29,10 @@ public class User extends WebApp{
 	//- restore an object from hashmap, refer to WebApp.toHash
 	//- wadelau@ufqi.com,  Thu Jul 28 03:46:17 CST 2016
 	public User(HashMap fromHm){
-		// @todo
+		//- call super Constructor with args if applicable, e.g. different DbAlias
+		//- i.e. WebApp->Contructor(HashMap hmcfg);
+		//super((HashMap)(new HashMap<String, String>(){{put("dbconf", User_Db_Alias);}}));
+		//- @todo
 		fromHm = fromHm==null ? (new HashMap()) : fromHm;
 		Iterator entries = fromHm.entrySet().iterator();
 		while (entries.hasNext()) {

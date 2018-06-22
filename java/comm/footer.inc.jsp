@@ -18,6 +18,10 @@ if(fmt.equals("")){
 
 		//- smttpl
 		data.put("smttpl", smttpl);
+		data.put("rtvdir", rtvdir);
+		data.put("url", url);
+		data.put("sid", sid);
+		data.put("userid", userid)
 
 		//- tpl engine
 		Engine smartyEngine = new Engine();

@@ -1,9 +1,9 @@
 <%
 /*
  * imprvs on time fields by Xenxin@ufqi, Tue, 13 Mar, 2018 19:24:12
+ * contructor agrs defined as HashMap, instead of String, Thur, 21, Jun, 2018
 */
 %><%@include file="./WebApp.interface.jsp"%><%
-%><%@include file="./Config.class.jsp"%><%!
 %><%@include file="./Conn.class.jsp"%><%!
 %><%@include file="./Dba.class.jsp"%><%!
 %><%@include file="./Cachea.class.jsp"%><%!
@@ -21,18 +21,17 @@ public class WebApp implements WebAppInterface{
 	Cachea cachea = null;
 
 	//- constructor
-	public WebApp(String cfg){
-		//- cfg in json? or "a=b; c=d; e=f"
+	public WebApp(HashMap hmcfg){
+		//- cfg in json? or "a=b; c=d; e=f" ?
+		//- in HashMap, confirmed on Jun 21, 2018
 		//- db
 		if(this.dba == null){
 			String dbconf = "";
-			if(cfg != null && cfg.indexOf("dbconf") > -1){
-				dbconf = ""; // @todo
+			if(cfg != null && hmcfg.containsKey("dbconf")){
 				this.set("dbconf", dbconf);
 			}
 			this.dba = new Dba(dbconf);
 		}
-		
 		//- cache
 		if((boolean)Config.get("enable_cache")){
 			if(this.cachea == null){
@@ -53,7 +52,6 @@ public class WebApp implements WebAppInterface{
 		if(this.dba == null){
 			this.dba = new Dba("");
 		}
-		
 		//- cachea
 		if((boolean)Config.get("enable_cache")){
 			this.cachea = new Cachea("");

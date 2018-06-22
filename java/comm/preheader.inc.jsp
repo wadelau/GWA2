@@ -22,6 +22,8 @@ request.setCharacterEncoding("UTF-8");
 
 //- all I/O toolsets
 %><%@include file="./Wht.tools.inc.jsp"%><%
+//- global configs
+%><%@include file="./Config.class.jsp"%><%!
 //- parent of all objects
 %><%@include file="../inc/WebApp.class.jsp"%><%
 //- user
