@@ -8,7 +8,6 @@
  * Thu Sep 11 16:34:20 CST 2014
  * Ported into Java by wadelau@ufqi.com, June 28, 2016s
  */
- 
 
 %><%@page import="java.sql.Connection,java.sql.SQLException,java.sql.Statement,java.sql.ResultSetMetaData,java.util.HashSet"%><%
 %><%@include file="./MySql.class.jsp"%><%
@@ -55,7 +54,10 @@ public final class Dba { //- db administrator
 		
 		HashMap tmpHm = new HashMap();
 		boolean hasLimitOne = false;
-		if(sql.indexOf("limit 1") > -1 || (args.containsKey("pagesize") && (int)args.get("pagesize") == 1) ){
+		int pageSize = 0;
+		String tmpps = String.valueOf(args.get("pagesize"));
+		if(tmpps.equals("")){}else{ pageSize = Integer.parseInt(tmpps); }
+		if(sql.indexOf("limit 1") > -1 || pageSize == 1 ){
 			hasLimitOne = true;
 			tmpHm = this.dbDrv.readSingle(sql, args, idxArr);
 		}
@@ -199,152 +201,10 @@ public final class Dba { //- db administrator
 					//System.out.println("tmpi:["+tmpi+"] k:["+k+"]");
 				}
 			}
-			
-			/* old codes bgn
-			 *
-			tmpindex=0;
-			for(ki=0;ki<tmpobj.length;ki++){
-				if(tmpobj[ki] != null){
-					obj[tmpindex]=tmpobj[ki];
-					//System.out.println("Dba.sortObj: ki:["+ki+"] idx:["+tmpindex+"] obj-i:["+obj[tmpindex]
-					//		+"] hmvar:["+hmvar.toString()+"] sqlstr:["+sqlstr+"]");
-					tmpindex++;
-				}
-				
-			}
-			//set=null;
-			 * old coded end
-			 */
 			itr=null;
 			tmpobj=null;
 			
 		}
-		
-		/* old codes bgn 
-		 *
-		//int whlen=newwh.length();
-		sqlstr=" "+sqlstr;
-		if(sqlstr.indexOf("insert")>-1 || sqlstr.indexOf("update")>-1){
-			sqlstr=sqlstr.replaceAll(",", ", ");
-		}
-		
-		int whlen=sqlstr.length();
-		Object[] tmpobj=new Object[whlen];
-		int tmpindex=-1; HashMap posHm = new HashMap(); 
-		int tmpindex2=-1;
-		int tmpindex1=-1;
-		int tmpki=1;
-		int tmpidx=0;
-		int selectPos = sqlstr.indexOf("select ");
-		int wherePos = sqlstr.indexOf(" where ");
-		//Set set=hmvar.keySet();
-		Iterator itr=hmvar.keySet().iterator();
-		while(itr.hasNext()){
-			k=(String)itr.next();
-			k = k==null ? "" : k;
-			if(k.equals("")){ 
-				
-				continue; 
-			}
-			int tmpKpos = sqlstr.indexOf(k);
-			if(k.equals("") || "oderby,groupby,pagesize,pagenum,".indexOf(k+",") > -1 
-				|| tmpKpos < 0 ){
-				//System.out.println("Dba.sortObj: ki:["+ki+"] k:["+k+"] skip.");
-				continue;
-			}
-			else{
-				tmpki=1;
-				tmpidx=0;
-				*//* instance: com.ufqi.exp.EXP.java: getRelatedSubject
-				 *	Attention: 
-				 *		one field matches more than two values, 
-				 *		name it as "field.2","field.3", "field.N", etc, as hash key
-				 *//*
-				tmpindex1=sqlstr.indexOf("("+k);	
-				tmpindex2=sqlstr.indexOf(" "+k);
-				while((tmpindex1!=-1 || tmpindex2!=-1)){
-					if(tmpindex1==-1){
-						tmpindex=tmpindex2;
-					}
-					else if(tmpindex2==-1){
-						tmpindex=tmpindex1;
-					}
-					else if(tmpindex1!=-1 && tmpindex2!=-1){
-						tmpindex = tmpindex1>tmpindex2 ? tmpindex2 : tmpindex1;
-					}
-					if(tmpindex!=-1){
-						boolean hasExist = posHm.get(tmpindex)==null ? false : (boolean)posHm.get(tmpindex);
-						if(hasExist){
-							//System.out.println("com.ufqi.base.DBACT.java: sortObject-0, k:["
-							//	+k+"] tmpindex:["+tmpindex+"] obj:["+tmpobj[tmpindex]+"] tmpki:["
-							//	+tmpki+"], existed pos, continue.");	
-							tmpindex1=sqlstr.indexOf("("+k, tmpindex1+1);
-							tmpindex2=sqlstr.indexOf(" "+k, tmpindex2+1);
-							continue;
-						}
-						if(selectPos > -1 && tmpindex < wherePos){
-							//System.out.println("com.ufqi.base.DBACT.java: sortObject-1, k:["
-							//	+k+"] tmpindex:["+tmpindex+"] obj:["+tmpobj[tmpindex]+"] tmpki:["+tmpki+"] continue.");	
-							posHm.put(tmpindex, true);
-							tmpindex1=sqlstr.indexOf("("+k, tmpindex1+1);
-							tmpindex2=sqlstr.indexOf(" "+k, tmpindex2+1);
-							continue; //- skip in case "select a, b, c where a = ?"; # by wadelau on Sat Nov  3 20:35:46 CST 2012
-						}
-						if(hmvar.containsKey(k+"."+tmpki)){
-							tmpobj[tmpindex]=hmvar.get(k+"."+tmpki);
-							*//* 
-							 *  Attention: 
-							 *      one field matches more than two values, 
-							 *      name it as "field.2","field.3", "field.N", etc, as hash key
-							 *  e.g. in sql: "... where age > ? and age < ? and gender=? ", settings go like:
-							 *      $Obj->set('age', 20);
-							 *      $obj->set('age.2', 30); # for the second match of 'age'
-							 *  Sun Jul 24 21:18:00 UTC 2011
-							 *  !! Need space before > or < in this case, Thu Sep 11 16:29:03 CST 2014
-							 *  ----- Another Example, 19:48 06 July 2016	
-							 *	this.set("pagesize", 10);
-								this.set("email", "%hotmail%");
-								this.set("email.2", "%163%");
-								this.set("realname", "%");
-								HashMap userInfo = this.getBy("id, email, updatetime", "(email like ?  or email like ?) and realname like ?");
-							 *//*
-						}
-						else{
-							tmpobj[tmpindex]=hmvar.get(k);
-						}
-						posHm.put(tmpindex, true);
-						//System.out.println("com.ufqi.base.DBACT.java: sortObject-2, k:["
-						//		+k+"] tmpindex:["+tmpindex+"] obj:["+tmpobj[tmpindex]+"] tmpki:["+tmpki+"] tidx1:["
-						//		+tmpindex1+"] tidx2:["+tmpindex2+"]");	
-						tmpki++;
-						tmpidx=tmpindex;
-						//tmpindex=-1;
-						if(tmpindex1>tmpindex){
-							tmpindex=tmpindex1;
-						}
-						else if(tmpindex2>tmpindex){
-							tmpindex=tmpindex2;
-						}
-						if(tmpindex!=tmpidx){
-							if(hmvar.containsKey(k+"."+tmpki)){
-								tmpobj[tmpindex]=hmvar.get(k+"."+tmpki);
-							}
-							else{
-								tmpobj[tmpindex]=hmvar.get(k);
-							}
-							posHm.put(tmpindex, true);
-							//System.out.println("com.ufqi.base.DBACT.java: sortObject-3, k:["+
-							//		k+"] tmpindex:["+tmpindex+"] obj:["+tmpobj[tmpindex]+"] tmpki:["+tmpki+"]  last.");	
-							tmpki++;
-						}
-					}
-					tmpindex1=sqlstr.indexOf("("+k, tmpindex1+1); //- tmpindex1 + 1
-					tmpindex2=sqlstr.indexOf(" "+k, tmpindex2+1); //- tmpindex2 + 1
-				}
-			}
-		}
-		* old codes end 
-		*/
 		
 		return obj;
 	
@@ -412,7 +272,6 @@ public final class Dba { //- db administrator
 	
 }
 
-
 //- define for all drivers
 public interface DbDriver{
 	
@@ -431,7 +290,6 @@ public interface DbDriver{
 	public int getLastInsertedId();
 	
 	public int getAffectedRows();
-	
 
 }
 

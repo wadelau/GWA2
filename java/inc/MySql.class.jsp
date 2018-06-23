@@ -9,13 +9,11 @@
  * Ported into Java by wadelau@ufqi.com, June 28, 2016s
  */
 
-
 %><%@page import="javax.sql.DataSource,java.sql.DriverManager,java.sql.ResultSet,java.sql.PreparedStatement"%><%
 
 %><%!
 
 public final class MySql implements DbDriver {
-
 
 	private String myHost = "";
 	private int myPort = 3306;
@@ -25,7 +23,6 @@ public final class MySql implements DbDriver {
 
 	protected Connection dbConn = null;
 	
-
 	public MySql(DbConn dbConf){
 		
 		this.myHost = dbConf.myHost;	
@@ -73,7 +70,6 @@ public final class MySql implements DbDriver {
 		
 	}
 	
-	
 	//-
 	public HashMap query(String sqlstr, HashMap args, Object[] idxArr){
 	
@@ -99,8 +95,7 @@ public final class MySql implements DbDriver {
 				//pstmt.setString(myi,String.valueOf(idxArr[myi-1]));
 				//pstmt.setObject(myi,idxArr[myi-1]);
 				if( idxArr[myi] != null ){
-					//pstmt.setObject(myi+1,idxArr[myi]);
-					pstmt.setObject(myj,idxArr[myi]);
+					pstmt.setObject(myj, args.get(idxArr[myi]));
 					myj++;
 				}
 			}
@@ -165,8 +160,7 @@ public final class MySql implements DbDriver {
 				for( int myi=0;myi<idxArr.length && myi<paraCount;myi++ ){
 					System.out.println("MySql.readSingle: myj:["+myj+"] myi:["+myi+"] idxArr-i:["+idxArr[myi]+"]");
 					if( idxArr[myi] != null ){
-						//pstmt.setObject(myi+1,idxArr[myi]);
-						pstmt.setObject(myj,idxArr[myi]);
+						pstmt.setObject(myj, args.get(idxArr[myi]));
 						myj++;
 					}
 					else{
@@ -233,7 +227,7 @@ public final class MySql implements DbDriver {
 					if( idxArr[myi] != null ){
 						//System.out.println("MySql.readBatch: myj:["+myj+"] myi:["+myi+"] idxArr-i:["+idxArr[myi]+"]");
 						//pstmt.setObject(myi+1,idxArr[myi]);
-						pstmt.setObject(myj,idxArr[myi]);
+						pstmt.setObject(myj, args.get(idxArr[myi]));
 						myj++ ;
 					}
 				}
@@ -259,7 +253,7 @@ public final class MySql implements DbDriver {
 					fieldname = fieldname.toLowerCase() ;
 					hmtmp2.put(fieldname, fieldvalue);
 				}
-				hmtmp.put(""+count,hmtmp2);
+				//hmtmp.put(""+count,hmtmp2);
 				count++;
 			}
 			hmtmp.put("count",""+count);

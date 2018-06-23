@@ -85,19 +85,23 @@ public class WebApp implements WebAppInterface{
 	 * Thu Jul 21 11:31:47 UTC 2011, wadelau@gmail.com
 	 * update by extending to readObject by wadelau, Sat May  7 11:06:37 CST 2016
 	 */
-	public HashMap getBy(String fields, String args){
+	public HashMap getBy(String fields, String args, HashMap hmCache){
 	
 		HashMap hm = new HashMap();
+		
+		//- @todo hmCache
 
 		StringBuffer sqls = new StringBuffer();
 		boolean hasLimitOne = false;
 		int pageNum = 1; //- default pagenum set to "1", unless pre set in hmvar, 20080903
 		int pageSize = 0; //- default pagesize set to "0", unless pre set in hmvar, "0" means all, no limit, 20080903
 		if(this.hmf.containsKey("pagenum")){
-			pageNum = (int)this.hmf.get("pagenum");
+			String tmppn = String.valueOf(this.hmf.get("pagenum"));
+			pageNum = Integer.parseInt(tmppn);
 		}
 		if(this.hmf.containsKey("pagesize")){
-			pageSize = (int)this.hmf.get("pagesize");
+			String tmpps = String.valueOf(this.hmf.get("pagesize"));
+			pageSize = Integer.parseInt(tmpps);
 		}
 		
 		sqls.append("select ").append(fields).append(" from ").append(this.getTbl()).append(" where ");
@@ -142,7 +146,12 @@ public class WebApp implements WebAppInterface{
 
 	}
 
-
+	//- override this.getBy
+	public HashMap getBy(String fields, String args){
+		HashMap hmCache = new HashMap();
+		return this.getBy(fields, args, hmCache);
+	}
+	
 	//-
 	/* 
 	 * mandatory return $hm = (0 => true|false, 1 => string|array); in GWA2 PHP
@@ -221,9 +230,11 @@ public class WebApp implements WebAppInterface{
 
 	//- initial added on Mon Jan 23 12:20:24 GMT 2012 by wadelau@ufqi.com
 	//- reported from GWA2PHP by wadelau, Sun Jul 17 22:13:39 CST 2016
-	public HashMap execBy(String sql, String args){
+	public HashMap execBy(String sql, String args, HashMap hmCache){
 	
 		HashMap hm = new HashMap();
+		
+		//- @todo hmCache
 
 		args = args==null ? "" : args;
 		String sqlx = null;
@@ -279,8 +290,13 @@ public class WebApp implements WebAppInterface{
 
 		return hm;
 
-	} 
-
+	}
+	
+	//- override this.execBy
+	public HashMap execBy(String sql, String args){
+		HashMap hmCache = new HashMap();
+		return this.execBy(sql, args, hmCache);
+	}
 
 	/*
 	 * mandatory return $hm = (0 => true|false, 1 => string|array);
