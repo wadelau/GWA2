@@ -115,7 +115,7 @@ class MYSQL {
 			}
 		}
 		else{
-			$hm[0] = true;
+			$hm[0] = false;
 			$hm[1] = array('sayError'=>'No record. 200607050202.');
 		}
 		return $hm;

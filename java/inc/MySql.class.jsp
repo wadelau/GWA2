@@ -169,7 +169,6 @@ public final class MySql implements DbDriver {
 				}
 			}
 
-			hm.put(0, true);
 			//hm.put("1", pstmt.executeQuery() );
 			ResultSet rs = pstmt.executeQuery();
 			HashMap hmtmp = null ;		
@@ -185,15 +184,19 @@ public final class MySql implements DbDriver {
 					fieldname = fieldname.toLowerCase() ;
 					hmtmp.put( fieldname,fieldvalue ) ;
 				}
+				hm.put(0, true);
+				hm.put(1, (new Object[]{hmtmp})); //- hm[1][0]
 			}
-			hm.put(1, hmtmp);
+			else{
+				hm.put(0, false);
+				hm.put(1, (new Object[]{"No Record. 1806241109."}));	
+			}
 			hmtmp = null; rsmd = null;
-
 			rs.close();
-						
 		}
 		catch (Exception ex){
 			hm.put(0, false);
+			hm.put(1, (new Object[]{"No Record. 1806241110."}));
 			ex.printStackTrace();
 			//System.out.println("DBACT.getExistSafe():"+e+" sql:["+sqlstr+"]");
 		}
@@ -216,7 +219,8 @@ public final class MySql implements DbDriver {
 			this._init();
 		}
 		
-		PreparedStatement pstmt =  null ; 
+		PreparedStatement pstmt =  null;
+		HashMap hmtmp = new HashMap();		
 		try{
 
 			pstmt = this.dbConn.prepareStatement(sqlstr);
@@ -232,11 +236,9 @@ public final class MySql implements DbDriver {
 					}
 				}
 			}
-
-			hm.put(0, true);
 			//hm.put("1", pstmt.executeQuery() );
 			ResultSet rs = pstmt.executeQuery();
-			HashMap hmtmp = new HashMap();
+			
 			HashMap hmtmp2 = null;
 			int count = 0 ;
 			ResultSetMetaData rsmd = rs.getMetaData() ;
@@ -256,14 +258,23 @@ public final class MySql implements DbDriver {
 				//hmtmp.put(""+count,hmtmp2);
 				count++;
 			}
-			hmtmp.put("count",""+count);
-			hm.put(1, hmtmp);
+			if(count > 0){
+				hm.put(0, true);
+				hm.put(1, hmtmp);
+			}
+			else{
+				hm.put(0, false);
+                hmtmp.put(0, "No Record. 1806241112.");
+                hm.put(1, hmtmp);
+			}
 			hmtmp = null; hmtmp2 = null; rsmd = null;
 			rs.close();
 			
 		}
 		catch (Exception e){
 			hm.put(0, false);
+			hmtmp.put(0, "No Record. 1806241112.");
+            hm.put(1, hmtmp);
 			e.printStackTrace();
 			System.out.println(e);
 		}
