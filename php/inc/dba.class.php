@@ -44,7 +44,7 @@ class DBA {
 		$tmphm = $this->dbconn->query($sql,$hmvars,$idxarr);
 		if($tmphm[0]){
 			$hm[0] = true;
-			$hm[1] = array('insertid'=>$this->dbconn->getInsertId(),'affectedrows'=>$this->dbconn->getAffectedRows());
+			$hm[1] = array('insertedid'=>$this->dbconn->getInsertId(),'affectedrows'=>$this->dbconn->getAffectedRows());
 		}
 		else{
 			$hm[0] = false;
