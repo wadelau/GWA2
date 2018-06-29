@@ -51,6 +51,9 @@ public class DbConn{
 public static class CacheConn{
 	
 	//- @todo, socket pool, config, connection
+	public CacheConn(String cacheServer){
+		//- @todo
+	}
 	
 }
 
@@ -58,6 +61,9 @@ public static class CacheConn{
 public static class SessionConn{
 	
 	//- @todo, socket pool
+	public SessionConn(String sessionServer){
+		//- @todo
+	}
 	
 }
 

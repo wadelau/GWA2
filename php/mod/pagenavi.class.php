@@ -264,7 +264,6 @@ class PageNavi extends WebApp{
                 }
 				else{
                     # remedy on Sun Jun 17 07:54:59 CST 2012 by wadelau
-                    
                     $fieldopv = $_REQUEST['oppnsk'.$field]; # refer to ./class/gtbl.class.php: getLogicOp,
                     if($fieldopv == null || $fieldopv == ''){
                         $fieldopv = "=";
@@ -276,7 +275,8 @@ class PageNavi extends WebApp{
                         $fieldopv = str_replace('&lt;', '<', $fieldopv);
                     }
                     if($fieldopv == 'inlist'){
-                        if($this->isNumeric($hmfield[$field]) && strpos($hmfield[$field],'date') === false){
+                        if($this->isNumeric($hmfield[$field]) 
+							&& strpos($hmfield[$field],'date') === false){
                             # numeric
                         }
 						else{

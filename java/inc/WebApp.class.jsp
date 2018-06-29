@@ -1,12 +1,13 @@
 <%
-/*
+/* Global and unique parent of all objects in this application
  * imprvs on time fields by Xenxin@ufqi, Tue, 13 Mar, 2018 19:24:12
  * contructor agrs defined as HashMap, instead of String, Thur, 21, Jun, 2018
 */
 %><%@include file="./WebApp.interface.jsp"%><%
-%><%@include file="./Conn.class.jsp"%><%!
-%><%@include file="./Dba.class.jsp"%><%!
-%><%@include file="./Cachea.class.jsp"%><%!
+%><%@include file="./Conn.class.jsp"%><%
+%><%@include file="./Dba.class.jsp"%><%
+%><%@include file="./Cachea.class.jsp"%><%
+%><%@include file="./Sessiona.class.jsp"%><%!
 
 public class WebApp implements WebAppInterface{
 	
@@ -19,6 +20,7 @@ public class WebApp implements WebAppInterface{
 
 	Dba dba = null;
 	Cachea cachea = null;
+	Sessiona sessiona = null;
 
 	//- constructor
 	public WebApp(HashMap hmcfg){
@@ -41,9 +43,16 @@ public class WebApp implements WebAppInterface{
 				this.cachea = new Cachea(cacheconf);
 			}
 		}
+		//- session
+        if((boolean)Config.get("enable_session")){
+                if(this.sessiona == null){
+                        String sessionconf = "";
+                        this.set("sessionconf", sessionconf);
+                        this.sessiona = new Sessiona(sessionconf);
+                }
+        }
 		
 	}
-	
 	
 	//-
 	public WebApp(){
@@ -56,6 +65,14 @@ public class WebApp implements WebAppInterface{
 		if((boolean)Config.get("enable_cache")){
 			this.cachea = new Cachea("");
 		}
+		//- session
+        if((boolean)Config.get("enable_session")){
+                if(this.sessiona == null){
+                        String sessionconf = "";
+                        this.set("sessionconf", sessionconf);
+                        this.sessiona = new Sessiona(sessionconf);
+                }
+        }
 
 	}
 	
