@@ -53,7 +53,11 @@ public final static class Wht{
 	 */
 	public static String getQuery(HttpServletRequest request){
 
-		return Wht._enSafe(request.getQueryString());	
+		String params = Wht._enSafe(request.getQueryString());
+		if(params.contentEquals("")) {}
+		else { params = "?" + params; }
+		
+		return params;
 
 	}
 

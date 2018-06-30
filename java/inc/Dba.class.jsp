@@ -55,8 +55,10 @@ public final class Dba { //- db administrator
 		HashMap tmpHm = new HashMap();
 		boolean hasLimitOne = false;
 		int pageSize = 0;
-		String tmpps = String.valueOf(args.get("pagesize"));
-		if(tmpps.equals("")){}else{ pageSize = Integer.parseInt(tmpps); }
+        if(args.containsKey("pagesize")){
+                String tmpps = String.valueOf(args.get("pagesize"));
+                if(tmpps.equals("")){}else{ pageSize = Integer.parseInt(tmpps); }
+        }
 		if(sql.indexOf("limit 1") > -1 || pageSize == 1 ){
 			hasLimitOne = true;
 			tmpHm = this.dbDrv.readSingle(sql, args, idxArr);
@@ -84,7 +86,7 @@ public final class Dba { //- db administrator
 			hm.put(1, tmpHm.get(1));
 		}
 		tmpHm = null; idxArr = null;
-		hm.put("read-in-Dba", (new Date()));	
+		//hm.put("read-in-Dba", (new Date()));	
 
 		return hm;
 	
@@ -103,7 +105,7 @@ public final class Dba { //- db administrator
 		if((boolean)tmpHm.get(0)){
 			hm.put(0, true);
 			HashMap inHm = new HashMap();
-			inHm.put("insertid", tmpHm.get(1));
+			inHm.put("insertedid", tmpHm.get(1));
 			inHm.put("affectedrows", tmpHm.get(1));
 			hm.put(1, inHm);
 		}

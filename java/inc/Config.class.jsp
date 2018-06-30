@@ -41,6 +41,14 @@ if(true){
 	hmconf.put("cacheport", "");
 	hmconf.put("cachedriver", "MEMCACHEX"); //- REDISX, XCACHEX
 	hmconf.put("cacheexpire", 30*60);
+	
+    //- session
+    hmconf.put("enable_session", true);
+    hmconf.put("sessionhost", "");
+    hmconf.put("sessionport", "");
+    hmconf.put("sessiondriver", "SESSIONX"); //- SESSIONX 
+    hmconf.put("sessionexpire", 30*60);
+
 
 	//- tpl
 	hmconf.put("template_display_index", true); //- true for embedded, false for standalone 

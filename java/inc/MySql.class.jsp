@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 <%
 //import java.util.HashMap;
 
@@ -145,7 +147,8 @@ public final class MySql implements DbDriver {
 			this._init();
 		}
 		
-		PreparedStatement pstmt = null ;
+		PreparedStatement pstmt = null;
+		HashMap hmtmp = null;
 		try{
 			
 			sqlstr = sqlstr.trim();
@@ -158,45 +161,48 @@ public final class MySql implements DbDriver {
 			if( idxArr!=null ){
 				int myj = 1 ;
 				for( int myi=0;myi<idxArr.length && myi<paraCount;myi++ ){
-					System.out.println("MySql.readSingle: myj:["+myj+"] myi:["+myi+"] idxArr-i:["+idxArr[myi]+"]");
+					//System.out.println("MySql.readSingle: myj:["+myj+"] myi:["+myi+"] idxArr-i:["+idxArr[myi]+"]");
 					if( idxArr[myi] != null ){
 						pstmt.setObject(myj, args.get(idxArr[myi]));
 						myj++;
 					}
 					else{
-						System.out.println("MySql.readSingle: ???");
+						System.out.println("inc/MySql: readSingle no parameter. 1806251959.");
 					}
 				}
 			}
 
 			//hm.put("1", pstmt.executeQuery() );
-			ResultSet rs = pstmt.executeQuery();
-			HashMap hmtmp = null ;		
+			ResultSet rs = pstmt.executeQuery();		
 			ResultSetMetaData rsmd = rs.getMetaData();
 			if( rs.next() ){
 				hmtmp = new HashMap();
-				int cci = rsmd.getColumnCount() ;
-				String fieldname = null  ;
-				String fieldvalue = null  ;
+				int cci = rsmd.getColumnCount();
+				String fieldname = null ;
+				String fieldvalue = null ;
 				for(int i=1; i<=cci;i++){
-					fieldname = rsmd.getColumnName(i) ;
-					fieldvalue = rs.getString(i) ; //- fieldname, remedy by wadelau, 13:01 18 July 2016
-					fieldname = fieldname.toLowerCase() ;
-					hmtmp.put( fieldname,fieldvalue ) ;
+					fieldname = rsmd.getColumnName(i);
+					fieldvalue = rs.getString(i); //- fieldname, remedy by wadelau, 13:01 18 July 2016
+					fieldname = fieldname.toLowerCase();
+					hmtmp.put( fieldname, fieldvalue);
 				}
 				hm.put(0, true);
-				hm.put(1, (new Object[]{hmtmp})); //- hm[1][0]
+				HashMap hmtmp2 = new HashMap();
+				hmtmp2.put(0, hmtmp);
+				hm.put(1, hmtmp2); //- hm[1][0]
 			}
 			else{
 				hm.put(0, false);
-				hm.put(1, (new Object[]{"No Record. 1806241109."}));	
+				hmtmp.put(0, "No Record. 1806241109.");
+				hm.put(1, hmtmp); //- hm[1][0]	
 			}
 			hmtmp = null; rsmd = null;
 			rs.close();
 		}
 		catch (Exception ex){
 			hm.put(0, false);
-			hm.put(1, (new Object[]{"No Record. 1806241110."}));
+			hmtmp.put(0, "No Record. 1806241110.");
+			hm.put(1,  hmtmp); //- hm[1][0]
 			ex.printStackTrace();
 			//System.out.println("DBACT.getExistSafe():"+e+" sql:["+sqlstr+"]");
 		}
@@ -249,13 +255,12 @@ public final class MySql implements DbDriver {
 				hmtmp2 = new HashMap() ;
 				for(int i=1; i<=icc; i++ ){
 					fieldname = rsmd.getColumnName(i) ;
-					
-					fieldvalue = rs.getString(i); // rs.getString(fieldname); remedy by wadelau, Sun Jul 17 22:51:13 CST 2016
-
+					fieldvalue = rs.getString(i); 
+					// rs.getString(fieldname); remedy by wadelau, Sun Jul 17 22:51:13 CST 2016
 					fieldname = fieldname.toLowerCase() ;
 					hmtmp2.put(fieldname, fieldvalue);
 				}
-				//hmtmp.put(""+count,hmtmp2);
+				hmtmp.put(count, hmtmp2); //- diff with hmtmp.put("0", hmtmp2);
 				count++;
 			}
 			if(count > 0){
@@ -264,7 +269,7 @@ public final class MySql implements DbDriver {
 			}
 			else{
 				hm.put(0, false);
-                hmtmp.put(0, "No Record. 1806241112.");
+                hmtmp.put(0, "No Record. 1806241110.");
                 hm.put(1, hmtmp);
 			}
 			hmtmp = null; hmtmp2 = null; rsmd = null;
