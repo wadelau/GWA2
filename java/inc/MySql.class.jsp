@@ -148,7 +148,7 @@ public final class MySql implements DbDriver {
 		}
 		
 		PreparedStatement pstmt = null;
-		HashMap hmtmp = null;
+		HashMap hmtmp = new HashMap();
 		try{
 			
 			sqlstr = sqlstr.trim();

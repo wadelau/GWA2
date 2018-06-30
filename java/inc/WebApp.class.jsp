@@ -54,26 +54,11 @@ public class WebApp implements WebAppInterface{
 		
 	}
 	
-	//-
+	//- override
 	public WebApp(){
 		// @todo
-		//- dba
-		if(this.dba == null){
-			this.dba = new Dba("");
-		}
-		//- cachea
-		if((boolean)Config.get("enable_cache")){
-			this.cachea = new Cachea("");
-		}
-		//- session
-        if((boolean)Config.get("enable_session")){
-                if(this.sessiona == null){
-                        String sessionconf = "";
-                        this.set("sessionconf", sessionconf);
-                        this.sessiona = new Sessiona(sessionconf);
-                }
-        }
-
+		HashMap hmcfg = new HashMap();
+		new WebApp(hmcfg);
 	}
 	
 	//-
