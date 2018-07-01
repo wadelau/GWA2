@@ -21,7 +21,7 @@ public final class SessionX implements SessionDriver {
 	//- methods, public
 	public String generateSid(User user, HttpServletRequest request){
 		String sid = "";
-		sid = "inc-SessionX-" + (new Random()).nextInt();
+		sid = Zeea.md5("inc-SessionX-" + (new Random()).nextInt());
 		return sid;
 	}
 

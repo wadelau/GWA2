@@ -20,8 +20,6 @@ public class User extends WebApp{
 		//- call super Constructor with args if applicable, e.g. different DbAlias
 		//- i.e. WebApp->Contructor(HashMap hmcfg);
  		//super((HashMap)(new HashMap<String, String>(){{put("dbconf", User_Db_Alias);}}));
-		
-		this.setTbl("gwa2_info_usertbl");
 
 	}
 
@@ -43,17 +41,11 @@ public class User extends WebApp{
 			this.set(key, value);
 		}
 		entries = null;
-	
-		//- dba
-		if(this.dba == null){
-			this.dba = new Dba(this.get("dbconf"));
-		}
 		
-		//- cachea
-		if((boolean)Config.get("enable_cache")){
-			this.cachea = new Cachea(this.get("cacheconf"));
-		}
-
+		String dbConfig = "userdb";
+		this.set("dbconfig", dbConfig);
+		this.setTbl("gwa2_info_usertbl");
+		
 	}
 
 	//-

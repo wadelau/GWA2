@@ -7,7 +7,8 @@
 %><%@include file="./Conn.class.jsp"%><%
 %><%@include file="./Dba.class.jsp"%><%
 %><%@include file="./Cachea.class.jsp"%><%
-%><%@include file="./Sessiona.class.jsp"%><%!
+%><%@include file="./Sessiona.class.jsp"%><%
+%><%@include file="./Zeea.class.jsp"%><%!
 
 public class WebApp implements WebAppInterface{
 	

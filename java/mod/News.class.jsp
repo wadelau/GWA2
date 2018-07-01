@@ -13,7 +13,7 @@ public class News extends WebApp{
 	
 	//- constructor ?
 	public News(){
-		
+		//-
 		this.setTbl("gwa2_info_usertbl");
 
 	}
