@@ -57,9 +57,8 @@ public class WebApp implements WebAppInterface{
 	
 	//- override
 	public WebApp(){
-		// @todo
-		HashMap hmcfg = new HashMap();
-		new WebApp(hmcfg);
+		//- for constructor override
+		this(new HashMap());
 	}
 	
 	//-

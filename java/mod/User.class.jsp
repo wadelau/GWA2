@@ -6,9 +6,7 @@
  */
 
 %><% // @include file="../inc/WebApp.class.jsp" //- relocated into comm/preheader.inc
-
 %><%
-
 %><%!
 
 public class User extends WebApp{
@@ -17,10 +15,8 @@ public class User extends WebApp{
 	
 	//- constructor ?
 	public User(){
-		//- call super Constructor with args if applicable, e.g. different DbAlias
-		//- i.e. WebApp->Contructor(HashMap hmcfg);
- 		//super((HashMap)(new HashMap<String, String>(){{put("dbconf", User_Db_Alias);}}));
-
+		//- for constructor override
+		this(new HashMap());
 	}
 
 	//-
@@ -44,8 +40,7 @@ public class User extends WebApp{
 		
 		String dbConfig = "userdb";
 		this.set("dbconfig", dbConfig);
-		this.setTbl("gwa2_info_usertbl");
-		
+		this.setTbl("gwa2_info_usertbl");	
 	}
 
 	//-

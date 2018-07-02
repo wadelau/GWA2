@@ -11,11 +11,13 @@
 public final class SessionX implements SessionDriver {
 
 	//- variables
+	private static final String Data_Sep = "";
+	private String Session_Private_Key = "";
 
 	//- constructor
 	public SessionX(SessionConn myConn){
 		//- @todo
-
+		this.Session_Private_Key = (String)Config.get("sign_key");
 	}	
 	
 	//- methods, public

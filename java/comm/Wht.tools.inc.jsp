@@ -81,20 +81,16 @@ public final static class Wht{
 	 * @failed with a return value -1 
 	 */
 	public static int parseInt(String numstr){
-
 		if(numstr.equals("")){
 			return -1;
 		}
-
 		try	{
 			return Integer.parseInt(numstr);
 		}
 		catch(Exception ex){
 			ex.printStackTrace();
 		}
-
 		return -1;
-
 	}
 
 	/*
@@ -208,10 +204,9 @@ public final static class Wht{
 	/*
 	 * collectUA
 	 * @param HttpServletRequest request
-	 * @param String profile
 	 * @return String mobtype	
 	 */
-	public static String collectUA(HttpServletRequest request, String profile) {
+	public static String collectUA(HttpServletRequest request) {
 
 		//-- collecting user-agenct in very beginning, added on 20090108
 		String mobtype = getHeader(request,"User-Agent");
@@ -272,7 +267,6 @@ public final static class Wht{
 	//-
 	//- check whether a class has been loaded
 	public boolean isClass(String className){
-	
 		try{
 			Class.forName(className);
 			return true;
@@ -280,8 +274,7 @@ public final static class Wht{
 		catch (final ClassNotFoundException e){
 			return false;
 		}
-		
-}
+	}
 
 }
 

@@ -49,6 +49,7 @@ if(true){
     hmconf.put("sessiondriver", "SESSIONX"); //- SESSIONX 
     hmconf.put("sessionexpire", 30*60);
 
+	hmconf.put("sign_key", "--my sign key--");
 
 	//- tpl
 	hmconf.put("template_display_index", true); //- true for embedded, false for standalone 
