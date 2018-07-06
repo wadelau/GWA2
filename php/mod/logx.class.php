@@ -14,6 +14,7 @@ class LogX extends WebApp {
     
     //- variables
     var $logf = '';
+    const Max_Message_Length = 1024;
     
     //- construct
     public function __construct($args){
@@ -37,12 +38,18 @@ class LogX extends WebApp {
     public function say($msg, $args=null){
         $rtn = true;
         $logf = $this->logf;
+        if($msg == null || $msg == ''){
+            return $rtn;
+        }
+        else if(strlen($msg) > self::Max_Message_Length){
+            $msg = substr($msg, 0, self::Max_Message_Length);
+        }
         $mytime = time();
         $logf .= date("Ymd", $mytime).'.log';
         $hm = $this->setBy('file:', array('target'=>$logf, 'reuse'=>true,
                 'isappend'=>true,
                 'content'=>date("Y-m-d-H:i:sO", $mytime).' '.$msg."\n",
-        ));
+            ));
         return $rtn;
     }
     

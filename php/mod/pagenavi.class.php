@@ -45,6 +45,10 @@ class PageNavi extends WebApp{
             $this->hmf[$k]=$para[$k];
        }
        
+       # Parent constructors are not called implicitly
+       #     if the child class defines a constructor.
+       # In order to run a parent constructor, a call to parent::__construct()
+       #     within the child constructor is required.
        parent::__construct();
 
    }
@@ -238,7 +242,7 @@ class PageNavi extends WebApp{
                     $linkfield = $arr[1];
                 }
 				# for select
-       	   		if(isset($_REQUEST[$field]) && $_REQUEST[$field] != '' 
+       	   		if(isset($_REQUEST[$field]) && $_REQUEST[$field] != ''
 					&& $_REQUEST[$field] != $v){
        	   			$v = $_REQUEST[$field];
        	   		}
@@ -275,7 +279,7 @@ class PageNavi extends WebApp{
                         $fieldopv = str_replace('&lt;', '<', $fieldopv);
                     }
                     if($fieldopv == 'inlist'){
-                        if($this->isNumeric($hmfield[$field]) 
+                        if($this->isNumeric($hmfield[$field])
 							&& strpos($hmfield[$field],'date') === false){
                             # numeric
                         }

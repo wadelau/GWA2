@@ -21,10 +21,19 @@ public final class SessionX implements SessionDriver {
 	}	
 	
 	//- methods, public
+	//-
 	public String generateSid(User user, HttpServletRequest request){
 		String sid = "";
 		sid = Zeea.md5("inc-SessionX-" + (new Random()).nextInt());
 		return sid;
+	}
+	
+	//-
+	public HashMap checkSid(User user, HttpServletRequest request, String sid){
+        HashMap hmrtn = new HashMap();
+        boolean isValid = false;
+        //- @todo
+        return hmrtn;
 	}
 
 	//-
@@ -48,7 +57,6 @@ public final class SessionX implements SessionDriver {
 
 		return isSucc;
 	}
-	
 
 	//- methods, private
 	

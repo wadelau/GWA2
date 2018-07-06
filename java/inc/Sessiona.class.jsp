@@ -32,11 +32,17 @@ public final class Sessiona { //- Session administrator
 	}
 
 	//- methods, public
+	//-
 	public String generateSid(User user, HttpServletRequest request){
 		String sid = "";
 		sid = this.myDriver.generateSid(user, request);
 		return sid;
 
+	}
+	
+	//-
+	public HashMap checkSid(User user, HttpServletRequest request, String sid){
+		return this.myDriver.checkSid(user, request, sid);
 	}
 	
 	//-
@@ -55,6 +61,8 @@ public interface SessionDriver{
 	//private void _init();
 
 	public String generateSid(User user, HttpServletRequest request);
+	
+	public String checkSid(User user, HttpServletRequest request, String sid);
 
 	public Object get(String key);
 
