@@ -13,11 +13,16 @@ if(!defined('__ROOT__')){
 require_once(__ROOT__.'/inc/webapp.class.php');
 
 class PageNavi extends WebApp{
+	
+	//- variables
+    var $dummy = '';
+    const SID = 'sid';
+	const Omit_String = '----';
 
    public function __construct(){
 
        $para = array();
-       $pdef = array('pnpn'=>1,'pnps'=>100,'pntc'=>0); # 28 for development
+       $pdef = array('pnpn'=>1,'pnps'=>100,'pntc'=>0, 'navilen'=>10); # 28 for development
 
        $file = $_SERVER['PHP_SELF'];
        $query = $_SERVER['QUERY_STRING'];
@@ -82,7 +87,7 @@ class PageNavi extends WebApp{
        #print_r($this->hmf);
 
        $totalpage = $para['pntc'] % $para['pnps'] == 0 ? ($para['pntc']/$para['pnps']) : ceil($para['pntc']/$para['pnps']);
-       $navilen = 8;
+       $navilen = $para['navilen'];
        $str = "&nbsp;&nbsp;<b>页号: &nbsp;<a href=\"javascript:pnAction('".$para['url']."&pnpn=1');\" title=\"第一页\">|&laquo;</a></b>&nbsp; ";
 
        for($i=$para['pnpn']-$navilen; $i<$para['pnpn'] + $navilen && $i<=$totalpage; $i++){
@@ -111,7 +116,7 @@ class PageNavi extends WebApp{
        #print_r($para);
        if($this->hmf['totalcount'] > 0){
             $para['pntc'] = $this->hmf['totalcount'];
-            $this->hmf['url'] = preg_replace("/\/pntc\/([0-9]*)/","", $this->hmf['url']);
+            $this->hmf['url'] = preg_replace("/\/pntc\/([0-9]*)/","", $this->hmf['url']); # RESTful format
             if(!inString('?', $this->hmf['url'])){
 		    $this->hmf['url'] .= "?_0101=1";
 	    }
@@ -122,9 +127,9 @@ class PageNavi extends WebApp{
        #print_r($this->hmf);
 
        $totalpage = $para['pntc'] % $para['pnps'] == 0 ? ($para['pntc']/$para['pnps']) : ceil($para['pntc']/$para['pnps']);
-       $navilen = 10;
+       $navilen = $para['navilen'];
 
-		    $pageArr = array('totalpage'=>$totalpage, 'totalrecord'=>$para['pntc'], 'url'=>$para['url']);
+		$pageArr = array('totalpage'=>$totalpage, 'totalrecord'=>$para['pntc'], 'url'=>$para['url']);
 
         for($i=$para['pnpn']-$navilen; $i<$para['pnpn'] + $navilen && $i<=$totalpage; $i++){
 
@@ -160,17 +165,17 @@ class PageNavi extends WebApp{
        $order = "";
        foreach($_REQUEST as $k=>$v){
             if(strpos($k,"pnob") === 0){
-                $order = .substr($k,4);
-		if($v == 1){
-			$order .= " desc";
-		}
-		$order .= ",";
+                $order .= substr($k,4);
+				if($v == 1){
+					$order .= " desc";
+				}
+				$order .= ",";
                 #break; # allow multiple order fields
             }
         }
-	if($order != ''){
-		$order .= "1 "; # + "order by 1 ", compatible with this->get('isasc')
-	}
+		if($order != ''){
+			$order .= "1 "; # + "order by 1 ", compatible with this->get('isasc')
+		}
         #error_log(__FILE__.":getOrder:$order");
         return $order;
    }
@@ -254,7 +259,7 @@ class PageNavi extends WebApp{
                 
                 }
 				else if(strpos($v,"in::") === 0){ # <hidesk>tuanid=id::in::tbl:hss_tuanduitbl:operatearea=IN=USER_OPERATEAREA</hidesk>
-                    error_log(__FILE__.": k:$k, v:$v");
+                    #error_log(__FILE__.": k:$k, v:$v");
                     $tmparr = explode("::", $v);
                     $tmpop = $tmparr[0];
                     $tmpval = $tmparr[1];
@@ -277,6 +282,7 @@ class PageNavi extends WebApp{
 							$fieldopv = urldecode($fieldopv);
 						}
                         $fieldopv = str_replace('&lt;', '<', $fieldopv);
+						$fieldopv = str_replace('&gt;', '>', $fieldopv);
                     }
                     if($fieldopv == 'inlist'){
                         if($this->isNumeric($hmfield[$field])

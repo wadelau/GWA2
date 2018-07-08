@@ -92,6 +92,12 @@ public final static class Wht{
 		}
 		return -1;
 	}
+	
+	//-
+    public static int parseInt(Object obj){
+        return Wht.parseInt((String)obj);
+    }
+        
 
 	/*
 	 * inString, find where the string in another string, which separated by ","

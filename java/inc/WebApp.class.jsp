@@ -63,23 +63,25 @@ public class WebApp implements WebAppInterface{
 	
 	//-
 	public void set(String k, Object v){
-		
 		if(k == null || k.equals("")){
 			//- @todo ?
 		}
 		else{
 			this.hmf.put(k, v);	
 		}
-		
 	}
 
 	//-
 	public String get(String k){
-	
 		String tmp = (String)this.hmf.get(k);
 		return tmp==null ? "" : tmp;
 
 	}
+	
+	//-
+    public void del(String k){
+       this.hmf.remove(k);
+    }
 	
 	//-
 	/* 
