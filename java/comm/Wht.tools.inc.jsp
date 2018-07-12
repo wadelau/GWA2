@@ -18,9 +18,7 @@ public final static class Wht{
 	 * @return String, formated fieldvalue 	
 	 */
 	public static String get(HttpServletRequest request, String field){
-		
 		return Wht._enSafe(request.getParameter(field));
-
 	}
 
 	/*
@@ -30,9 +28,7 @@ public final static class Wht{
 	 * @return String, formated fieldvalue 	
 	 */
 	public static String getHeader(HttpServletRequest request, String field){
-
-		return Wht._enSafe(request.getHeader(field));	
-
+		return Wht._enSafe(request.getHeader(field));
 	}
 
 	/*
@@ -41,9 +37,7 @@ public final static class Wht{
 	 * @return String, formated uri	
 	 */
 	public static String getURI(HttpServletRequest request){
-
-		return request.getRequestURI()==null?"":request.getRequestURI();	
-
+		return request.getRequestURI()==null?"":request.getRequestURI();
 	}
 
 	/*
@@ -52,24 +46,19 @@ public final static class Wht{
 	 * @return String, formated querystring	
 	 */
 	public static String getQuery(HttpServletRequest request){
-
 		String params = Wht._enSafe(request.getQueryString());
 		if(params.contentEquals("")) {}
 		else { params = "?" + params; }
-		
 		return params;
-
 	}
 
 	/*
 	 * ensafe user input
 	 */
 	private static String _enSafe(String s){
-	
 		s = s==null ? "" : s;
 		s = s.replaceAll("<", "&lt;");
 		s = s.replaceAll("\"", "&quot;");
-
 		return s;
 
 	}
@@ -95,7 +84,7 @@ public final static class Wht{
 	
 	//-
     public static int parseInt(Object obj){
-        return Wht.parseInt((String)obj);
+        return Wht.parseInt(String.valueOf(obj));
     }
         
 
@@ -105,7 +94,6 @@ public final static class Wht{
 	 * @reurn boolean true|false, if yes true, then false
 	 */
 	public static boolean inString(String needle,String haystack){
-
 		boolean matched=false;
 		if( haystack==null || haystack.equals("") || needle==null || needle.equals("")){
 			return matched; 
@@ -118,7 +106,6 @@ public final static class Wht{
 			//System.out.println("Wht.inString: needle:["+needle+"] hays:["+haystack+"] matched:["+matched+"]");
 		}
 		return matched;
-
 	}
 
 	/*
@@ -127,7 +114,6 @@ public final static class Wht{
 	 * @reurn boolean true|false, if yes true, then false
 	 */
 	public static boolean inList(String needle,String haystack, String sep){
-
 		boolean matched=false;
 		if( haystack==null || haystack.equals("") || needle==null || needle.equals("")){
 			return matched; 
@@ -146,9 +132,7 @@ public final static class Wht{
 				matched=true;
 			}
 		}
-
 		return matched;
-
 	}
 
 	/*
@@ -158,7 +142,6 @@ public final static class Wht{
 	 * @return boolean true|false
 	 */
 	public static boolean startsWith(String needle,String haystack){
-
 		boolean matched=false;
 		if(needle==null || haystack==null || haystack.equals("")){
 			return matched;
@@ -172,7 +155,6 @@ public final static class Wht{
 			regp=null;
 			regm=null;
 		}
-
 		return matched;
 
 	}
@@ -183,8 +165,7 @@ public final static class Wht{
 	 * @param String haystack, which will be used in
 	 * @return boolean true|false
 	 */
-	public static boolean endsWith(String needle,String haystack)
-	{
+	public static boolean endsWith(String needle,String haystack){
 		boolean matched=false;
 		if(needle==null || haystack==null || haystack.equals("")){
 			return matched;
@@ -198,9 +179,7 @@ public final static class Wht{
 			regp=null;
 			regm=null;
 		}
-
 		return matched;
-
 	}
 
 	//
@@ -213,7 +192,6 @@ public final static class Wht{
 	 * @return String mobtype	
 	 */
 	public static String collectUA(HttpServletRequest request) {
-
 		//-- collecting user-agenct in very beginning, added on 20090108
 		String mobtype = getHeader(request,"User-Agent");
 		if (mobtype.equals("") || ( mobtype.startsWith("Java") )){
@@ -223,9 +201,7 @@ public final static class Wht{
 		if(!hdua.equals("") ){
 			mobtype = hdua;
 		}
-
 		return mobtype;
-
 	}
 	
 	/*
@@ -234,7 +210,6 @@ public final static class Wht{
 	 * @return String ip
 	 */
 	public static String collectIP(HttpServletRequest request){
-
 		String remoteip=request.getRemoteAddr();
 		if (remoteip.startsWith("127.0")){
 			remoteip=get(request,"myip");
@@ -242,9 +217,7 @@ public final static class Wht{
 		if(remoteip.equals("") && request.getHeader("X-Forwarded-For")!=null){
 			remoteip=request.getHeader("X-Forwarded-For");
 		}
-
 		return remoteip;
-
 	}
 
 
@@ -265,9 +238,7 @@ public final static class Wht{
 				}
 			}	
 		}
-
 		return matched;
-
 	}
 	
 	//-

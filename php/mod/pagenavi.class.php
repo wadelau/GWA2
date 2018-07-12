@@ -327,6 +327,10 @@ class PageNavi extends WebApp{
                         $condition .= " ".$pnsm." "."$field <> ?";
                         $gtbl->set($field, $v);
                     }
+					else if($fieldopv == 'regexp'){
+                        $condition .= " ".$pnsm." "."$field regexp ?";
+                        $gtbl->set($field, $v);
+                    }
                     else if($fieldopv == 'notregexp'){
                         $condition .= " ".$pnsm." "."$field not regexp ?";
                         $gtbl->set($field, $v);
