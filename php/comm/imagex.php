@@ -5,7 +5,7 @@
  * update 10:37 15 June 2016
  */
 
-session_start();
+# session_start(); # refer to http://ufqi.com/blog/recaptcha-based-on-message-digest/
 
 if(true){
 	
@@ -26,7 +26,7 @@ if(true){
 			$verifycode .= $letters[rand(0, $llen)];
 			#error_log(__FILE__.":i:$i verifycode:".$verifycode);
 	}
-	$_SESSION['verifycode'] = $verifycode;
+	#$_SESSION['verifycode'] = $verifycode;
 	#error_log(__FILE__.": verifycode:".$verifycode);
 
 	$width = 90;
