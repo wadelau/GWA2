@@ -50,55 +50,46 @@ outx = new StringBuffer(); //- for $out in -PHP
 *  reported into GWA2 Java by wadelau, 19:43 18 July 2016
 */
 public static void debug(Object obj, String tag, String output){
-	
 	StringBuffer s = new StringBuffer((new Date()).toString());
 	s.append(" ");
-	
 	tag = tag==null ? "" : tag;
 	if(!tag.equals("")){
 		s.append(tag).append(":[");
 	}
-	
 	if(obj == null){
 		s.append("");
 	}
 	else{
 		s.append(obj.toString());
 	}
-	
 	if(!tag.equals("")){
 		s.append("]");
 	}
-	
 	output = output==null ? "" : output;
 	if(output.equals("") || output.equals("0")){
+		//- simple, concise
 		System.out.println(s.toString());
+		//- robust
+		//(new Throwable(s.toString())).printStackTrace();
 	}
 	else if(output.equals("1")){
-		String ss = s.toString();
-		System.out.println(ss);
 		//((new javax.servlet.http.HttpServletResponse()).getWriter()).println(ss); //write(ss);
+		//- robust
+        (new Throwable(s.toString())).printStackTrace();
 	}
 	else{
-		//-
-		System.out.println("comm/header.inc.jsp: unsupported output:["+output+"] 1607182227.");
-		(new Throwable()).printStackTrace();
-		
+		//- robust
+		s.append("comm/header.inc.jsp: unsupported output:["+output+"] 1607182227.");
+		(new Throwable(s.toString())).printStackTrace();
 	}
-    
 }
-
+//-
 public static void debug(HashMap obj){
-	
 	debug((Object)obj, null, null);
-	
 }
-
-
+//-
 public static void debug(String obj){
-	
 	debug((Object)obj, null, null);
-	
 }
 
 //- for urlencode / escape, etc

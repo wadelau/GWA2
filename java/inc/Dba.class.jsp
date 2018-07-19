@@ -59,7 +59,7 @@ public final class Dba { //- db administrator
                 String tmpps = String.valueOf(args.get("pagesize"));
                 if(tmpps.equals("")){}else{ pageSize = Integer.parseInt(tmpps); }
         }
-		if(sql.indexOf("limit 1") > -1 || pageSize == 1 ){
+		if(sql.indexOf("limit 1 ") > -1 || pageSize == 1 ){
 			hasLimitOne = true;
 			tmpHm = this.dbDrv.readSingle(sql, args, idxArr);
 		}

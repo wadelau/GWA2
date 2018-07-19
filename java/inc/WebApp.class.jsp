@@ -319,8 +319,9 @@ public class WebApp implements WebAppInterface{
 		if(!args.equals("")){
 			if(this.getId().equals("")){
 				hm.put(0, false);
-				hm.put(1, (new HashMap()).put("error", "unconditional deletion is strictly forbidden. stop it. sql:["+
-					sqlb.toString()+"] conditions:["+ args + "]"));
+				hm.put(1, (new HashMap()).put("error", 
+					"unconditional deletion is strictly forbidden. stop it. sql:["
+					+sqlb.toString()+"] conditions:["+ args + "]"));
 			}
 			else{
 				sqlb.append(this.myId).append("=?");
