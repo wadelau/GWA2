@@ -27,19 +27,24 @@ public final class Dba { //- db administrator
 			));
 
 	//- constructor	
-	public Dba(String hmconf){
+	public Dba(String xconf){
 	
-		hmconf = hmconf==null ? "master" : hmconf;
-		this.dbConf = new DbConn(hmconf); 
+		xconf = xconf==null ? "master" : xconf;
+		this.dbConf = new DbConn(xconf); 
 
-		String dbDriver = (String)Config.get("dbdriver");
+		String dbDriver = "";
+		if(xconf.equals("")){
+			dbDriver = (String)Config.get("dbdriver");
+		}
+		else{
+			dbDriver = (String)Config.get("dbdriver_"+xconf);
+		}
 		if(dbDriver.equals("MYSQL")){
 			this.dbDrv = new MySql(dbConf);	
 		}
 		else{
-			System.out.println("Dba.class: Unknown dbDriver:["+dbDriver+"]. 1607021745.\n");	
+			debug("Dba.class: Unknown dbDriver:["+dbDriver+"]. 1607021745.\n");	
 		}
-
 		//System.out.println("Dba.class: dbDriver:["+dbDriver+"] dbc:["+this.dbDrv+"]. 1607021957.\n");	
 
 	}

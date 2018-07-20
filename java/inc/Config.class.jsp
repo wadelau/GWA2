@@ -7,7 +7,6 @@
  # 
  */
 
-
 //- exec
 
 if(true){
@@ -23,12 +22,12 @@ if(true){
 	hmconf.put("dbname", "");
 	hmconf.put("dbdriver", "MYSQL"); //- MYSQL, SQLSERVER, ORACLE, INFORMIX, SYBASE
 	hmconf.put("db_enable_utf8_affirm", false);
+	hmconf.put("db_enable_socket_pool", true); //- Fri Jul 20 13:21:41 UTC 2018
 
 	/*
 	hmconf.put("dbhost", "192.168.0.241");
 	hmconf.put("dbport", 3306);
 	hmconf.put("dbuser", "");
-
 	hmconf.put("dbpassword", "");
 	hmconf.put("dbname", "");
 	hmconf.put("dbdriver", "MYSQL"); //- MYSQL, SQLSERVER, ORACLE, INFORMIX, SYBASE
@@ -56,7 +55,6 @@ if(true){
 
 
 	//- init config
-
 	Config.setConf(hmconf);
 
 }

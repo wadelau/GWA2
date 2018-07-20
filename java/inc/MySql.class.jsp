@@ -1,17 +1,20 @@
-import java.util.HashMap;
-
 <%
-//import java.util.HashMap;
-
 /* DB Driver, MySql, implements DbDriver.
  * v0.1
  * wadelau@gmail.com
  * since Wed Jul 13 18:22:06 UTC 2011
  * Thu Sep 11 16:34:20 CST 2014
  * Ported into Java by wadelau@ufqi.com, June 28, 2016s
+ * With socket pool, Xenxin@Ufqi,  Fri Jul 20 12:30:29 UTC 2018
+ *    need socket pool support from Tomcat, Resin, JBoss, or inc/SocketPool
  */
 
-%><%@page import="javax.sql.DataSource,java.sql.DriverManager,java.sql.ResultSet,java.sql.PreparedStatement"%><%
+%><%@page import="javax.sql.DataSource,
+java.sql.DriverManager,
+java.sql.ResultSet,
+java.sql.PreparedStatement,
+javax.naming.InitialContext,
+javax.sql.DataSource"%><%
 
 %><%!
 
@@ -22,8 +25,11 @@ public final class MySql implements DbDriver {
 	private String myUser = "";
 	private String myPwd = "";
 	private String myDb = "";
+	private boolean hasSocketPool = false;
 
-	protected Connection dbConn = null;
+    protected InitialContext ctx = null;
+    protected Connection dbConn = null;
+    protected DataSource ds = null;
 	
 	public MySql(DbConn dbConf){
 		
@@ -33,41 +39,45 @@ public final class MySql implements DbDriver {
 		this.myPwd = dbConf.myPwd; 
 		this.myDb = dbConf.myDb; 
 
-		this.dbConn = null; //- init ?
+		this.hasSocketPool = (boolean)Config.get("db_enable_socket_pool");
+        //debug("inc/MySql: db:"+this.myDb+" haspool:"+hasSocketPool);
+        if(this.hasSocketPool){
+            try{
+            this.ctx = new InitialContext();
+            this.ds = (DataSource)ctx.lookup("java:comp/env/jdbc/"+this.myDb);
+            }
+            catch(Exception ex){
+                ex.printStackTrace();
+            }
+        }
 	
 	}
 	
-
 	//- init connection 
 	private void _init(){
 	
 		try{
-
 			if(this.dbConn == null){
-				
-				Class.forName("com.mysql.jdbc.Driver"); //- need prior to JDBC 4.0
-			    //System.out.println("Driver loaded!");
-				this.dbConn = DriverManager.getConnection("jdbc:mysql://" + this.myHost + ":" 
-					+ this.myPort + "/" + this.myDb + "?" + "user=" + this.myUser 
-					+ "&password=" + this.myPwd + "&useSSL=false&characterEncoding=utf8");
-				//this.dbConn = DriverManager.getConnection("jdbc:mysql://"+this.myHost+":"+this.myPort+"/"
-				//	+this.myDb, this.myUser, ""+this.myPort);
-				
-				//- @todo
-				//- set names ‘utf8’
-
-				// - connection pool ?
-
+				if(this.hasSocketPool){
+                    //- with socket pool
+                    this.dbConn = this.ds.getConnection();
+                }
+                else{
+                     /*
+                      * standalone without socket pool
+                      */
+                    Class.forName("com.mysql.jdbc.Driver"); //- need prior to JDBC 4.0
+                    this.dbConn = DriverManager.getConnection("jdbc:mysql://" + this.myHost + ":"
+                        + this.myPort + "/" + this.myDb + "?" + "user=" + this.myUser
+                        + "&password=" + this.myPwd + "&useSSL=false&characterEncoding=utf8");
+                }
 			}
-
 		}
 		catch(Exception ex){
 			ex.printStackTrace();	
 		}
 		finally{
-		
-			//- release? long connection?  
-
+			//- release? long connection?
 		}
 		
 	}
