@@ -39,6 +39,14 @@ public class DbConn{
 			//- slave	
 
 		}
+		else if(dbServer.equals("userdb")){
+			this.myHost = (String)Config.get("dbhost_userdb"); //- inc/Config.class
+			this.myPort = (Integer)Config.get("dbport_userdb");
+			this.myUser = (String)Config.get("dbuser_userdb");
+			this.myPwd = (String)Config.get("dbpassword_userdb");
+			this.myDb = (String)Config.get("dbname_userdb");
+			this.myDriver = (String)Config.get("dbdriver_userdb");
+		}
 		else{
 			System.out.println("Unknown dbServer:["+dbServer+"]. 1607021811.");	
 		}
@@ -50,9 +58,25 @@ public class DbConn{
 //-
 public static class CacheConn{
 	
+    String myHost = "";
+    int myPort = 0;
+    String myDriver = "";
+    int myExpire = 30*60;
+    int myMaxConn = 5;
 	//- @todo, socket pool, config, connection
 	public CacheConn(String cacheServer){
-		//- @todo
+        cacheServer = cacheServer==null ? "" : cacheServer;
+        cacheServer = cacheServer.equals("") ? "Cache_Master" : cacheServer;
+        if(cacheServer.equals("Cache_Master")){
+            this.myHost = (String)Config.get("cachehost");
+            this.myPort = (Integer)Config.get("cacheport");
+            this.myDriver = (String)Config.get("cachedriver");
+            this.myExpire = (Integer)Config.get("cacheexpire");
+            this.myMaxConn = (Integer)Config.get("cachemaxconn");
+        }
+        else{
+            debug("inc/Conn: unsupported cacheServer:["+cacheServer+"] 1808012241.");
+        }
 	}
 	
 }

@@ -149,7 +149,8 @@ if(true){
     if($sid == ''){
       $sid = Wht::get($_SESSION, 'sid');
       if($sid == ''){
-        $sid = rand(1000, 999999); $_SESSION['sid'] = $sid;
+		  #$sid = date("Ymd", time()); # for production
+		  $sid = rand(1000, 999999); $_SESSION['sid'] = $sid; # for development
       }
     }
     else{

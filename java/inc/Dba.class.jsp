@@ -8,8 +8,13 @@
  * Thu Sep 11 16:34:20 CST 2014
  * Ported into Java by wadelau@ufqi.com, June 28, 2016s
  */
+ 
 
-%><%@page import="java.sql.Connection,java.sql.SQLException,java.sql.Statement,java.sql.ResultSetMetaData,java.util.HashSet"%><%
+%><%@page import="java.sql.Connection,
+java.sql.SQLException,
+java.sql.Statement,
+java.sql.ResultSetMetaData,
+java.util.HashSet"%><%
 %><%@include file="./MySql.class.jsp"%><%
 %><%!
 
@@ -28,19 +33,18 @@ public final class Dba { //- db administrator
 
 	//- constructor	
 	public Dba(String xconf){
-	
 		xconf = xconf==null ? "master" : xconf;
+		//System.out.println(" dbname in inc/Dba.. ["+xconf+"]");
 		this.dbConf = new DbConn(xconf); 
-
-		String dbDriver = "";
-		if(xconf.equals("")){
-			dbDriver = (String)Config.get("dbdriver");
-		}
-		else{
-			dbDriver = (String)Config.get("dbdriver_"+xconf);
-		}
+        String dbDriver = "";
+        if(xconf.equals("")){
+		    dbDriver = (String)Config.get("dbdriver");
+        }
+        else{
+		    dbDriver = (String)Config.get("dbdriver_"+xconf);
+        }
 		if(dbDriver.equals("MYSQL")){
-			this.dbDrv = new MySql(dbConf);	
+			this.dbDrv = new MySql(this.dbConf);	
 		}
 		else{
 			debug("Dba.class: Unknown dbDriver:["+dbDriver+"]. 1607021745.\n");	
@@ -60,18 +64,18 @@ public final class Dba { //- db administrator
 		HashMap tmpHm = new HashMap();
 		boolean hasLimitOne = false;
 		int pageSize = 0;
-        if(args.containsKey("pagesize")){
-                String tmpps = String.valueOf(args.get("pagesize"));
-                if(tmpps.equals("")){}else{ pageSize = Integer.parseInt(tmpps); }
-        }
-		if(sql.indexOf("limit 1 ") > -1 || pageSize == 1 ){
+		if(args.containsKey("pagesize")){
+			String tmpps = String.valueOf(args.get("pagesize"));
+			if(tmpps.equals("")){}else{ pageSize = Integer.parseInt(tmpps); }
+		}
+		if(sql.indexOf("limit 1 ") > -1 || pageSize == 1){
 			hasLimitOne = true;
 			tmpHm = this.dbDrv.readSingle(sql, args, idxArr);
 		}
 		else{
 			tmpHm = this.dbDrv.readBatch(sql, args, idxArr);
 		}
-		
+		//debug("inc/Dba: select:["+tmpHm+"] hasLimitOne:"+hasLimitOne);	
 		if((boolean)tmpHm.get(0)){ //- what's for?
 			hm.put(0, true);
 			try{
@@ -119,9 +123,8 @@ public final class Dba { //- db administrator
 			hm.put(1, tmpHm.get(1));
 		}
 
+		//hm.put("write-in-Dba", (new Date())+" args:["+args+"] idxArr:["+idxArr+"]");	
 		tmpHm = null; idxArr = null;
-		
-		hm.put("write-in-Dba", (new Date()));	
 		
 		return hm;
 	
@@ -205,79 +208,23 @@ public final class Dba { //- db administrator
 						kSerial.put(k, ki+1);
 					}
 					tmpi++;
-					//System.out.println("tmpi:["+tmpi+"] k:["+k+"]");
+					//System.out.println("inc/Dba: tmpi:["+tmpi+"] k:["+k+"]");
 				}
 			}
+			
 			itr=null;
 			tmpobj=null;
 			
 		}
 		
+		//System.out.println("inc/Dba: obj:["+obj+"]");
+
 		return obj;
 	
 	}
-	
-	
-	//--- added on 20071124 by wadelau, read single record and save in an hashmap
-	/*
-	public HashMap getInfo( ResultSet rs ) throws SQLException {
-		HashMap hm = null ;
 		
-		ResultSetMetaData rsmd = rs.getMetaData();
-		if( rs.next() ){
-			hm = new HashMap();
-			int cci = rsmd.getColumnCount() ;
-			String fieldname = null  ;
-			String fieldvalue = null  ;
-			for(int i=1; i<=cci;i++){
-				fieldname = rsmd.getColumnName(i) ;
-				fieldvalue = rs.getString(i) ; //- fieldname, remedy by wadelau, 13:01 18 July 2016
-				fieldname = fieldname.toLowerCase() ;
-				hm.put( fieldname,fieldvalue ) ;
-			}
-		}
-		rs.close();
-		//System.out.println("WebBean:hm["+hm+"]");
-		
-		return hm ;
-	
-	}
-	*/
-
-	//--- added on 20071124 by wadelau, read records and save in an hashmap
-	//- disabled since 21:49 24 July 2016
-	/*
-	public HashMap getRs( ResultSet rs ) throws SQLException{
-		HashMap hm = new HashMap();
-		int count = 0 ;
-		
-		ResultSetMetaData rsmd = rs.getMetaData() ;
-		int icc = rsmd.getColumnCount() ;
-		String fieldname = null ;
-		String fieldvalue = null ;
-		while ( rs.next() ){
-			HashMap hmtmp = new HashMap() ;
-			for(int i=1; i<=icc; i++ ){
-				fieldname = rsmd.getColumnName(i) ;
-				
-				fieldvalue = rs.getString(i); // rs.getString(fieldname); remedy by wadelau, Sun Jul 17 22:51:13 CST 2016
-
-				fieldname = fieldname.toLowerCase() ;
-				hmtmp.put(fieldname, fieldvalue);
-			}
-			hm.put(""+count,hmtmp);
-			count++;
-		}
-		
-		hm.put("count",""+count);
-		rs.close();
-		
-		return hm ;
-	
-	}
-	*/
-	
 }
+
 
 //- define for all drivers
 public interface DbDriver{
@@ -297,6 +244,7 @@ public interface DbDriver{
 	public int getLastInsertedId();
 	
 	public int getAffectedRows();
+	
 
 }
 

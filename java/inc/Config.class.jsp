@@ -7,6 +7,7 @@
  # 
  */
 
+
 //- exec
 
 if(true){
@@ -17,42 +18,31 @@ if(true){
 	hmconf.put("dbhost", "localhost");
 	hmconf.put("dbport", 3306);
 	hmconf.put("dbuser", "");
-
 	hmconf.put("dbpassword", "");
 	hmconf.put("dbname", "");
 	hmconf.put("dbdriver", "MYSQL"); //- MYSQL, SQLSERVER, ORACLE, INFORMIX, SYBASE
 	hmconf.put("db_enable_utf8_affirm", false);
 	hmconf.put("db_enable_socket_pool", true); //- Fri Jul 20 13:21:41 UTC 2018
 
-	/*
-	hmconf.put("dbhost", "192.168.0.241");
-	hmconf.put("dbport", 3306);
-	hmconf.put("dbuser", "");
-	hmconf.put("dbpassword", "");
-	hmconf.put("dbname", "");
-	hmconf.put("dbdriver", "MYSQL"); //- MYSQL, SQLSERVER, ORACLE, INFORMIX, SYBASE
-	hmconf.put("db_enable_utf8_affirm", false);
-	*/
-
 	//- cache
-	hmconf.put("enable_cache", false);
-	hmconf.put("cachehost", "");
-	hmconf.put("cacheport", "");
-	hmconf.put("cachedriver", "MEMCACHEX"); //- REDISX, XCACHEX
+	hmconf.put("enable_cache", true);
+	hmconf.put("cachehost", "localhost");
+	hmconf.put("cacheport", 8800);
+	hmconf.put("cachedriver", "MEMCACHED"); //- REDISX, XCACHEX
 	hmconf.put("cacheexpire", 30*60);
+	hmconf.put("cachemaxconn", 6); //- max connections for pool
 	
-    //- session
-    hmconf.put("enable_session", true);
-    hmconf.put("sessionhost", "");
-    hmconf.put("sessionport", "");
-    hmconf.put("sessiondriver", "SESSIONX"); //- SESSIONX 
-    hmconf.put("sessionexpire", 30*60);
+	//- session
+	hmconf.put("enable_session", true);
+	hmconf.put("sessionhost", "localhost");
+	hmconf.put("sessionport", 9900);
+	hmconf.put("sessiondriver", "SESSIONX"); //- SESSIONX 
+	hmconf.put("sessionexpire", 30*60);
 
-	hmconf.put("sign_key", "--my sign key--");
+	hmconf.put("sign_key", "--Mon Jul  2 12:55:44 UTC 2018##");
 
 	//- tpl
 	hmconf.put("template_display_index", true); //- true for embedded, false for standalone 
-
 
 	//- init config
 	Config.setConf(hmconf);
@@ -63,7 +53,8 @@ if(true){
 
 //- define
 
-public final static class Config {
+//public final static class Config {
+public static class Config {
 
 	private static HashMap conf = new HashMap();
 	

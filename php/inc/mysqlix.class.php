@@ -338,7 +338,7 @@ class MYSQLIX {
                $str .= "<p>$errMsg</p>";
             }
             else{
-                $str .= "<p>Unkown Error! <a href='mailto:".$GConf::get("adminmail")
+                $str .= "<p>Unkown Error! <a href='mailto:".GConf::get("adminmail")
                     ."?subject=-GWA2-sql-error-$errNo'>Report to Tech Support</a></p>";
             }
             $str .= "</div>";

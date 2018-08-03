@@ -1,5 +1,7 @@
 <%
-/* DB Driver, MySql, implements DbDriver.
+//import java.util.HashMap;
+
+/* DB Driver, MySql, implements DbDriver
  * v0.1
  * wadelau@gmail.com
  * since Wed Jul 13 18:22:06 UTC 2011
@@ -20,17 +22,18 @@ javax.sql.DataSource"%><%
 
 public final class MySql implements DbDriver {
 
+
 	private String myHost = "";
 	private int myPort = 3306;
 	private String myUser = "";
 	private String myPwd = "";
 	private String myDb = "";
-	private boolean hasSocketPool = false;
+    private boolean hasSocketPool = false;
+    
+    protected InitialContext ctx = null; 
+	protected Connection dbConn = null;
+    protected DataSource ds = null;	
 
-    protected InitialContext ctx = null;
-    protected Connection dbConn = null;
-    protected DataSource ds = null;
-	
 	public MySql(DbConn dbConf){
 		
 		this.myHost = dbConf.myHost;	
@@ -39,7 +42,7 @@ public final class MySql implements DbDriver {
 		this.myPwd = dbConf.myPwd; 
 		this.myDb = dbConf.myDb; 
 
-		this.hasSocketPool = (boolean)Config.get("db_enable_socket_pool");
+        this.hasSocketPool = (boolean)Config.get("db_enable_socket_pool");
         //debug("inc/MySql: db:"+this.myDb+" haspool:"+hasSocketPool);
         if(this.hasSocketPool){
             try{
@@ -50,15 +53,13 @@ public final class MySql implements DbDriver {
                 ex.printStackTrace();
             }
         }
-	
 	}
-	
+
 	//- init connection 
-	private void _init(){
-	
+	private void _init(){	
 		try{
 			if(this.dbConn == null){
-				if(this.hasSocketPool){
+                if(this.hasSocketPool){
                     //- with socket pool
                     this.dbConn = this.ds.getConnection();
                 }
@@ -67,8 +68,8 @@ public final class MySql implements DbDriver {
                       * standalone without socket pool
                       */
                     Class.forName("com.mysql.jdbc.Driver"); //- need prior to JDBC 4.0
-                    this.dbConn = DriverManager.getConnection("jdbc:mysql://" + this.myHost + ":"
-                        + this.myPort + "/" + this.myDb + "?" + "user=" + this.myUser
+                    this.dbConn = DriverManager.getConnection("jdbc:mysql://" + this.myHost + ":" 
+                        + this.myPort + "/" + this.myDb + "?" + "user=" + this.myUser 
                         + "&password=" + this.myPwd + "&useSSL=false&characterEncoding=utf8");
                 }
 			}
@@ -77,10 +78,10 @@ public final class MySql implements DbDriver {
 			ex.printStackTrace();	
 		}
 		finally{
-			//- release? long connection?
+			//- release? long connection?  
 		}
-		
 	}
+	
 	
 	//-
 	public HashMap query(String sqlstr, HashMap args, Object[] idxArr){
@@ -103,10 +104,11 @@ public final class MySql implements DbDriver {
 			
 			int myj = 1 ;
 			for(int myi=0;myi<idxArr.length && myi<paraCount;myi++){
-				//System.out.println("myi:["+myi+"] val:["+String.valueOf(idxArr[myi])+"]");
+				//System.out.println("inc/Mysql: myi:["+myi+"] val:["+String.valueOf(idxArr[myi])+"]");
 				//pstmt.setString(myi,String.valueOf(idxArr[myi-1]));
 				//pstmt.setObject(myi,idxArr[myi-1]);
 				if( idxArr[myi] != null ){
+					//pstmt.setObject(myi+1,idxArr[myi]);
 					pstmt.setObject(myj, args.get(idxArr[myi]));
 					myj++;
 				}
@@ -139,7 +141,6 @@ public final class MySql implements DbDriver {
 		}
 		finally{
 			free( pstmt ) ; //@todo
-			//freeConn(); //--- has been moved into the upper method, 20071220
 		}
 		
 		return hm;
@@ -157,8 +158,8 @@ public final class MySql implements DbDriver {
 			this._init();
 		}
 		
-		PreparedStatement pstmt = null;
-		HashMap hmtmp = new HashMap();
+		PreparedStatement pstmt = null ;
+		HashMap hmtmp = new HashMap();		
 		try{
 			
 			sqlstr = sqlstr.trim();
@@ -173,28 +174,29 @@ public final class MySql implements DbDriver {
 				for( int myi=0;myi<idxArr.length && myi<paraCount;myi++ ){
 					//System.out.println("MySql.readSingle: myj:["+myj+"] myi:["+myi+"] idxArr-i:["+idxArr[myi]+"]");
 					if( idxArr[myi] != null ){
+						//pstmt.setObject(myi+1,idxArr[myi]);
 						pstmt.setObject(myj, args.get(idxArr[myi]));
 						myj++;
 					}
 					else{
-						System.out.println("inc/MySql: readSingle no parameter. 1806251959.");
+						System.out.println("MySql.readSingle: ???");
 					}
 				}
 			}
 
 			//hm.put("1", pstmt.executeQuery() );
-			ResultSet rs = pstmt.executeQuery();		
+			ResultSet rs = pstmt.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
 			if( rs.next() ){
 				hmtmp = new HashMap();
-				int cci = rsmd.getColumnCount();
-				String fieldname = null ;
-				String fieldvalue = null ;
+				int cci = rsmd.getColumnCount() ;
+				String fieldname = null  ;
+				String fieldvalue = null  ;
 				for(int i=1; i<=cci;i++){
-					fieldname = rsmd.getColumnName(i);
-					fieldvalue = rs.getString(i); //- fieldname, remedy by wadelau, 13:01 18 July 2016
-					fieldname = fieldname.toLowerCase();
-					hmtmp.put( fieldname, fieldvalue);
+					fieldname = rsmd.getColumnName(i) ;
+					fieldvalue = rs.getString(i) ; //- fieldname, remedy by wadelau, 13:01 18 July 2016
+					fieldname = fieldname.toLowerCase() ;
+					hmtmp.put(fieldname, fieldvalue) ;
 				}
 				hm.put(0, true);
 				HashMap hmtmp2 = new HashMap();
@@ -203,16 +205,18 @@ public final class MySql implements DbDriver {
 			}
 			else{
 				hm.put(0, false);
-				hmtmp.put(0, "No Record. 1806241109.");
-				hm.put(1, hmtmp); //- hm[1][0]	
+				hmtmp.put(0, "No Record. 1906241109.");
+				hm.put(1, hmtmp); //- hm[1][0]
 			}
 			hmtmp = null; rsmd = null;
+
 			rs.close();
+						
 		}
 		catch (Exception ex){
 			hm.put(0, false);
-			hmtmp.put(0, "No Record. 1806241110.");
-			hm.put(1,  hmtmp); //- hm[1][0]
+			hmtmp.put(0, "No Record. 1906241109.");
+			hm.put(1, hmtmp); //- hm[1][0]
 			ex.printStackTrace();
 			//System.out.println("DBACT.getExistSafe():"+e+" sql:["+sqlstr+"]");
 		}
@@ -235,8 +239,8 @@ public final class MySql implements DbDriver {
 			this._init();
 		}
 		
-		PreparedStatement pstmt =  null;
-		HashMap hmtmp = new HashMap();		
+		PreparedStatement pstmt =  null ; 
+		HashMap hmtmp = new HashMap();
 		try{
 
 			pstmt = this.dbConn.prepareStatement(sqlstr);
@@ -252,9 +256,9 @@ public final class MySql implements DbDriver {
 					}
 				}
 			}
+
 			//hm.put("1", pstmt.executeQuery() );
 			ResultSet rs = pstmt.executeQuery();
-			
 			HashMap hmtmp2 = null;
 			int count = 0 ;
 			ResultSetMetaData rsmd = rs.getMetaData() ;
@@ -265,23 +269,26 @@ public final class MySql implements DbDriver {
 				hmtmp2 = new HashMap() ;
 				for(int i=1; i<=icc; i++ ){
 					fieldname = rsmd.getColumnName(i) ;
-					fieldvalue = rs.getString(i); 
-					// rs.getString(fieldname); remedy by wadelau, Sun Jul 17 22:51:13 CST 2016
+					
+					fieldvalue = rs.getString(i); // rs.getString(fieldname); remedy by wadelau, Sun Jul 17 22:51:13 CST 2016
+
 					fieldname = fieldname.toLowerCase() ;
 					hmtmp2.put(fieldname, fieldvalue);
 				}
-				hmtmp.put(count, hmtmp2); //- diff with hmtmp.put("0", hmtmp2);
+				//hmtmp.put("yyy"+count, hmtmp2);
+				hmtmp.put(count, hmtmp2);
 				count++;
 			}
+			//hmtmp.put("count",""+count);
 			if(count > 0){
 				hm.put(0, true);
 				hm.put(1, hmtmp);
 			}
 			else{
 				hm.put(0, false);
-                hmtmp.put(0, "No Record. 1806241110.");
-                hm.put(1, hmtmp);
-			}
+				hmtmp.put(0, "No Record. 1806241110.");
+				hm.put(1, hmtmp);
+			}	
 			hmtmp = null; hmtmp2 = null; rsmd = null;
 			rs.close();
 			
@@ -289,7 +296,7 @@ public final class MySql implements DbDriver {
 		catch (Exception e){
 			hm.put(0, false);
 			hmtmp.put(0, "No Record. 1806241112.");
-            hm.put(1, hmtmp);
+			hm.put(1, hmtmp);
 			e.printStackTrace();
 			System.out.println(e);
 		}
@@ -337,7 +344,7 @@ public final class MySql implements DbDriver {
 		catch (SQLException ex){
 			ex.printStackTrace();
 		}
-		// freeConn(); //- @todo
+		freeConn(); //- @todo
 		
 	}
 
