@@ -18,6 +18,7 @@ public final class Cachea { //- cache administrator
 	private CacheConn myConn;	
 	private CacheDriver myDriver;
     private int myExpire = 30 * 60;
+    private final static String Log_Tag = "inc/Cachea";
 	
 	//- constructor
 	public Cachea(String hmconf){
@@ -31,7 +32,7 @@ public final class Cachea { //- cache administrator
             //debug("inc/Cachea: drv:"+myDriver+" is initiated by conn:"+myConn);
         }
         else{
-			System.out.println("inc/Cachea: Unsupported cacheDriver:["
+			System.out.println(Log_Tag + " Unsupported cacheDriver:["
 				+strDriver+"]. 1808012202.");
         }	
 	}
@@ -93,6 +94,9 @@ public final class Cachea { //- cache administrator
     }
 
     //-
+    public void close(){
+        this.myDriver.close();
+    }
 	
 }
 
@@ -112,6 +116,8 @@ public interface CacheDriver{
     public boolean set(String key, Object value, int seconds);
 
     public boolean rm(String key);
+
+    public void close();
 
 }
 

@@ -70,6 +70,7 @@ public final class Memcached implements CacheDriver{
     private int myExpire;
     private int myMaxConn;
     private SocketPool.SocketStream sock;
+    private final static String Log_Tag = "inc/Memcached";
 
 	//- constructor
 	public Memcached(CacheConn xconn) {
@@ -162,19 +163,19 @@ public final class Memcached implements CacheDriver{
 				return true;
 			}
 			else if ( NOTFOUND.equals( line ) ) {
-				debug( "inc/Memcached deletion of key: " + key + " from cache failed as the key was not found" );
+				debug( Log_Tag + " deletion of key: " + key + " from cache failed as the key was not found" );
 			}
 			else {
-				debug( "inc/Memcached error deleting key: " + key + "inc/Memcached server response: " + line );
+				debug( Log_Tag + " error deleting key: " + key + Log_Tag + " server response: " + line );
 			}
 		}
 		catch (Exception e ) {
-			debug( "inc/Memcached exception thrown while writing bytes to server on delete. " + e.getMessage() );
+			debug( Log_Tag + " exception thrown while writing bytes to server on delete. " + e.getMessage() );
 			try {
 				sock.hardClose();
 			}
 			catch ( Exception ioe ) {
-				debug( "inc/Memcached failed to close socket : " + sock.toString() );
+				debug( Log_Tag + " failed to close socket : " + sock.toString() );
 			}
 			sock = null;
 		}
@@ -251,19 +252,19 @@ public final class Memcached implements CacheDriver{
 							Integer hashCode, boolean asString ) {
 
 		if ( cmdname == null || cmdname.trim().equals( "" ) || key == null ) {
-			debug( "inc/Memcached: key is null or cmd is null/empty for set()" );
+			debug( Log_Tag + ": key is null or cmd is null/empty for set()" );
 			return false;
 		}
 		if ( value == null ) {
-			debug( "inc/Memcached: trying to store a null value to cache" );
+			debug( Log_Tag + ": trying to store a null value to cache" );
 			return false;
 		}
 		key = sanitizeKey( key );
 
-        sock = new SocketPool.SocketStream(myHost, myPort, myMaxConn); //- @todo
+        sock = new SocketPool.SocketStream(myHost, myPort, myMaxConn); 
 		
 		if ( sock == null ) {
-			debug( "inc/Memcached: no socket to server available:" + key );
+			debug( Log_Tag + ": no socket to server available:" + key );
 			return false;
 		}
 		if ( expiry <= 0 ) {	expiry = 0; }
@@ -280,12 +281,12 @@ public final class Memcached implements CacheDriver{
 				// useful for sharing data between java and non-java
 				// and also for storing ints for the increment method
 				try {
-					debug( "inc/Memcached storing data as a string for key: " + key + " for class: " 
-							+ value.getClass().getName() );
+					//debug( Log_Tag + " storing data as a string for key: " + key + " for class: " 
+					//		+ value.getClass().getName() );
 					val = value.toString().getBytes( defaultEncoding );
 				}
 				catch ( UnsupportedEncodingException ue ) {
-					debug( "inc/Memcached: invalid encoding type used: " + defaultEncoding + ", ue:"+ue );
+					debug( Log_Tag + ": invalid encoding type used: " + defaultEncoding + ", ue:"+ue );
 					sock.close();
 					sock = null;
 					return false;
@@ -293,12 +294,12 @@ public final class Memcached implements CacheDriver{
 			}
 			else {
 				try {
-					debug( "inc/Memcached: Storing with native handler..." );
+					//debug( Log_Tag + ": Storing with native handler..." );
 					flags |= MemcachedNativeHandler.getMarkerFlag( value );
 					val    = MemcachedNativeHandler.encode( value );
 				}
 				catch ( Exception e ) {
-					debug("inc/Memcached: Failed to native handle obj: " + e);
+					debug(Log_Tag + ": Failed to native handle obj: " + e);
 					sock.close();
 					sock = null;
 					return false;
@@ -308,14 +309,14 @@ public final class Memcached implements CacheDriver{
 		else {
 			// always serialize for non-primitive types
 			try {
-				debug( "inc/Memcached serializing for key: " + key + " for class: " + value.getClass().getName() );
+				//debug( Log_Tag + " serializing for key: " + key + " for class: " + value.getClass().getName() );
 				ByteArrayOutputStream bos = new ByteArrayOutputStream();
 				(new ObjectOutputStream( bos )).writeObject( value );
 				val = bos.toByteArray();
 				flags |= F_SERIALIZED;
 			}
 			catch ( IOException e ) {
-				debug( "inc/Memcached: failed to serialize obj:"+ value.toString() );
+				debug( Log_Tag + ": failed to serialize obj:"+ value.toString() );
 				// return socket to pool and bail
 				sock.close();
 				sock = null;
@@ -326,7 +327,7 @@ public final class Memcached implements CacheDriver{
 		// and if the length is over the threshold 
 		if ( compressEnable && val.length > compressThreshold ) {
 			try {
-				debug( "inc/Memcached trying to compress data inc/Memcached size prior to compression: " + val.length );
+				//debug( Log_Tag + " trying to compress data inc/Memcached size prior to compression: " + val.length );
 				ByteArrayOutputStream bos = new ByteArrayOutputStream( val.length );
 				GZIPOutputStream gos = new GZIPOutputStream( bos );
 				gos.write( val, 0, val.length );
@@ -335,10 +336,10 @@ public final class Memcached implements CacheDriver{
 				// store it and set compression flag
 				val = bos.toByteArray();
 				flags |= F_COMPRESSED;
-				debug( "inc/Memcached compression succeeded, size after: " + val.length );
+				//debug( Log_Tag + " compression succeeded, size after: " + val.length );
 			}
 			catch ( IOException e ) {
-				debug( "inc/Memcached: IOException while compressing stream: " + e.getMessage() 
+				debug( Log_Tag + ": IOException while compressing stream: " + e.getMessage() 
 						+ "storing data uncompressed" );
 			}
 		}
@@ -353,28 +354,28 @@ public final class Memcached implements CacheDriver{
 			sock.flush();
 			// get result code
 			String line = sock.readLine();
-			debug( "inc/Memcached memcache cmd (result code): " + cmd + " (" + line + ")" );
+			//debug( Log_Tag + " memcache cmd (result code): " + cmd + " (" + line + ")" );
 			if ( STORED.equals( line ) ) {
-				debug("inc/Memcached data successfully stored for key: " + key + " expiry:"+expiry );
+				//debug(Log_Tag + " data successfully stored for key: " + key + " expiry:"+expiry );
 				sock.close();
 				sock = null;
 				return true;
 			}
 			else if ( NOTSTORED.equals( line ) ) {
-				debug( "inc/Memcached data not stored in cache for key: " + key );
+				debug( Log_Tag + " data not stored in cache for key: " + key );
 			}
 			else {
-				debug( "inc/Memcached error storing data in cache for key: " + key + " -- length: " 
-						+ val.length + "inc/Memcached server response: " + line );
+				debug( Log_Tag + " error storing data in cache for key: " + key + " -- length: " 
+						+ val.length + Log_Tag + " server response: " + line );
 			}
 		}
 		catch ( Exception e ) {
-			debug( "inc/Memcached exception thrown while writing bytes to server on set" + e.getMessage());
+			debug( Log_Tag + " exception thrown while writing bytes to server on set" + e.getMessage());
 			try {
 				sock.hardClose();
 			}
 			catch ( Exception ioe ) {
-				debug( "inc/Memcached failed to close socket : " + sock.toString() );
+				debug( Log_Tag + " failed to close socket : " + sock.toString() );
 			}
 			sock = null;
 		}
@@ -415,7 +416,7 @@ public final class Memcached implements CacheDriver{
 			counter = Long.parseLong( (String)get( key, hashCode, true ) );
 		}
 		catch ( Exception ex ) {
-			debug( String.format( "inc/Memcached: Failed to parse Long value for key: %s", key ) );
+			debug( String.format( Log_Tag + ": Failed to parse Long value for key: %s", key ) );
 		}
 		return counter;
 	}
@@ -440,12 +441,12 @@ public final class Memcached implements CacheDriver{
         sock = new SocketPool.SocketStream(myHost, myPort, myMaxConn); //- @todo
 	    
 	    if ( sock == null ) {
-			debug( "inc/Memcached: no socket to server available, key:" + key );
+			debug( Log_Tag + ": no socket to server available, key:" + key );
 			return null;
 		}
 		try {
 			String cmd = "get " + key + "\r\n";
-			debug("inc/Memcached memcache get command: " + cmd);
+			//debug(Log_Tag + " memcache get command: " + cmd);
 			sock.write( cmd.getBytes() );
 			sock.flush();
 			// ready object
@@ -453,7 +454,7 @@ public final class Memcached implements CacheDriver{
             int maxNullCount = 10; int nullCount = 0;
 			while ( true ) {
 				String line = sock.readLine();
-				debug( "inc/Memcached: get inc/Memcached line: " + line );
+				//debug( Log_Tag + ": get inc/Memcached line: " + line );
                 if(nullCount++ > maxNullCount){
                     break;
                 }
@@ -461,7 +462,7 @@ public final class Memcached implements CacheDriver{
 					String[] info = line.split(" ");
 					int flag      = Integer.parseInt( info[2] );
 					int length    = Integer.parseInt( info[3] );
-					debug( "inc/Memcached key: " + key + "inc/Memcached flags: " + flag + "inc/Memcached length: " + length );
+					//debug( Log_Tag + " key: " + key + Log_Tag + " flags: " + flag + Log_Tag + " length: " + length );
 					// read obj into buffer
 					byte[] buf = new byte[length];
 					sock.read( buf );
@@ -483,7 +484,7 @@ public final class Memcached implements CacheDriver{
 							gzi.close();
 						}
 						catch ( IOException e ) {
-							debug( "inc/Memcached IOException thrown while trying to uncompress input stream for key: " 
+							debug( Log_Tag + " IOException thrown while trying to uncompress input stream for key: " 
 									+ key + " -- " + e.getMessage() );
 						}
 					}
@@ -491,7 +492,7 @@ public final class Memcached implements CacheDriver{
 					if ( ( flag & F_SERIALIZED ) != F_SERIALIZED ) {
 						if ( primitiveAsString || asString ) {
 							// pulling out string value
-							debug( "inc/Memcached retrieving object and stuffing into a string." );
+							//debug( Log_Tag + " retrieving object and stuffing into a string." );
 							o = new String( buf, defaultEncoding );
 						}
 						else {
@@ -500,7 +501,7 @@ public final class Memcached implements CacheDriver{
 								o = MemcachedNativeHandler.decode( buf, flag );    
 							}
 							catch ( Exception e ) {
-								debug( "inc/Memcached Exception thrown while trying to deserialize for key: " + key);
+								debug( Log_Tag + " Exception thrown while trying to deserialize for key: " + key);
 							}
 						}
 					}
@@ -510,17 +511,17 @@ public final class Memcached implements CacheDriver{
 							new ObjectInputStream( new ByteArrayInputStream( buf ));
 						try {
 							o = ois.readObject();
-							debug( "inc/Memcached deserializing " + o.getClass() );
+							//debug( Log_Tag + " deserializing " + o.getClass() );
 						}
 						catch ( Exception e ) {
 							o = null;
-							debug( "inc/Memcached Exception thrown while trying to deserialize for key: " 
+							debug( Log_Tag + " Exception thrown while trying to deserialize for key: " 
 									+ key + " -- " + e.getMessage() );
 						}
 					}
 				}
 				else if ( END.equals( line ) ) {
-					debug( "inc/Memcached finished reading from cache server" );
+					//debug( Log_Tag + " finished reading from cache server" );
 					break;
 				}
 			}
@@ -530,19 +531,25 @@ public final class Memcached implements CacheDriver{
 			return o;
 	    }
 		catch ( IOException e ) {
-			debug( "inc/Memcached exception thrown while trying to get object from cache for key: " 
+			debug( Log_Tag + " exception thrown while trying to get object from cache for key: " 
                     + key + " -- " + e.getMessage() );
 			try {
 				sock.hardClose();
 			}
 			catch ( Exception ioe ) {
-				debug( "inc/Memcached failed to close socket : " + sock.toString() );
+				debug( Log_Tag + " failed to close socket : " + sock.toString() );
 			}
 			sock = null;
 	    }
 		if ( sock != null ){ sock.close(); }
 		return null;
 	}
+
+    //-
+    public void close(){
+        //- @todo
+        //- connection trans to inc/SocketPool
+    }
 
 	//-
 	private String sanitizeKey( String key ) {

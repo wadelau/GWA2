@@ -28,6 +28,7 @@ public static class SocketPool{
     private final static int SOCKET_INUSE = 2;
 
 	private static HashMap AppList = new HashMap();
+    private final static String Log_Tag = "inc/SocketPool";
 
     //- constructors
 
@@ -50,10 +51,10 @@ public static class SocketPool{
 					poolparm.MaxConn=MaxConn;
 					poolparm.socklist=new ArrayList();
 					AppList.put(LongHost+":"+String.valueOf(LongPort),poolparm);
-					debug("inc/SocketPool: init getList for "+LongHost+":"+String.valueOf(LongPort));
+					debug(Log_Tag + " init getList for "+LongHost+":"+String.valueOf(LongPort));
 				}
 				else{
-					debug("inc/SocketPool: init getList with  LongHost or LongPort null");
+					debug(Log_Tag + " init getList with  LongHost or LongPort null");
 					return null;
 				}
 			}
@@ -95,7 +96,7 @@ public static class SocketPool{
 					map.put("init","long");
 					AppList.remove(poolparm.LongHost+":"+String.valueOf(poolparm.LongPort));
 					AppList.put(poolparm.LongHost+":"+String.valueOf(poolparm.LongPort), poolparm);
-					debug("inc/SocketPool: init for "+poolparm.LongHost+":"+String.valueOf(poolparm.LongPort)+" long conn-idx:"+map.get("index"));
+					debug(Log_Tag + ": init for "+poolparm.LongHost+":"+String.valueOf(poolparm.LongPort)+" long conn-idx:"+map.get("index"));
 					pool=null;
 				}
 				else if(poolparm.ShortHost!=null && poolparm.ShortPort!=0){	
@@ -390,19 +391,19 @@ public static class SocketPool{
                     }
                     map=null;
                     if(socket==null){
-                        debug("inc/SocketPool: socket "+i+" is null, try next....");
+                        debug(Log_Tag + ": socket "+i+" is null, try next....");
                         continue;
                     }
                     else if(socket.isClosed()){
-                        debug("inc/SocketPool: socket "+i+" is closed already, try next....");
+                        debug(Log_Tag + ": socket "+i+" is closed already, try next....");
                         continue;
                     }
                     else if(!socket.isConnected()){
-                        debug("inc/SocketPool: socket "+i+" is not connected already, try next....");
+                        debug(Log_Tag + ": socket "+i+" is not connected already, try next....");
                         continue;
                     }
                     else{
-                        debug("inc/SocketPool: socket:"+i+" is succ resumed....");
+                        //debug(Log_Tag + ": socket:"+i+" is succ resumed....");
                         issucc = true;
                         break;
                     }
@@ -424,7 +425,7 @@ public static class SocketPool{
                 hasSock = true;
             }
             else{
-                debug("inc/SocketPool: pool failed. try to reinit. 0606092818.");
+                debug(Log_Tag + ": pool failed. try to reinit. 0606092818.");
                 if(hasTry >= retry){
                     map = (HashMap)SocketPool.initSocket(SocketPool.getList(myHost, myPort, "", 0, maxConn));
                     socket=(Socket)map.get("socket");
@@ -445,7 +446,7 @@ public static class SocketPool{
                 }
             }
             else{
-                debug("inc/SocketPool: failed all & all. 1808021921.");
+                debug(Log_Tag + ": failed all & all. 1808021921.");
             }
         }
 		
@@ -490,7 +491,7 @@ public static class SocketPool{
                     bos.write(b, 0, 1);
                 }
                 if(bos.size() > 0){
-                    debug("inc/SocketStream: readLine:["+bos.toString()+"]");
+                    //debug("inc/SocketStream: readLine:["+bos.toString()+"]");
                     return bos.toString().trim();
                 }
                 else{

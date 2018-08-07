@@ -20,6 +20,7 @@ public class WebApp implements WebAppInterface{
 	private String myIdName = "myId";
 	private final String[] timeFieldArr = new String[]{"inserttime", "createtime", "savetime",
 		"modifytime", "edittime", "updatetime"};
+    private final static String Log_Tag = "inc/WebApp";
 
 	Dba dba = null;
 	Cachea cachea = null;
@@ -56,6 +57,15 @@ public class WebApp implements WebAppInterface{
 		}
 	}
 	
+    //- destructor
+    //- equivalent to __destruct , Tue Aug  7 09:37:17 UTC 2018
+    public void finalize(){
+        if(this.dba != null){
+            this.dba.close();
+        }
+        //debug(Log_Tag+" finalize is called to clean up....");
+    }
+
 	
 	//-
 	public WebApp(){
@@ -103,11 +113,10 @@ public class WebApp implements WebAppInterface{
         if(hmCache != null && hmCache.size() > 0){
             hm = this.readObject("cache:", hmCache);
             if((boolean)hm.get(0)){
-                debug("inc/WebApp: read cache succ. args:"+hmCache);
-                debug(hm);
+                debug(Log_Tag + ": read cache succ. args:"+hmCache);
             }
             else{
-                debug("inc/WebApp: read cache fail. try db with args:"+hmCache);
+                debug(Log_Tag + ": read cache fail. try db with args:"+hmCache);
                 this.set("cache:" + fields, hmCache.get("key"));
                 hm = this.getBy(fields, args);
             }
@@ -219,9 +228,9 @@ public class WebApp implements WebAppInterface{
 		if(args == null || args.equals("")){
 			if(this.getId().equals("")){
 				if(isUpdate){
-					System.out.println("WebApp.setBy: unconditonal update is forbidden. 1607072133.");
+					debug(Log_Tag + " unconditonal update is forbidden. 1607072133.");
 					hm.put("0", false);
-					hm.put("1", (new HashMap()).put("error", "unconditonal update is forbidden. 1607072133."));
+					hm.put("1", (new HashMap()).put("errordesc", "unconditonal update is forbidden. 1607072133."));
 					isSqlReady = false;
 				}
 			}
@@ -269,8 +278,10 @@ public class WebApp implements WebAppInterface{
             hm = this.readObject("cache:", hmCache);
             if((boolean)hm.get(0)){
                 //-
+                debug(Log_Tag + " execBy read cache succ..."+hmCache);
             }
             else{
+                debug(Log_Tag + " execBy read cache failed and try db...");
                 this.set("cache:" + origSql, hmCache.get("key"));
                 hm = this.execBy(sql, args);
             }
@@ -281,7 +292,7 @@ public class WebApp implements WebAppInterface{
 		int pos = -1;
 		if(sql == null){
 			hm.put("0", false);
-			hm.put("1", (new HashMap()).put("error", "sql:["+sql+"] is null. 1607172158.")); 
+			hm.put("1", (new HashMap()).put("errordesc", "sql:["+sql+"] is null. 1607172158.")); 
 		}
 		else{
 			sqlx = sql.trim().toUpperCase();
@@ -347,7 +358,6 @@ public class WebApp implements WebAppInterface{
 	public HashMap rmBy(String args){
 		HashMap hm = new HashMap();
 		args = args==null ? "" : args;
-
 		boolean isSqlReady = false;
 		StringBuffer sqlb = new StringBuffer("delete from ");
 		sqlb.append(this.getTbl()).append(" where ");
@@ -355,7 +365,7 @@ public class WebApp implements WebAppInterface{
 		if(!args.equals("")){
 			if(this.getId().equals("")){
 				hm.put(0, false);
-				hm.put(1, (new HashMap()).put("error", 
+				hm.put(1, (new HashMap()).put("errordesc", 
                     "unconditional deletion is strictly forbidden. stop it. sql:["
                     + sqlb.toString()+"] conditions:["+ args + "]"));
 			}
@@ -371,13 +381,12 @@ public class WebApp implements WebAppInterface{
 		}
 		
 		if(isSqlReady){
-			System.out.println("WebApp.rmBy: sql:["+sqlb.toString()+"]");
+			System.out.println(Log_Tag + " rmBy: sql:["+sqlb.toString()+"]");
 			hm = this.dba.update(sqlb.toString(), this.hmf);	
 			if(!this.getId().equals("")){
 				this.setId("");		
 			}
 		}
-
 		sqlb = null; args = null;
 
 		return hm;
@@ -435,7 +444,8 @@ public class WebApp implements WebAppInterface{
 	public HashMap toHash(){	
 		return this.hmf;
 	}
-
+ 
+    //- private methods
     //-
     private HashMap readObject(String type, HashMap args){
         HashMap rtnobj = new HashMap();
