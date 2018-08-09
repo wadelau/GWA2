@@ -57,6 +57,15 @@ public class WebApp implements WebAppInterface{
 		}
 	}
 	
+    //- destructor
+    //- equivalent to __destruct , Tue Aug  7 09:37:17 UTC 2018
+    public void finalize(){
+        if(this.dba != null){
+            this.dba.close();
+        }
+        //debug(Log_Tag+" finalize is called to clean up....");
+    }
+
 	
 	//-
 	public WebApp(){
@@ -105,7 +114,6 @@ public class WebApp implements WebAppInterface{
             hm = this.readObject("cache:", hmCache);
             if((boolean)hm.get(0)){
                 debug(Log_Tag + ": read cache succ. args:"+hmCache);
-                debug(hm);
             }
             else{
                 debug(Log_Tag + ": read cache fail. try db with args:"+hmCache);
@@ -270,8 +278,10 @@ public class WebApp implements WebAppInterface{
             hm = this.readObject("cache:", hmCache);
             if((boolean)hm.get(0)){
                 //-
+                debug(Log_Tag + " execBy read cache succ..."+hmCache);
             }
             else{
+                debug(Log_Tag + " execBy read cache failed and try db...");
                 this.set("cache:" + origSql, hmCache.get("key"));
                 hm = this.execBy(sql, args);
             }
@@ -348,7 +358,6 @@ public class WebApp implements WebAppInterface{
 	public HashMap rmBy(String args){
 		HashMap hm = new HashMap();
 		args = args==null ? "" : args;
-
 		boolean isSqlReady = false;
 		StringBuffer sqlb = new StringBuffer("delete from ");
 		sqlb.append(this.getTbl()).append(" where ");
@@ -378,7 +387,6 @@ public class WebApp implements WebAppInterface{
 				this.setId("");		
 			}
 		}
-
 		sqlb = null; args = null;
 
 		return hm;
@@ -436,7 +444,8 @@ public class WebApp implements WebAppInterface{
 	public HashMap toHash(){	
 		return this.hmf;
 	}
-
+ 
+    //- private methods
     //-
     private HashMap readObject(String type, HashMap args){
         HashMap rtnobj = new HashMap();

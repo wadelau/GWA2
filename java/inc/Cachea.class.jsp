@@ -94,6 +94,9 @@ public final class Cachea { //- cache administrator
     }
 
     //-
+    public void close(){
+        this.myDriver.close();
+    }
 	
 }
 
@@ -113,6 +116,8 @@ public interface CacheDriver{
     public boolean set(String key, Object value, int seconds);
 
     public boolean rm(String key);
+
+    public void close();
 
 }
 

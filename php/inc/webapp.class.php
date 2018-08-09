@@ -81,11 +81,14 @@ class WebApp implements WebAppInterface{
 	function __destruct(){
 		#  @todo, long conn?
 	    $this->dba->close();
+		$this->dba = null;
 	    if($this->cachea != null){
 	       $this->cachea->close();
+	       $this->cachea = null;
 	    }
 	    if($this->filea != null){
 	        $this->filea->close();
+		$this->filea = null;
 	    }
 	}
 	

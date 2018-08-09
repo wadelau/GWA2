@@ -32,8 +32,11 @@ public final class MySql implements DbDriver {
     
     protected InitialContext ctx = null; 
 	protected Connection dbConn = null;
+    //protected DataSource ds = null;	
     protected DataSource ds = null;	
+    private final static String Log_Tag = "inc/Mysql ";
 
+    //- constructor
 	public MySql(DbConn dbConf){
 		
 		this.myHost = dbConf.myHost;	
@@ -55,6 +58,11 @@ public final class MySql implements DbDriver {
         }
 	}
 
+    //- destructor
+    public void finalize(){
+        //- @todo
+    }
+
 	//- init connection 
 	private void _init(){	
 		try{
@@ -62,6 +70,7 @@ public final class MySql implements DbDriver {
                 if(this.hasSocketPool){
                     //- with socket pool
                     this.dbConn = this.ds.getConnection();
+                    //debug(Log_Tag+"get a new conn from pool:"+this.dbConn);
                 }
                 else{
                      /*
@@ -131,6 +140,8 @@ public final class MySql implements DbDriver {
 			
 			hm.put(0, true);
 			hm.put(1, affectrows);
+
+            rs.close(); rs = null;
 		
 		}
 		catch (Exception ex){
@@ -209,8 +220,7 @@ public final class MySql implements DbDriver {
 				hm.put(1, hmtmp); //- hm[1][0]
 			}
 			hmtmp = null; rsmd = null;
-
-			rs.close();
+			rs.close(); rs = null;
 						
 		}
 		catch (Exception ex){
@@ -231,18 +241,14 @@ public final class MySql implements DbDriver {
 	
 	//-
 	public HashMap readBatch(String sqlstr, HashMap args, Object[] idxArr){
-	
 		HashMap hm = new HashMap();
-		hm.put("readSingle-in-MySql", (new Date()));	
-
 		if(this.dbConn == null){
 			this._init();
 		}
-		
+	    //debug("readBatch-in-MySql:"+(new Date())+" sql:["+sqlstr+"] dbConn:"+this.dbConn);	
 		PreparedStatement pstmt =  null ; 
 		HashMap hmtmp = new HashMap();
 		try{
-
 			pstmt = this.dbConn.prepareStatement(sqlstr);
 			int paraCount = (pstmt.getParameterMetaData()).getParameterCount();
 			if( idxArr!=null ){
@@ -256,7 +262,6 @@ public final class MySql implements DbDriver {
 					}
 				}
 			}
-
 			//hm.put("1", pstmt.executeQuery() );
 			ResultSet rs = pstmt.executeQuery();
 			HashMap hmtmp2 = null;
@@ -269,9 +274,7 @@ public final class MySql implements DbDriver {
 				hmtmp2 = new HashMap() ;
 				for(int i=1; i<=icc; i++ ){
 					fieldname = rsmd.getColumnName(i) ;
-					
 					fieldvalue = rs.getString(i); // rs.getString(fieldname); remedy by wadelau, Sun Jul 17 22:51:13 CST 2016
-
 					fieldname = fieldname.toLowerCase() ;
 					hmtmp2.put(fieldname, fieldvalue);
 				}
@@ -290,7 +293,7 @@ public final class MySql implements DbDriver {
 				hm.put(1, hmtmp);
 			}	
 			hmtmp = null; hmtmp2 = null; rsmd = null;
-			rs.close();
+			rs.close(); rs = null;
 			
 		}
 		catch (Exception e){
@@ -298,7 +301,8 @@ public final class MySql implements DbDriver {
 			hmtmp.put(0, "No Record. 1806241112.");
 			hm.put(1, hmtmp);
 			e.printStackTrace();
-			System.out.println(e);
+			//System.out.println(e);
+            debug("read failed? sql:["+sqlstr+"]");
 		}
 		finally{
 			free(pstmt); // @todo
@@ -320,40 +324,36 @@ public final class MySql implements DbDriver {
 	
 	//-
 	public int getLastInsertedId(){
-		
 		return 0;
-		
 	}
 	
 	
 	//- 
 	public int getAffectedRows(){
-		
 		return 0;
-		
 	}
 	
 	//-
 	protected void free(Statement stmt){
-		
 		try{
 			if(stmt != null){
 				stmt.close();
+                stmt = null;
 			}
 		} 
 		catch (SQLException ex){
 			ex.printStackTrace();
 		}
-		freeConn(); //- @todo
+		//freeConn(); //- @todo, why or why not?
 		
 	}
 
 	//- @todo
-	protected void freeConn(){
-		
+	protected void freeConn(){	
 		try{
 			if (dbConn != null){
 				dbConn.close(); //- back to connection pool for re use?
+                dbConn = null;
 			}
 		}
 		catch (SQLException ex){
@@ -361,6 +361,12 @@ public final class MySql implements DbDriver {
 		}
 		
 	}
+
+    //-
+    public void close(){
+        //- when to make hard close or soft close to pool?
+        this.freeConn();
+    }
 	
 	
 }

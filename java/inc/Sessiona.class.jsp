@@ -32,18 +32,28 @@ public final class Sessiona { //- Session administrator
 	}
 
 	//- methods, public
-	//-
 	public String generateSid(User user, HttpServletRequest request){
 		String sid = "";
 		sid = this.myDriver.generateSid(user, request);
 		return sid;
 
 	}
-	
+
+    //-
+    public String getCookieSidSep(){
+        return this.myDriver.getCookieSidSep();
+    }
+
 	//-
 	public HashMap checkSid(User user, HttpServletRequest request, String sid){
 		return this.myDriver.checkSid(user, request, sid);
 	}
+
+    //-
+    public void close(){
+        //-
+        this.myDriver.close();
+    }
 	
 	//-
 	private String _md5k(String key){
@@ -62,7 +72,7 @@ public interface SessionDriver{
 
 	public String generateSid(User user, HttpServletRequest request);
 	
-	public String checkSid(User user, HttpServletRequest request, String sid);
+	public HashMap checkSid(User user, HttpServletRequest request, String sid);
 
 	public Object get(String key);
 
@@ -70,6 +80,9 @@ public interface SessionDriver{
 	
 	public boolean rm(String key);
 	
+    public String getCookieSidSep();
+
+    public void close();
 
 }
 

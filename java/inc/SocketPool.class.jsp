@@ -403,7 +403,7 @@ public static class SocketPool{
                         continue;
                     }
                     else{
-                        debug(Log_Tag + ": socket:"+i+" is succ resumed....");
+                        //debug(Log_Tag + ": socket:"+i+" is succ resumed....");
                         issucc = true;
                         break;
                     }
@@ -491,7 +491,7 @@ public static class SocketPool{
                     bos.write(b, 0, 1);
                 }
                 if(bos.size() > 0){
-                    debug("inc/SocketStream: readLine:["+bos.toString()+"]");
+                    //debug("inc/SocketStream: readLine:["+bos.toString()+"]");
                     return bos.toString().trim();
                 }
                 else{

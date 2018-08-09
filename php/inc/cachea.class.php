@@ -32,6 +32,7 @@ class CacheA {
 	//-
 	function __destruct(){
 		$this->close();
+		$this->cacheconn = null;
 	}
 
 	# get

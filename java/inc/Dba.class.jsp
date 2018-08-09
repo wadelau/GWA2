@@ -30,6 +30,7 @@ public final class Dba { //- db administrator
 				">","<","-","(",")",","
 				}
 			));
+    private final static String Log_Tag = "inc/Dba ";
 
 	//- constructor	
 	public Dba(String xconf){
@@ -53,6 +54,10 @@ public final class Dba { //- db administrator
 
 	}
 
+    //- destructor
+    public void finalize(){
+        //- @todo
+    }
 
 	//- 
 	public HashMap select(String sql, HashMap args){
@@ -222,6 +227,13 @@ public final class Dba { //- db administrator
 		return obj;
 	
 	}
+
+    //-
+    public void close(){
+        if(this.dbDrv != null){
+            this.dbDrv.close();
+        }
+    }
 		
 }
 
@@ -244,6 +256,8 @@ public interface DbDriver{
 	public int getLastInsertedId();
 	
 	public int getAffectedRows();
+
+    public void close();
 	
 
 }

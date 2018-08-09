@@ -8,7 +8,6 @@
 # Wed Nov  5 14:10:39 CST 2014
 require_once(__ROOT__."/inc/config.class.php");
 
-
 class MYSQLIX { 
 
 	var $m_host; 
@@ -18,6 +17,16 @@ class MYSQLIX {
 	var $m_name; 
 	var $m_link;
 	var $m_sock;
+	/*
+	 * connection pool for db, Aug 11, 2018
+	 * this relies on 1) max_persistent in mysqli in php.ini,
+	 * and 2) processes/threads of MPM in httpd.conf, 
+	 * and 3) max_connections in mysql.conf,
+	 * and 4) pool shared across process/thread, not application wide, diff with -Java.
+	 * and 5) active instances of all objects.
+	 */
+	var $m_persistent;
+	const Persistent_Tag = 'p:';
 	var $isdebug = 0; # debug mode
 
 	# 
@@ -28,9 +37,19 @@ class MYSQLIX {
 		$this->m_password = $config->mDbPassword; 
 		$this->m_name     = $config->mDbDatabase;
 		$this->m_sock     = $config->mDbSock;
+		$this->m_persistent = $config->mDbPersistent;
 		$this->m_link = null;
+		if($this->m_persistent){
+			$this->m_host = Persistent_Tag . $this->m_host;
+		}
 	} 
 
+	#
+	function __destruct(){
+		$this->close();
+		$this->m_link = null;
+	}
+	
 	//-
 	private function _initConnection(){
 		
@@ -247,29 +266,29 @@ class MYSQLIX {
 	
 	#
 	function getErrno(){
-		
+		/*
 		if (!$this->m_link){
 			$this->_initConnection();
 		}
-		
+		*/
 		return mysqli_errno($this->m_link);
 	
 	}
 	
 	#
 	function getError(){
-
+		/*
 		if (!$this->m_link){
 			$this->_initConnection();
 		}
-		
+		*/
 		return mysqli_error($this->m_link);
 	}
 	
 	#
 	function freeResult(&$result){ 
 	
-		return mysqli_free_result($result) or eval($this->sayErr()); 
+		return mysqli_free_result($result) or $this->sayErr(); 
 		
 	} 
 
@@ -297,8 +316,8 @@ class MYSQLIX {
 
 	#	
 	function close(){
-		if( !$this->m_link ){
-			mysqli_close($this->m_link) or eval($this->sayErr());
+		if( $this->m_link ){
+			mysqli_close($this->m_link) or $this->sayErr();
 		}
 		return 0;
 	}
