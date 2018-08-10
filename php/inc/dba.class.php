@@ -33,6 +33,12 @@ class DBA {
 				'>'=>1,'<'=>1,'-'=>1,'('=>1,')'=>1,','=>1);
 	}	
 
+	#
+	function __destruct(){
+		$this->close();
+		$this->dbconn = null;
+	}
+	
 	/* 
 	 * mandatory return $hm = (0 => true|false, 1 => string|array);
 	 * Thu Jul 21 11:31:47 UTC 2011, wadelau@gmail.com
@@ -161,6 +167,7 @@ class DBA {
 	//-
 	function close(){
 	    # @todo, long conn?
+		$this->dbconn->close();
 	    return true;
 	}
 }

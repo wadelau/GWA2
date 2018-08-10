@@ -39,6 +39,7 @@ if(true){
 	$conf['dbdriver']	= 'MYSQL'; # 'MYSQL', 'MYSQLIX', 'PDOX', 'SQLSERVER', 'ORACLE' in support, UPCASE only
 	$conf['db_enable_utf8_affirm'] = false; # append utf-8 affirm after db connection established, should be false in a all-utf-8 env.
 	$conf['dbsock'] = '/www/bin/mysql/mysql.sock'; # use only if dbhost=localhost since php7.0+
+	$conf['dbpersistent'] = true; # assume db connection pool per process is support
 	
 	# cache server
 	$conf['enable_cache'] = 1; # or true for 1, false for 0

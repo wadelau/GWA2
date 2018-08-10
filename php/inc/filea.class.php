@@ -32,6 +32,7 @@ class FileA {
 	//-
 	function __destruct(){
 	    $this->close();
+		$this->filehdl = null;
 	}
 	
 	//- read
