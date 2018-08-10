@@ -140,8 +140,6 @@ public final class MySql implements DbDriver {
 			
 			hm.put(0, true);
 			hm.put(1, affectrows);
-
-            rs.close(); rs = null;
 		
 		}
 		catch (Exception ex){

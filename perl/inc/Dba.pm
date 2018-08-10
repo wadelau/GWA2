@@ -14,7 +14,10 @@ use inc::Config;
 use inc::MySQL;
 use inc::Conn;
 
-my $_ROOT_ = dirname(abs_path($0));
+my $_ROOT_ = "../";
+if(my $tmpPath=abs_path($0)){
+    $_ROOT_ = dirname($tmpPath);
+}
 my $conf = ();
 my $dbconn = {};
 my %Sql_Operator_List = (' '=>1,'^'=>1,'~'=>1,':'=>1,'!'=>1,'/'=>1,

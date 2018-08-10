@@ -75,5 +75,5 @@ require("./comm/footer.inc.pl");
 
 if($singlerun == 1){
 	close(LOCK);
-	unlink($mydir."/".$basename.".lock") or warn "remove lock file failed:[$!].\n";
+	unlink($mydir."/".$basename.".".$mod.".".$act.".lock") or warn "remove lock file failed:[$!].\n";
 }

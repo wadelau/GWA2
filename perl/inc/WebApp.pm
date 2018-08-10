@@ -25,7 +25,10 @@ use inc::Config qw(GConf);
 use inc::Dba;
 use inc::Filea;
 
-my $_ROOT_ = dirname(abs_path($0));
+my $_ROOT_ = "../";
+if(my $tmpPath=abs_path($0)){
+    $_ROOT_ = dirname($tmpPath);
+}
 use constant VER => 0.01;
 my $dba = {};
 my %hm = (); # []; is a reference

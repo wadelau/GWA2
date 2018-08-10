@@ -20,7 +20,10 @@ use File::Path qw(make_path remove_tree);
 #use parent 'inc::DBA';
 use inc::Config;
 
-my $_ROOT_ = dirname(abs_path($0));
+my $_ROOT_ = "../";
+if(my $tmpPath=abs_path($0)){
+    $_ROOT_ = dirname($tmpPath);
+}
 my $isdbg = 1;
 my $file = '';
 my $fh = undef;
