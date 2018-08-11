@@ -92,7 +92,14 @@ public class WebApp implements WebAppInterface{
     //-
     public String get(String k, boolean noExtra){
         //- @todo if noExtra==false , try to retrieve info from db
-		String tmp = (String)this.hmf.get(k);
+		String tmp;
+        Object obj = this.hmf.get(k);
+        if(obj instanceof Integer){
+            tmp = String.valueOf(obj);
+        }
+        else{
+            tmp = (String)obj;
+        }
 		return tmp==null ? "" : tmp;
     }
 

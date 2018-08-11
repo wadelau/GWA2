@@ -28,7 +28,8 @@ public class News extends WebApp{
 		this.set("orderby", "id desc");
 		
 		HashMap userInfo = this.getBy("id, email, realname, updatetime", 
-				"(email like ?  or email like ?) and realname like ?");
+				"(email like ?  or email like ?) and realname like ?",
+				(new HashMap(){{ put("key", baseCK+"email-163"); }}));
 
 		userInfo.put("read-in-User-timestamp", (new Date()) + "userinfo:["+userInfo.toString()+"]");	
 

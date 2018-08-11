@@ -70,6 +70,8 @@ public final static class Wht{
 	 * @failed with a return value -1 
 	 */
 	public static int parseInt(String numstr){
+		numstr = numstr== null ? "" : numstr;
+		numstr = numstr.equals("null") ? "" : numstr;
 		if(numstr.equals("")){
 			return -1;
 		}
