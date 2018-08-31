@@ -81,7 +81,7 @@ sub query($ $ $) {
 	}
 	catch{
 		print "sql:[$sql] read failed in inc/MySQL.... continue?\n";
-	}
+	};
 	my @rows = (); # [] as a ref to array
 	my $rtnflag = 0;
 	if($result){
@@ -122,7 +122,7 @@ sub readSingle($ $ $) {
 	}
 	catch{
 		print "sql:[$sql] read failed in inc/MySQL.... continue?\n";
-	}
+	};
 	my @rows = []; my $rtnflag = 0;
 	if($result){
 		if(my $ref = $sth->fetchrow_hashref()){
@@ -166,7 +166,7 @@ sub readBatch($ $ $) {
 	}
 	catch{
 		print "sql:[$sql] read failed in inc/MySQL.... continue?\n";
-	}
+	};
 	my @rows = (); my $i = 0; my $rtnflag = 0;
 	if($result){
 		while(my $ref = $sth->fetchrow_hashref()){

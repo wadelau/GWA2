@@ -69,10 +69,11 @@ sub readf($ $){
 
 	$fh = $self->openf($file, \%args);
 	my $cont = '';
-	while(<$fh>){
-		$cont .= $_;	
+	if(defined($fh)){
+		while(<$fh>){
+			$cont .= $_;	
+		}
 	}
-
 	# @todo, reuse
 	if(1){
 		close($fh);	
@@ -152,7 +153,12 @@ sub openf($ $){
 	elsif($amm eq 'w+'){
 		$amm = '>>';
 	}
-	open($fh, $amm, $file) or warn "\t\tinc::FileSys::openf: cannot open file:[$file] 1702281906.";
+	if(-e $file){
+		open($fh, $amm, $file) or warn "\t\tinc::FileSys::openf: cannot open file:[$file] 1702281906.";
+	}
+	else{
+		print "inc::FileSys::openf: file:$file not exist... contd...\n";
+	}
 	return $fh;
 }
 
@@ -160,7 +166,7 @@ sub openf($ $){
 sub closef(){
 	if(!$isclosed){
 		if(defined($fh)){
-			close($fh) or warn '';
+			close($fh) or warn "inc::FileSys:: closef: filehd:$fh failed. 1808290716.";
 		}
 	}
 	#print "\t\tinc::FileSys::closef: $fh is closing.\n";

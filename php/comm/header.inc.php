@@ -92,7 +92,7 @@ $display_style = $_CONFIG['display_style_index'];
 foreach($_REQUEST as $k=>$v){
     $k = trim($k);
     if($k != ''){
-        if(preg_match("/([0-9a-z_]+)/i",$k,$matcharr)){
+        if(preg_match("/([0-9a-z_]+)/i", $k, $matcharr)){
             $k = $matcharr[1];
 			if(is_string($v)){
 				$v = trim($v);
@@ -103,8 +103,9 @@ foreach($_REQUEST as $k=>$v){
 				}
 			}
             $data[$k] = $v;
-            if(preg_match('/[^\x20-\x7e]/', $k)){
-                eval("\${$k} = \"$v\";");
+            if(true)){
+                #eval("\${$k} = \"$v\";"); # risky
+				${$k} = $v;
             }
         }
 		else{

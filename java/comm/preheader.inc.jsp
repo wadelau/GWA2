@@ -82,6 +82,7 @@ public static void debug(Object obj, String tag, String output){
 		s.append("comm/header.inc.jsp: unsupported output:["+output+"] 1607182227.");
 		(new Throwable(s.toString())).printStackTrace();
 	}
+	s = null;
 }
 //-
 public static void debug(HashMap obj){

@@ -83,12 +83,12 @@ public static class Config {
 			Object value = entry.getValue();
 			Config.set(key, value);
 		}
-		
+		myConf = null;
+		entries = null;
 	}
 	
 	
 	public static HashMap getConf(){
-		
 		
 		return Config.conf;
 		
