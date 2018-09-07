@@ -7,10 +7,13 @@ package mod::Hello;
 
 use parent 'inc::WebApp';
 #extends 'mod::Hello'; # with Moose
+use mod::Base62x;
+#use mod::Base62x qw(base62x_encode base62x_decode);
 
 our @ISA = qw(inc::WebApp); # for what?
 
 my $hello_var = 'glad to see you @'.time().' from mod::Hello.';
+my $base62x = undef;
 
 # override new of WebApp
 sub new {
@@ -29,7 +32,7 @@ sub new {
 
 	my %args = ("args"=>$args, "dbconf"=>"MasterDB");
 	inc::WebApp->new(\%args);
-	
+	$base62x = Base62x->new();
 	$self->setTbl('temptbl');
 
 	return $self;

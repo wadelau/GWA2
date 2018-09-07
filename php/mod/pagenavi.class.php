@@ -148,6 +148,7 @@ class PageNavi extends WebApp{
 
    }
 
+	#
    function getInitUrl(){
         $fieldlist = array('tbl','tit','db');
         $file = $_SERVER['PHP_SELF'];
@@ -161,6 +162,7 @@ class PageNavi extends WebApp{
         return $file.$query;
    }
 
+	#
    function getOrder(){
        $order = "";
        foreach($_REQUEST as $k=>$v){
@@ -219,7 +221,7 @@ class PageNavi extends WebApp{
 			}
        }
 
-        $objpnps = $gtbl->get("pagesize");
+       $objpnps = $gtbl->get("pagesize");
        if($objpnps > 0){
         $this->hmf['pnps'] = $objpnps; # in case that pnps does not exists in URL,  remedy by wadelau, Mon Nov 19 11:18:52 CST 2012
        }
@@ -315,6 +317,28 @@ class PageNavi extends WebApp{
                         $condition .= " ".$pnsm." "."$field not like ?";
                         $gtbl->set($field, "%".$v."%");
                     }
+					else if($fieldopv == 'containslist'){
+                        $isString = false;
+                        if($this->isNumeric($hmfield[$field]) && strpos($hmfiled[$field],'date') === false){
+                            # numeric
+                        }
+                        else{
+                            $isString = true;
+                        }
+					    $v = str_replace("，",",", $v);
+                        $vArr = explode(",", $v);
+                        $conditionTmp = " 1=0 ";
+                        foreach($vArr as $vk=>$vv){
+                            #$vv = $this->addQuote($vv);
+                            $vv = trim($vv);
+                            $vv = addslashes($vv);
+                            $vv = "%$vv%";
+                            if($isString){ $vv = "'$vv'"; }
+                            $conditionTmp .= " or $field like $vv";
+                        }
+                        $condition .= " $pnsm ($conditionTmp)";
+						$gtbl->del($field);
+                    }
 					else if($fieldopv == 'startswith'){
                         $condition .= " ".$pnsm." "."$field like ?";
                         $gtbl->set($field, $v."%");
@@ -383,12 +407,12 @@ class PageNavi extends WebApp{
            $arr = explode(",", $str);
            $tmpval = '';
            foreach($arr as $k12=>$v12){
-               $tmpval .= "'".addslashes($v12)."',";
+               $tmpval .= "'".addslashes(trim($v12))."',";
            }
            $tmpval = substr($tmpval, 0, strlen($tmpval)-1);
        }
        else{
-           $tmpval = "'".addslashes($str)."'";
+           $tmpval = "'".addslashes(trim($str))."'";
        }
        return $tmpval;
    }
