@@ -25,4 +25,4 @@ if os language is not set to unicode or utf-8,
 	
 	usually in appserver_home/bin
 	
-	see http://ufqi.com/blog/gwa2-java-i18n/ for more details.
+	see [https://ufqi.com/blog/gwa2-java-i18n/](https://ufqi.com/blog/gwa2-java-i18n/) for more details.
