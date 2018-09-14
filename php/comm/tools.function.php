@@ -242,9 +242,9 @@ function redirect($url, $time=0, $msg='') {
 	        $url = "//".$_SERVER['SERVER_NAME'].":".$_SERVER['SERVER_PORT'].$url;
 	    }
 	}
-	if($time < 10){ $time = $time * 1000; } # in case of milliseconds
+	$mstime = $time * 1000; # in case of milliseconds
 	$hideMsg = "<!DOCTYPE html><html><head>";
-	$hideMsg .= "<meta http-equiv=\"refresh\" content=\"".($time/1000).";url='$url'\">";
+	$hideMsg .= "<meta http-equiv=\"refresh\" content=\"".($time).";url='$url'\">";
 	$hideMsg .= "</head><body>";  # remedy Mon Nov 23 22:03:24 CST 2015
     if (empty($msg)){
         #$msg = "系统将在{$time}秒之后自动跳转到{$url}！";
@@ -253,7 +253,8 @@ function redirect($url, $time=0, $msg='') {
 	else{
 		$hideMsg = $hideMsg . $msg;
 	}
-	$hideMsg .= "<script type='text/javascript'>window.setTimeout(function(){window.location.href='".$url."';}, ".$time.");</script>";
+	$hideMsg .= "<script type='text/javascript'>window.setTimeout(function(){window.location.href='"
+		.$url."';}, ".$mstime.");</script>";
 	$hideMsg .= "</body></html>";
     if (!headers_sent()) {
         // redirect
