@@ -238,7 +238,7 @@ class PageNavi extends WebApp{
            }
        }
        #error_log(__FILE__.": req:".$this->toString($_REQUEST));
-
+	   $isTimeField = false;
        foreach($_REQUEST as $k=>$v){
             if($k != 'pnsk' && strpos($k,"pnsk") === 0){
                 $field = substr($k, 4);
@@ -256,6 +256,11 @@ class PageNavi extends WebApp{
        	   		if(strlen($v) > 3 && startsWith($v, '%')){
        	   			$v = urldecode($v);
        	   		}
+				if(strpos($hmfield[$field],'date') !== false
+                        || strpos($hmfield[$field],'time') !== false){
+                    $isTimeField = true;    
+                }
+				# operator list
                 if(strpos($v,"tbl:") === 0){ #http://ufqi.com:81/dev/gtbl/ido.php?tbl=hss_dijietbl&tit=%E5%AF%BC%E6%B8%B8%E8%A1%8C%E7%A8%8B&db=&pnsktuanid=tbl:hss_findaoyoutbl:id=2
                     $condition .= " ".$pnsm." ".$field." in (".$this->embedSql($linkfield,$v).")";
                 
@@ -298,16 +303,54 @@ class PageNavi extends WebApp{
                         $gtbl->del($field);
                     }
 					else if($fieldopv == 'inrange'){
+						$v = str_replace("，",",", $v);
                         $tmparr = explode(",", $v);
-                        if(strpos($hmfield[$field],'date') === false){
-                            $condition .= " ".$pnsm." ($field >= ".intval($tmparr[0])
-                                ." and $field <= ".intval($tmparr[1]).")";
+                        if(isset($tmparr[1])){
+                            if(!$isTimeField){
+                                $condition .= " ".$pnsm." ($field >= ".$tmparr[0]." and $field <= ".$tmparr[1].")";
+                            }
+                            else{
+                                $condition .= " ".$pnsm." ($field >= '".$tmparr[0]."' and $field <= '".$tmparr[1]."')";
+                            }
                         }
-						else{
-                            $condition .= " ".$pnsm." ($field >= ".$this->addQuote($tmparr[0])." and $field <= "
-                                    .$this->addQuote($tmparr[1]).")";
+                        else{
+                            if(!$isTimeField){
+                                $condition .= " ".$pnsm." ($field >= ".$tmparr[0].")";
+                            }
+                            else{
+                                $condition .= " ".$pnsm." ($field >= '".$tmparr[0]."')";
+                            }
                         }
-                        $gtbl->del($field);
+						$gtbl->del($field);
+                    }
+					else if($fieldopv == 'inrangelist'){
+						$v = str_replace("，",",", $v);
+                        $tmparr = explode(",", $v);
+                        $conditionTmp = ' 1=0 '; 
+                        foreach($tmparr as $tmpk=>$tmpv){
+                            $tmpArr2 = explode('~', $tmpv);
+                            if(count($tmpArr2) > 1 && $tmpArr2[1] !== ''){
+                                $tmpbgn = $tmpArr2[0];
+                                $tmpend = $tmpArr2[1];
+                                if(!$isTimeField){
+                                    $conditionTmp .= " or ($field >= ".$tmpbgn." and $field < ".$tmpend.")";
+                                }
+                                else{
+                                    $conditionTmp .= " or ($field >= '".$tmpbgn."' and $field < '".$tmpend."')";
+                                }
+                            }
+                            else{
+                                $tmpbgn = $tmpArr2[0];
+                                if(!$isTimeField){
+                                    $conditionTmp .= " or ($field >= ".$tmpbgn.")";
+                                }
+                                else{
+                                    $conditionTmp .= " or ($field >= '".$tmpbgn."')";
+                                }
+                            }
+                        }
+                        $condition .= " $pnsm ($conditionTmp)";
+						$gtbl->del($field);
                     }
 					else if($fieldopv == 'contains'){
                         $condition .= " ".$pnsm." "."$field like ?";
