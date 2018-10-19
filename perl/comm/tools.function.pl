@@ -77,6 +77,84 @@ sub debug{ # ($ $)
 	print "\n";
 }
 
+# 
+# %args = ('from'=>'', 'to'=>'', 'subject'=>'', 'content'=>'', 'attachfile'=>'', 'attachfiles'=>Array);
+sub sendMail($){
+    my $self = $_[0];
+	my $args = pop @_;
+    my %args = %{$args};
+
+    my $rtn = 0;
+    my $cont =  $args->{'content'}; 
+    print "content:$cont\n";
+
+    my %mailconfig = ('mailhost'=>'', 'hellohost'=>'', 'mailport'=>465, 
+        'authuser'=>'1234@abc.com', 'authpass'=>'',
+        'isssl'=>1, 'isdebug'=>0); 
+
+    my $mailfrom = $args->{'from'};
+    my @tmpHelloArr = split(/@/, $mailfrom);
+    $mailconfig{'hellohost'} = $tmpHelloArr[1];
+
+    my $mailto = $args->{'to'};
+    my @toAddressList = split(/,/, $mailto);
+    my $msubject = $args->{'subject'}; if($cont eq ''){ $cont = $msubject; }
+    my $mailx = MIME::Lite->new(
+            From    => $mailfrom,
+            To      => @toAddressList,
+            #Subject => Encode::encode("utf8", $msubject),
+            Subject => $msubject,
+            Type    => 'text/html;charset=UTF-8',
+            charset => 'UTF-8',
+            Data     => Encode::encode("utf8", $cont),
+            Encoding => 'base64'
+            );
+
+    if(exists($args->{'attachfiles'})){
+        my @filepath = @{$args->{'attachfiles'}};
+        foreach my $tmpi (keys @filepath){
+            my $tmpfilepath = $filepath[$tmpi];
+            $mailx->attach('Type'=>'auto', 'Path'=>$tmpfilepath);
+        }
+    }
+    elsif(exists($args->{'attachfile'})){
+        if(1){
+            my $tmpfilepath = $args->{'attachfile'};
+            $mailx->attach('Type'=>'auto', 'Path'=>$tmpfilepath);
+        }
+    }
+
+    #$mailx->send('smtp', $mailconfig{'mailhost'}); # no auth
+    #$mailx->send('smtp', $mailconfig{'mailhost'}, 'Debug'=>$mailconfig{'isdebug'}, 'SSL'=>$mailconfig{'isssl'}, 
+    #   'Port'=>465, 'AuthUser'=>$mailconfig{'authuser'}, 'AuthPass'=>$mailconfig{'authpass'});
+
+    my $smtp = Net::SMTP->new($mailconfig{'mailhost'}, 'Hello'=>$mailconfig{'hellohost'}, 
+        'SSL'=>$mailconfig{'isssl'}, 'Debug'=>$mailconfig{'isdebug'});
+    if($smtp){
+        if($smtp->auth($mailconfig{'authuser'}, $mailconfig{'authpass'})){
+            print "smtp connected and authorized succ\n";
+            $smtp->mail($mailfrom);
+            $smtp->to(@toAddressList);
+            $smtp->data();
+            $smtp->datasend(Encode::encode("utf8", $mailx->as_string));
+            $smtp->datasend("\r\n");
+            $smtp->datasend();
+            $smtp->quit();
+            print "mail sent succ.\n";
+            $rtn = 1;
+        }
+        else{
+            print "smtp connected but authorized failed.\n";
+        }
+    }
+    else{
+        print "smtp server connection failed.\n";
+    }
+
+    return $rtn;
+
+}
+
 $ARGV[$argvsize] = \%hmf; # return to parent
 
 1;
