@@ -413,7 +413,7 @@ sub _decodeByLength($ $ $){
     }
     else{
         $c0 = $tmpArr[0];
-        $op[$m] = chr($c0);
+        if(defined($c0)){ $op[$m] = chr($c0); } # ?
     }
     $rtnArr[0] = \@op;
     $rtnArr[1] = $m;

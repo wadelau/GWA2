@@ -181,16 +181,19 @@ class WebApp implements WebAppInterface{
 		return true;
 	}
 
+	//-
 	function getTbl(){
 		return $this->get("tbl");
 	}
 
+	//-
 	function setId($id){
 		#debug("id:$id, myId:".$this->myId);
 		$this->set($this->myId, $id);
 		return true;
 	}
 
+	//-
 	function getId(){
 		return $this->get($this->myId);
 	}
@@ -411,7 +414,7 @@ class WebApp implements WebAppInterface{
 			$sql .= $conditions;
 			$issqlready = 1;
 		}
-		#error_log(__FILE__.": rmBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
+		#debug(": rmBy: sql:[".$sql."] hmf:[".serialize($this->hmf)."] [1201241223].\n");
 		if($issqlready == 1){
 			$hm = $this->dba->update($sql, $this->hmf);
 		}
@@ -715,15 +718,15 @@ class WebApp implements WebAppInterface{
         }
         else if($type == 'url:'){
             //-- http(s) request
+			$header = '';
+			if(is_array($args['header'])){
+				foreach($args['header'] as $k=>$v){
+					$header .= "$k: $v\r\n";
+				}
+			}
             if(strtolower($args['method']) == 'post'){
                 //- curl or fsockopen, todo
-                //- or file_get_contents with  stream_context_create()
-                $header = '';
-                if(is_array($args['header'])){
-                    foreach($args['header'] as $k=>$v){
-                        $header .= "$k: $v\r\n";
-                    }
-                }
+                //- or file_get_contents with  stream_context_create()    
                 $paraStr = '';
                 if($args['parameter']){
                     $paraStr = http_build_query($args['parameter']);
@@ -763,7 +766,12 @@ class WebApp implements WebAppInterface{
                     $args['target'] .= (inString('?', $args['target']) ? '&' : '?');
                     $args['target'] .= http_build_query($args['parameter']);
                 }
-				$ctxArr = array(); # $args: 'method', 'header', 'content'...
+				$ctxArr = array(
+					'http'=>array(
+						'method'=>'GET',
+						'header'=>$header,
+						),
+					); # $args: 'method', 'header', 'content'...
 				if($this->ssl_verify_ignore){
 					$ctxArr['ssl'] = array(
 						'verify_peer'=>false, # for reliable src

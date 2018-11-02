@@ -253,8 +253,8 @@ function redirect($url, $time=0, $msg='') {
 	else{
 		$hideMsg = $hideMsg . $msg;
 	}
-	$hideMsg .= "<script type='text/javascript'>window.setTimeout(function(){window.location.href='"
-		.$url."';}, ".$mstime.");</script>";
+	$hideMsg .= "<script type='text/javascript'>window.setTimeout(function(){window.location.replace('"
+		.$url."');}, ".$mstime.");</script>";
 	$hideMsg .= "</body></html>";
     if (!headers_sent()) {
         // redirect
