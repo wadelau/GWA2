@@ -24,10 +24,12 @@ my %Sql_Operator_List = (' '=>1,'^'=>1,'~'=>1,':'=>1,'!'=>1,'/'=>1,
 	'*'=>1,'&'=>1,'%'=>1,'+'=>1,'='=>1,'|'=>1,
 	'>'=>1,'<'=>1,'-'=>1,'('=>1,')'=>1,','=>1);
 
+my $self = {};
+	
 #
 sub new {
 	my $class = shift @_;
-	my $self = {}; # {@_}
+	$self = {}; # {@_}
 
 	$conf = shift;
 	if($conf ne ""){ $conf = "inc::Conn::$conf"; }
@@ -178,6 +180,13 @@ sub _sortObject($ $){
 	#	print "\t\t\t$i: ".$rtn[$i]."\n";	
 	#}
 	return @rtn;
+}
+
+#
+# return current dbconf/dbname
+sub getConf(){
+	print "\t\tinc::Dba: conf:$conf\n"
+	return $conf;
 }
 
 1;

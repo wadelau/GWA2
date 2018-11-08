@@ -6,7 +6,8 @@ package inc::WebApp;
 # Main designs from -GWA2 in -PHP, -GWA2 in -Perl
 # Since Sun Jan  1 22:56:46 CST 2017
 # Update Wed Jan 25 11:11:49 CST 2017
-# v0.10
+# Update Nov 07, 2018, +multiple databases connections in a single session
+# v0.20
 #
 
 use strict;
@@ -19,6 +20,7 @@ binmode( STDIN,  ':encoding(utf8)' );
 binmode( STDOUT, ':encoding(utf8)' );
 binmode( STDERR, ':encoding(utf8)' );
 #use Try::Tiny;
+use Scalar::Util qw(refaddr);
 
 use parent 'inc::WebInterface';
 use inc::Config qw(GConf);
@@ -45,6 +47,10 @@ use constant {
 my $GWA2_Rumtime_Env_List = ();
 
 my $gconf = inc::Config->new();
+my $self = {};
+# the unique id of an instance object and/or its children
+# see multiple databases in a single session
+my $theUniqId = ''; 
 
 #
 sub new {
@@ -52,10 +58,15 @@ sub new {
 	my $args = shift; # @_ may be omitted.
 	my %args = %{$args};
 	#print "\t\tclass:[$class] args:[".\%args."]\n";
-	my $self = {@_};
+	$self = {@_};
+	bless $self, $class;
 	if(1){
-		if(!defined($args{'dbconf'})){ $args{'dbconf'} = 'MasterDB';  }
-		$dba = inc::Dba->new($args{'dbconf'});	
+		if(!defined($args{'dbconf'})){ $args{'dbconf'} = 'MasterDB'; }
+		$dba = inc::Dba->new($args{'dbconf'});
+		
+		if(defined($args{'unique_id'})){ $theUniqId = $args{'unique_id'}; }
+		else{ $theUniqId = $self->getUniqueId(); }
+		$self->set('dbconf'.$theUniqId, $args{'dbconf'});
 	}
 	if(1){
 		if(!defined($args{'fileconf'})){ $args{'fileconf'} = 'FileSystem';  }
@@ -176,6 +187,7 @@ sub getBy($ $ $) { # $fields, $conditions, $withCache
 			if($pagesize == 0){ $pagesize = 99999; } # default maxium records per page
 			$sql .= " limit ".(($pagenum-1)*$pagesize).", ".$pagesize;	
 		}
+		$dba = $self->_checkDbConn($dba, $self->get('dbconf'.$self->getUniqueId()));
 		my $result = $dba->select($sql, \%hmf);
 		%result = %{$result};
 		print "\t\t\tinc::WebApp: getBy: sql:[$sql] result:".%result."\n";
@@ -237,6 +249,7 @@ sub setBy($ $){ # $$ # $fields, $conditions
 			$sql .= " where ".$conditions;	
 		}
 		print "\t\tinc::WebApp: setBy: sql:[$sql]\n";
+		$dba = $self->_checkDbConn($dba, $self->get('dbconf'.$self->getUniqueId()));
 		if($issqlready == 1){
 			if($idval ne ''){ $hmf{'pagesize'} = 1; }	
 			my $result = $dba->update($sql, \%hmf);
@@ -293,6 +306,7 @@ sub execBy($ $ $){ # $sql, $conditions, $withCache
 		}
 		print "\t\tinc::WebApp: execBy: sql:[$sql] pos:[$pos]\n";
 		my $result = ();
+		$dba = $self->_checkDbConn($dba, $self->get('dbconf'.$self->getUniqueId()));
 		if($pos > -1){
 			$result	= $dba->select($sql, \%hmf);
 		}
@@ -339,6 +353,7 @@ sub rmBy($){
 	}
 	print "\t\t\tinc::WebApp: rmBy: sql:[$sql]\n";
 	my $result = ();
+	$dba = $self->_checkDbConn($dba, $self->get('dbconf'.$self->getUniqueId()));
 	if($issqlready == 1){
 		$result = $dba->update($sql, \%hmf);
 		%result = %{$result};
@@ -421,6 +436,43 @@ sub getConf($){
 	#print "\t\tinc::WebApp::getConf: k:$k\n";
 	#return inc::Config::get($k); # use qw ?
 	return $gconf->{$k}; # ?
+}
+
+#
+# get an unique id for an object
+sub getUniqueId { 
+    my $self = shift;
+    my $uniqid = refaddr $self;
+    #print "\t\tinc/WebApp: unique_id: $uniqid with self:$self\n";
+    return $uniqid;
+}
+
+#
+# check if current connection has same dbname with current object by unique id
+sub _checkDbConn($ $){
+    $self = $_[0];
+    my $dba = $_[1];
+    my $objDb = $_[2];
+    if(defined($dba) && defined($objDb)){
+        my $currentDb = $dba->getConf();
+        if(defined($currentDb)){
+            if($currentDb=~/$objDb/){
+                # same db
+                #print "\t\tinc/WebApp: _checkDbConn: dba:$dba same db: objDb:$objDb currentDb:$currentDb\n";
+            }
+            else{
+                $dba = inc::Dba->new($objDb);	
+                print "\t\tinc/WebApp: _checkDbConn: dba:$dba switch diff db: objDb:$objDb currentDb:$currentDb\n";
+            }
+        }
+        else{
+            print "\t\tinc/WebApp: _checkDbConn: dba:$dba  currentDb error!\n";
+        }
+    }
+    else{
+        print "\t\tinc/WebApp: _checkDbConn: dba error or no specified dbname.\n";
+    }
+    return $dba;
 }
 
 1;

@@ -62,7 +62,7 @@ class MYSQLIX {
 			}
 		}
 		if($this->m_link->connect_errno > 0){
-				print "Database connection error. 201710071225.";
+				print "Database connection error:[".$this->m_link->connect_errno."]. 201710071225.";
 				debug($this->m_link);
 				exit(0);
 		}

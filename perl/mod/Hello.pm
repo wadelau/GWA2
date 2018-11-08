@@ -15,12 +15,14 @@ our @ISA = qw(inc::WebApp); # for what?
 my $hello_var = 'glad to see you @'.time().' from mod::Hello.';
 my $base62x = undef;
 
+my $self = {};
+
 # override new of WebApp
 sub new {
 	my $class = shift;
 	my $args = shift;
 	#my $self = {@_};
-	my $self = {
+	$self = {
 		_firstname => shift ,
 		_lastname => shift,
 	};
@@ -31,6 +33,15 @@ sub new {
 	print "\t\tmod/Hello.pm: init with firstname:[".$self->{_firstname}."] at time:[".time()."].\n\n";
 
 	my %args = ("args"=>$args, "dbconf"=>"MasterDB");
+	
+	if(!defined($args{'dbconf'})){ $args{'dbconf'} = 'MasterDB'; }
+	else{
+		# other dbconf
+	}
+	
+	# optional for multiple db,file,cache, etc. 
+    $args{'unique_id'} = $self->getUniqueId();
+	
 	inc::WebApp->new(\%args);
 	$base62x = Base62x->new();
 	$self->setTbl('temptbl');
