@@ -129,11 +129,13 @@ class MYSQLIX {
 			else{
 				$hm[0] = false;
 				$hm[1] = array('sayError'=>'No record. 200607050101.');
+				debug("inc/mysqlix: readSingle failed. errno:".$this->getErrno()." err:".$this->getError());
 			}
 		}
 		else{
 			$hm[0] = false;
 			$hm[1] = array('sayError'=>'No record. 200607050202.');
+			debug("inc/mysqlix: readSingle failed. errno:".$this->getErrno()." err:".$this->getError());
 		}
 		return $hm;
 		
@@ -165,7 +167,10 @@ class MYSQLIX {
 			}
 			//--- refined by tim's advice on 20060804 by wadelau
 			mysqli_free_result($result);
-		} 
+		}
+		else{
+			debug("inc/mysqlix: readBatch failed. errno:".$this->getErrno()." err:".$this->getError());
+		}
 		if(count($rtnarr)> 0){
 			$hm[0] = true;
 			$hm[1] = $rtnarr;
