@@ -155,6 +155,15 @@ sub sendMail($){
 
 }
 
+#
+# just trim it
+sub trim{
+    my $str = shift;
+    #$str = lc($str);
+    $str =~ s/^\s+|\s+$//g;
+    return $str;
+}
+
 $ARGV[$argvsize] = \%hmf; # return to parent
 
 1;
