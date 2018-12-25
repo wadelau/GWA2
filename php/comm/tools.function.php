@@ -332,6 +332,7 @@ function debug($obj, $tag='', $output=null){
 	if($tag != ''){
 		$s = " $tag:[$s]";
 	}
+	$s = str_replace("\0", '\\0', $s);
 	$callidx = count($caller) - 2;
 	$s .= ' func:['.$caller[$callidx]['function'].'] file:['.$caller[$callidx]['file'].'] line:['.$caller[$callidx]['line'].']';
 
