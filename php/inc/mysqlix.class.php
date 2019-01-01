@@ -201,7 +201,8 @@ class MYSQLIX {
 	private function _enSafe($sql,$idxarr,$hmvars){
 		
 		$sql = $origSql = trim($sql);
-		if($hmvars[GConf::get('no_sql_check')]){
+		$no_sql_check = Gconf::get('no_sql_check') ? Gconf::get('no_sql_check') : '';
+        if($no_sql_check != '' &&  $hmvars[$no_sql_check]){
 			$hmvars[GConf::get('no_sql_check')] = false; # valid only once
 			return $origSql;
 		}
