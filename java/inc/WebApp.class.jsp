@@ -117,7 +117,7 @@ public class WebApp implements WebAppInterface{
 	public HashMap getBy(String fields, String args, HashMap hmCache){
 		HashMap hm = new HashMap();
         //- from cache
-        if(hmCache != null && hmCache.size() > 0){
+        if(fields.equals("cache:") && hmCache != null && hmCache.size() > 0){
             hm = this.readObject("cache:", hmCache);
             if((boolean)hm.get(0)){
                 debug(Log_Tag + ": read cache succ. args:"+hmCache);

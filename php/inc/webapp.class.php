@@ -264,7 +264,7 @@ class WebApp implements WebAppInterface{
 	 */
 	function getBy($fields, $conditions, $withCache=null){
         $hm = array();
-        if($withCache != null){
+        if($fields == 'cache:' && $withCache != null){
             $hm = $this->readObject($type='cache:', $args=$withCache);
             if($hm[0]){
                 #debug(__FILE__.": get from cache succ. ckstr:[".$this->toString($withCache)."]");

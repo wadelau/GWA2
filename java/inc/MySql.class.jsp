@@ -15,8 +15,8 @@
 java.sql.DriverManager,
 java.sql.ResultSet,
 java.sql.PreparedStatement,
-javax.naming.InitialContext,
-javax.sql.DataSource"%><%
+javax.naming.Context,
+javax.naming.InitialContext"%><%
 
 %><%!
 
@@ -47,15 +47,18 @@ public final class MySql implements DbDriver {
 
         this.hasSocketPool = (boolean)Config.get("db_enable_socket_pool");
         //debug("inc/MySql: db:"+this.myDb+" haspool:"+hasSocketPool);
-        if(this.hasSocketPool){
+        if(this.hasSocketPool && !this.myDb.equals("")){
             try{
-            this.ctx = new InitialContext();
-            this.ds = (DataSource)ctx.lookup("java:comp/env/jdbc/"+this.myDb);
+				this.ctx = new InitialContext();
+				this.ds = (DataSource)ctx.lookup("java:comp/env/jdbc/"+this.myDb);
             }
             catch(Exception ex){
                 ex.printStackTrace();
             }
         }
+		else{
+			//- no connection pool or emty db , ref: -R/z2SU 
+		}
 	}
 
     //- destructor
