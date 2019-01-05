@@ -39,6 +39,10 @@ if(true){
 	hmconf.put("sessiondriver", "SESSIONX"); //- SESSIONX 
 	hmconf.put("sessionexpire", 30*60);
 
+    //- file
+    hmconf.put("enable_file", true);
+    hmconf.put("filedriver", "LINUX");
+
 	hmconf.put("sign_key", "--Mon Jul  2 12:55:44 UTC 2018##");
 
 	//- tpl

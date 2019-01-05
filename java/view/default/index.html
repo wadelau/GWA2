@@ -18,9 +18,9 @@
 <div id="container">
 
 <div id="header">
-    -GWA2 works with -Java!
+    -GWA2 works with -Java and -Hanjst!
     <br/><br/>
-	<img src='images/gwa2-logo-201606.v2.jpg' alt='gwa2-logo'/>
+	<img src='images/gwa2-logo-201606.v2.jpg' alt='gwa2-logo' width="50%"/>
 	<br/><br/>Random number {$sid} @ {$time}!
     <br/>
     <p/>
@@ -28,7 +28,7 @@
    
 <!-- saturday.. include file="include/header.html" -->
  
-{include file="$smttpl"}
+{include file="$embedtpl"}
 
 <!-- include file="include/footer.html" -->
 
@@ -66,8 +66,7 @@
         }
         </script>
         <br/>
-        <br/>
-        自然域名(NatureDNS):  <a href="#-gwa2">-吉娃兔</a> , -GWA2 .<a href="./"><script type="text/javascript">diff=diffInYearsAndDays('2011-01-08',(new Date()));document.write(' '+diff[0]+' yrs and '+diff[1]+' days.');</script></a>
+        -自然域名(-NatureDNS):  <a href="#-gwa2">-吉娃兔</a> , -GWA2 .<a href="./"><script type="text/javascript">diff=diffInYearsAndDays('2011-01-08',(new Date()));document.write(' '+diff[0]+' yrs and '+diff[1]+' days.');</script></a>
         
         <div class="inder_othrer">
                 <ul>
@@ -83,6 +82,16 @@
 
     
 </div>
+
+<div id="Hanjstjsondata">HANJST_JSON_DATA</div>
+<!-- Hanjst codes begin -->
+<script type="text/javascript" async>
+    window.Hanjst = {'JsonDataId':'Hanjstjsondata', 'IsDebug': false}; // optional
+</script>
+<script type="text/javascript" src="js/Hanjst.js" async></script>
+<noscript>JavaScript Required for Hanjst.</noscript>
+<!-- Hanjst codes end -->
+
 </body>
     <script type="text/javascript">
     //- create -naturedns urlredir for this page.

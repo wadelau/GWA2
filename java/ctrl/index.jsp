@@ -45,9 +45,9 @@ outx.append("\n\tend: appending to outx in /ctrl/index."+(new java.util.Date()) 
 
 
 //- output
-if(fmt.equals("") && smttpl.equals("")){
+if(fmt.equals("") && mytpl.equals("")){
 
-	smttpl = "homepage.html";	
+	mytpl = "homepage.html";	
 
 }
 

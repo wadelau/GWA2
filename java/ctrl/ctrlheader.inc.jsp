@@ -13,7 +13,7 @@ user = new User((HashMap)crsPage.get("user"));
 
 mod = (String)crsPage.get("mod");
 act = (String)crsPage.get("act");
-smttpl = (String)crsPage.get("smttpl");
+mytpl = (String)crsPage.get("mytpl");
 fmt = (String)crsPage.get("fmt");
 url = (String)crsPage.get("url");
 

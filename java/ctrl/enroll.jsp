@@ -11,7 +11,7 @@ if(act.equals("")){
 	data.put("iname", "Wadelau"+(new java.util.Random()).nextInt());
 	data.put("phonenum", ""+(new java.util.Random()).nextInt());
 
-	smttpl = "enroll.html";
+	mytpl = "enroll.html";
 
 }
 else if(act.equals("dosubmit")){

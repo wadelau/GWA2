@@ -10,13 +10,11 @@ need jdk1.7+
 ## Third parties jars required  ##
 com.mysql.jdbc.driver,
 
-org.lilystudio.smarty4j,
-
-org.objectweb.asm,
+com.google.gson,
 
 	are required, please put them in appserver_home/lib usually,
 	
-	copies of these jars are stored in ./memo for backup
+	copies of these jars are stored in ./memo and/or ./WEB-INF/lib for backup
 
 ## Force to use UTF-8 ##
 if os language is not set to unicode or utf-8, 

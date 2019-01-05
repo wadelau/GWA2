@@ -15,8 +15,9 @@
 java.sql.DriverManager,
 java.sql.ResultSet,
 java.sql.PreparedStatement,
-javax.naming.Context,
-javax.naming.InitialContext"%><%
+javax.naming.InitialContext,
+javax.naming.Context
+"%><%
 
 %><%!
 
@@ -30,7 +31,7 @@ public final class MySql implements DbDriver {
 	private String myDb = "";
     private boolean hasSocketPool = false;
     
-    protected InitialContext ctx = null; 
+    protected Context ctx = null; 
 	protected Connection dbConn = null;
     //protected DataSource ds = null;	
     protected DataSource ds = null;	

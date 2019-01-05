@@ -33,7 +33,7 @@ public class User extends WebApp{
 			Map.Entry entry = (Map.Entry) entries.next();
 			String key = (String)entry.getKey();
 			Object value = entry.getValue();
-			System.out.println("WebApp/Constructor: restore: key:["+key+"] value:["+value+"]\n");
+			//System.out.println("User/Constructor: restore: key:["+key+"] value:["+value+"]\n");
 			this.set(key, value);
 		}
 		entries = null;

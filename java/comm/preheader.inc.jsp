@@ -6,10 +6,7 @@ java.util.Iterator,
 java.util.Arrays,
 java.util.Random,
 java.text.SimpleDateFormat,
-java.io.File,
-org.lilystudio.smarty4j.Context,
-org.lilystudio.smarty4j.Engine,
-org.lilystudio.smarty4j.Template"
+java.io.File"
 language="java" 
 pageEncoding="UTF-8"%><%
 
@@ -29,10 +26,12 @@ request.setCharacterEncoding("UTF-8");
 %><%@include file="../inc/WebApp.class.jsp"%><%
 //- user
 %><%@include file="../mod/User.class.jsp"%><%
+//- template
+%><%@include file="../mod/HanjstTemplate.class.jsp"%><%
 
 //- global variables across the app, embedded in two types of files: /index, /ctrl/xxx
 //- need to init before manipulate
-%><%!String sid, appdir, siteid, fmt, smttpl, mod, act, rtvdir, url;
+%><%!String sid, appdir, siteid, fmt, mytpl, mod, act, rtvdir, url;
 HashMap data; StringBuffer outx; User user; %><%
 
 data = new HashMap(); //- for tpl data container

@@ -2,66 +2,73 @@
 //- embedded in ./index, work with ./comm/header
 //- output and finalize the response
 
-outx.append("\n\toutput in comm/footer: "+(new Date())+" smttpl:["+smttpl+"]\n");
+outx.append("\n\toutput in comm/footer: "+(new Date())+" mytpl:["+mytpl+"]\n");
 
 
 if(fmt.equals("")){
 
 	//- @todo
 
-	if(smttpl.equals("")){
+	if(mytpl.equals("")){
 		
 		out.println(outx);
 		
 	}
 	else{
 
-		//- smttpl
-		data.put("smttpl", smttpl);
+        //- template engine
+        HanjstTemplate hanjst = new HanjstTemplate();
+
+		//- mytpl
+        debug("mytpl:"+mytpl);
+		data.put("mytpl", mytpl);
 		data.put("rtvdir", rtvdir);
 		data.put("url", url);
 		data.put("sid", sid);
-		data.put("userid", userid)
+		data.put("userid", user.getId());
 
-		//- tpl engine
-		Engine smartyEngine = new Engine();
-
-		smartyEngine.setTemplatePath(appdir); 
-		smartyEngine.setEncoding("utf-8");
-		smartyEngine.setDebug(true);
-		Template mytpl = null;
-		Context tplcontext = new Context();
+		//- tpl handler
+        //- 1) wrap data into JSON
+        //- 2) load tpl from files or cache
+        //- 3) output JSON and tpl contents
+        String viewdir = "view/default";
+        String hanjstJsonDataTag = "HANJST_JSON_DATA"; //- same with original tpl
+        String tpldir = appdir + "/" + viewdir;
+        String tplcont = "";
 
 		if((boolean)Config.get("template_display_index")){ 
 			//- embedded in index.html
-			mytpl = smartyEngine.getTemplate("/view/default/index.html");
-			tplcontext.set("smttpl", smttpl);
+            HashMap hmtmp = user.getBy("file:", null, (new HashMap(){{put("file", tpldir+"/index.html");}}));
+            if((boolean)hmtmp.get(0)){
+                tplcont = (String)hmtmp.get(1);
+            }
+            String intplcont = "";
+            hmtmp = user.getBy("file:", null, (new HashMap(){{put("file", tpldir+"/"+mytpl);}}));
+            if((boolean)hmtmp.get(0)){
+                intplcont = (String)hmtmp.get(1);
+            }
+            data.put("embedtpl", intplcont); // same with tpl
 		}
 		else{
 			//- standalone
-			mytpl = smartyEngine.getTemplate("view/default/"+smttpl);
+            HashMap hmtmp = user.getBy("file:", null, (new HashMap(){{put("file", tpldir+"/"+ mytpl);}}));
+            if((boolean)hmtmp.get(0)){
+                tplcont = (String)hmtmp.get(1);
+            }
 		}
 
-		Iterator ei = data.keySet().iterator();
-		String obj = null;
-		while(ei.hasNext()){
-			obj = (String)ei.next();
-			tplcontext.set(obj, data.get(obj));	
-		}
+        String jsondata = hanjst.map2Json(data);
 
-		java.io.ByteArrayOutputStream tplout = new java.io.ByteArrayOutputStream();
-		mytpl.merge(tplcontext, tplout);
-		
-		String tplcont = tplout.toString(); //-"utf-8"
+        //- replaces
+        String[] repTags = new String[]{"images", "css", "js", "pics"};
+        for(int ti=0; ti<repTags.length; ti++){
+            outx.append("ti:["+ti+"] reptag:["+repTags[ti]+"]");
+            tplcont = tplcont.replaceAll(repTags[ti]+"/",  viewdir +"/"+repTags[ti]+"/"); 
+        }
+        tplcont = tplcont.replace(hanjstJsonDataTag, jsondata);
 
-		String[] repTags = new String[]{"images", "css", "js", "pics"};
-		for(int ti=0; ti<repTags.length; ti++){
-			outx.append("ti:["+ti+"] reptag:["+repTags[ti]+"]");
-			tplcont = tplcont.replaceAll(repTags[ti]+"/", "view/default/"+repTags[ti]+"/");	
-		}
-
-		//- @todo cache replaced tpl ?
-		out.println("<!--" + outx +" \n -->" + tplcont);
+		//- @todo cache final tpls ?
+		out.println("<!--" + outx +" \n -->" + tplcont); 
 	
 	}
 }

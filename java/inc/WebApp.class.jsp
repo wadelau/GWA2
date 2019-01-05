@@ -11,6 +11,7 @@
 %><%@include file="./Cachea.class.jsp"%><%
 %><%@include file="./Sessiona.class.jsp"%><%!
 %><%@include file="./Zeea.class.jsp"%><%!
+%><%@include file="./Filea.class.jsp"%><%!
 
 public class WebApp implements WebAppInterface{
 	
@@ -25,6 +26,7 @@ public class WebApp implements WebAppInterface{
 	Dba dba = null;
 	Cachea cachea = null;
 	Sessiona sessiona = null; //-  Fri Jun 29 12:08:49 UTC 2018
+    Filea filea = null;
 
 	//- constructor
 	public WebApp(HashMap hmcfg){
@@ -53,6 +55,14 @@ public class WebApp implements WebAppInterface{
 				String sessionconf = "";
 				this.set("sessionconf", sessionconf);
 				this.sessiona = new Sessiona(sessionconf);
+			}
+		}
+        //- filea
+		if((boolean)Config.get("enable_file")){
+			if(this.filea == null){
+				String fileconf = "";
+				this.set("fileconf", fileconf);
+				this.filea = new Filea(fileconf);
 			}
 		}
 	}
@@ -478,7 +488,22 @@ public class WebApp implements WebAppInterface{
             }
         }
         else if(type.equals("file:")){
-            //- @todo
+            rtnobj.put(0, true);
+            if(this.filea != null){
+                rtnobj = (HashMap)this.filea.read((String)args.get("file"), hmtmp);
+            }
+            if((boolean)rtnobj.get(0)){
+                rtnobj.put(0, true);
+                rtnobj.put(1, rtnobj.get(1));
+            }
+            else{
+                hmtmp.put("errcode", 1901021637);
+                hmtmp.put("errordesc", rtnobj.get(1));
+                rtnobj = new HashMap(){{
+                        put(0, false);
+                        put(1, hmtmp);
+                    }};
+            }
         }
         else if(type.equals("url:")){
             //- @todo

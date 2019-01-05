@@ -39,7 +39,7 @@ public void indexCtrl(){
 
 	//- tpl
 	if(fmt.equals("")){
-		smttpl = "homepage.html";
+		mytpl = "homepage.html";
 	}
 
 }

@@ -45,7 +45,7 @@ if((new File(realModfs)).exists()){
 	crsPage.put("outx", outx);
 	crsPage.put("mod", mod);
 	crsPage.put("act", act);
-	crsPage.put("smttpl", smttpl);
+	crsPage.put("mytpl", mytpl);
 	crsPage.put("fmt", fmt);
 	crsPage.put("url", url);
 		user.set("time-in-index", ""+(new Date()));
@@ -66,7 +66,7 @@ if((new File(realModfs)).exists()){
 	// variables needs to be retrieved explictly 
 	mod = (String)crsPage.get("mod");
 	act = (String)crsPage.get("act");
-	smttpl = (String)crsPage.get("smttpl");
+	mytpl = (String)crsPage.get("mytpl");
 	fmt = (String)crsPage.get("fmt");
 	url = (String)crsPage.get("url");
 

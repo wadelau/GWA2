@@ -91,5 +91,17 @@ public static class SessionConn{
 	
 }
 
+//-
+public static class FileConn{
+	
+	//- @todo, file handler pool
+	public FileConn(String FileServer){
+		//- @todo
+        //- linux, windows, mac
+        //- local or remote
+	}
+	
+}
+
 
 %>

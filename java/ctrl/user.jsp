@@ -51,7 +51,7 @@ else if(act.equals("dosignin")){
 
 	outx.append("\twrite-in-ctrl/user-update: return hm:["+hm.toString()+"]");
 
-	smttpl = "user.html";
+	mytpl = "user.html";
 	
 }
 else{
@@ -61,9 +61,9 @@ else{
 }
 
 //- tpl & output
-if(fmt.equals("") && smttpl.equals("")){
+if(fmt.equals("") && mytpl.equals("")){
 	
-	smttpl = "user.html";
+	mytpl = "user.html";
 	
 }
 
