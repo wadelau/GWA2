@@ -43,7 +43,7 @@ if(true){
 	
 	# cache server
 	$conf['enable_cache'] = 1; # or true for 1, false for 0
-	$conf['cachehost'] = '127.0.0.1'; # '/www/bin/memcached/memcached.sock'; #  ip, domain or .sock
+	$conf['cachehost'] = '127.0.0.1'; # '/www/bin/memcached/memcached.sock'; #  ip, domain or .sock, when making change here, it needs to restart httpd to clear old memcached server in server pool. Use ip if sharing cache service with java and others.
 	$conf['cacheport'] = '11211'; # empty or '0' for linux/unix socket
 	$conf['cachedriver'] = 'MEMCACHEDX'; # REDISX, XCACHEX
 	$conf['cacheexpire'] = 1800; # 30 * 60;

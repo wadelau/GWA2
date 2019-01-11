@@ -346,7 +346,7 @@ public final class MySql implements DbDriver {
 		catch (SQLException ex){
 			ex.printStackTrace();
 		}
-		//freeConn(); //- @todo, why or why not?
+		freeConn(); //- @todo, return to pool
 		
 	}
 

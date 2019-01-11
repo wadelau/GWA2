@@ -35,8 +35,13 @@ if(fmt.equals("")){
         String hanjstJsonDataTag = "HANJST_JSON_DATA"; //- same with original tpl
         String tpldir = appdir + "/" + viewdir;
         String tplcont = "";
-
-		if((boolean)Config.get("template_display_index")){ 
+		
+		boolean needDispIndex = (boolean)Config.get("template_display_index");
+		Object tmpDispIndex = data.get("template_display_index");
+        if(tmpDispIndex !=null && (boolean)tmpDispIndex){
+            needDispIndex = true;
+        }
+		if(needDispIndex){ 
 			//- embedded in index.html
             HashMap hmtmp = user.getBy("file:", null, (new HashMap(){{put("file", tpldir+"/index.html");}}));
             if((boolean)hmtmp.get(0)){

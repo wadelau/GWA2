@@ -18,7 +18,11 @@ public final static class Wht{
 	 * @return String, formated fieldvalue 	
 	 */
 	public static String get(HttpServletRequest request, String field){
-		return Wht._enSafe(request.getParameter(field));
+		String tmps = request.getParameter(field);
+        if(tmps == null || tmps.equals("")){
+            tmps = (String)request.getAttribute(field);
+        }
+        return Wht._enSafe(tmps);
 	}
 
 	/*

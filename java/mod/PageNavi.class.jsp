@@ -73,6 +73,22 @@ public class PageNavi extends WebApp{
 			this.hmf.put(xname, this.para.get(xname));
 			this.parahm.put(xname, xvalue);
 		}
+		 //- init attributes
+        paraNames = request.getAttributeNames();
+        //String xname = null; String xvalue = null;
+        while (paraNames.hasMoreElements()) {
+            xname = (String)paraNames.nextElement();
+            xvalue = String.valueOf(request.getAttribute(xname));
+            xvalue = xvalue==null ? "" : xvalue;
+            if(xvalue.equals("") && this.pdef.containsKey(xname)){
+                this.para.put(xname, this.pdef.get(xname));
+            }
+            else{
+                this.para.put(xname, xvalue);
+            }
+            this.hmf.put(xname, this.para.get(xname));
+            this.parahm.put(xname, xvalue);
+        }
 
         }
 
@@ -83,7 +99,12 @@ public class PageNavi extends WebApp{
 			if(xvalue3 <= 0){ this.para.put(xname2, xvalue2); }
 			this.hmf.put(xname2, this.para.get(xname2));
 			});
-
+		    
+        //- append params if post
+        this.url = (String)this.hmf.get("url");
+        this.url = this._appendPostParams(request, this.url, this.parahm);
+        this.hmf.put("url", this.url);
+			
 		//- call parent's constuctor
 		//- do it implicitly	
 	}
@@ -167,7 +188,7 @@ public class PageNavi extends WebApp{
 		int totalpage = (pntc % pnps) == 0 ? (pntc / pnps) : (Wht.parseInt(pntc / pnps) + 1);
 		tmpurl = (String)this.para.get("url");
 		int endpage = pnpn + navilen;
-		int[] pageArr = new int[navilen];
+		int[] pageArr = new int[navilen*2];
 		
 		navihm.put("totalpage", totalpage); navihm.put("totalrecord", pntc);
 		navihm.put("url", tmpurl); navihm.put("pnps", pnps);
@@ -391,6 +412,22 @@ public class PageNavi extends WebApp{
 
 		return isnum;	
 	}
+	
+	//- 
+    private String _appendPostParams(HttpServletRequest request, String url, HashMap parahm){
+        String rtnurl = url;
+        String v = null; 
+        for(Object obj : parahm.keySet()){
+            v = (String)parahm.get(obj);
+            String k = (String)obj;
+            //debug("k:"+k+" v:"+v);
+            if((k.startsWith("pnsk") || k.startsWith("oppnsk")) 
+                && url.indexOf("&"+k+"=") == -1){
+                rtnurl += "&"+k+"="+v;
+            }       
+        }       
+        return rtnurl;
+    }
 
 }
 

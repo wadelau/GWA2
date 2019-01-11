@@ -270,7 +270,7 @@ class WebApp implements WebAppInterface{
                 #debug(__FILE__.": get from cache succ. ckstr:[".$this->toString($withCache)."]");
             }
             else{
-                $this->set('cache:'.$fields, $ckstr=$withCache['key']);
+                $this->set('cache:'.$fields.'-'.$conditions, $ckstr=$withCache['key']);
                 #debug(__FILE__.": get from cache failed, rtn:[".$this->toString($hm)."], try db.
                 #        ckstr:[".$ckstr."]");
                 $hm = $this->getBy($fields, $conditions);
@@ -313,7 +313,7 @@ class WebApp implements WebAppInterface{
 			}
 			#debug(__FILE__.": getBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
 			$hm = $this->dba->select($sql, $this->hmf);
-			$this->_setCache($hm, $fields);
+			$this->_setCache($hm, $fields.'-'.$conditions);
 		}
 		return $hm;
 	}
@@ -822,6 +822,12 @@ class WebApp implements WebAppInterface{
 	        if($ckstr != ''){
 	            $tmphm = $this->setBy('cache:', array('key'=>$ckstr, 'value'=>$hm[1]));
 	            $this->set('cache:'.$fields, '');
+				if($tmphm[0]){
+					#debug("setCache: ck:$ckstr succ. rtn:[".serialize($tmphm)."]");
+				}
+				else{
+					debug("setCache: ck:$ckstr failed. rtn:[".serialize($tmphm)."]");
+				}
 	        }
 	    }
 	    else{
