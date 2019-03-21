@@ -7,9 +7,8 @@
  * Ported into Java by wadelau@ufqi.com, June 28, 2016
  */
 
-
 %><%!
-//-
+//- for db service
 public class DbConn{
 	
 	//- connection poll?
@@ -20,6 +19,7 @@ public class DbConn{
 	String myDb = "";
 	String myDriver = "MYSQL";
 	
+	//- constructor
 	public DbConn(String dbServer){
 		
 		if(dbServer == null || dbServer.equals("")){
@@ -50,12 +50,10 @@ public class DbConn{
 		else{
 			System.out.println("Unknown dbServer:["+dbServer+"]. 1607021811.");	
 		}
-		
 	}
-	
 }
 
-//-
+//- for Cache service
 public static class CacheConn{
 	
     String myHost = "";
@@ -81,7 +79,7 @@ public static class CacheConn{
 	
 }
 
-//-
+//- session service
 public static class SessionConn{
 	
 	//- @todo, socket pool
@@ -91,7 +89,7 @@ public static class SessionConn{
 	
 }
 
-//-
+//- file service
 public static class FileConn{
 	
 	//- @todo, file handler pool

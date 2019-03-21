@@ -1,6 +1,4 @@
 <%
-//import java.util.HashMap;
-
 /* DB Administration, handling all db transations across the site.
  * v0.1
  * wadelau@gmail.com
@@ -8,7 +6,6 @@
  * Thu Sep 11 16:34:20 CST 2014
  * Ported into Java by wadelau@ufqi.com, June 28, 2016s
  */
- 
 
 %><%@page import="java.sql.Connection,
 java.sql.SQLException,
@@ -21,7 +18,6 @@ java.util.HashSet"%><%
 public final class Dba { //- db administrator
 
 	protected DbConn dbConf;
-	
 	protected DbDriver dbDrv;
 	private final HashSet<String> Sql_Operator_List = new HashSet<String>(
 			java.util.Arrays.asList(new String[]{
@@ -59,7 +55,7 @@ public final class Dba { //- db administrator
         //- @todo
     }
 
-	//- 
+	//- select / retrieve
 	public HashMap select(String sql, HashMap args){
 	
 		HashMap hm = new HashMap();
@@ -107,7 +103,7 @@ public final class Dba { //- db administrator
 	}
 	
 	
-	//- 
+	//- update / write
 	public HashMap update(String sql, HashMap args){
 	
 		HashMap hm = new HashMap();
@@ -135,8 +131,7 @@ public final class Dba { //- db administrator
 	
 	}
 	
-	
-	//--
+	//-- sort ? and its variable name
 	public Object[] sortObject(String sqlstr, HashMap hmvar){
 		
 		Object[] obj = new Object[1];
@@ -239,6 +234,7 @@ public final class Dba { //- db administrator
 
 
 //- define for all drivers
+//- diff with GWA2 in PHP
 public interface DbDriver{
 	
 	//- @todo in Impls

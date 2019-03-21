@@ -1,4 +1,7 @@
 <%!
+/*
+ * interface to the rest of the world.
+ */
 
 public interface WebAppInterface{
 	

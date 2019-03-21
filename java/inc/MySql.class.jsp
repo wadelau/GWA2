@@ -1,6 +1,4 @@
 <%
-//import java.util.HashMap;
-
 /* DB Driver, MySql, implements DbDriver
  * v0.1
  * wadelau@gmail.com
@@ -21,8 +19,8 @@ javax.naming.Context
 
 %><%!
 
+//- mysql driver
 public final class MySql implements DbDriver {
-
 
 	private String myHost = "";
 	private int myPort = 3306;
@@ -95,7 +93,6 @@ public final class MySql implements DbDriver {
 		}
 	}
 	
-	
 	//-
 	public HashMap query(String sqlstr, HashMap args, Object[] idxArr){
 	
@@ -159,7 +156,6 @@ public final class MySql implements DbDriver {
 		return hm;
 
 	}
-	
 
 	//-
 	public HashMap readSingle(String sqlstr, HashMap args, Object[] idxArr){
@@ -237,9 +233,7 @@ public final class MySql implements DbDriver {
 		}
 		
 		return hm;
-
 	}
-	
 	
 	//-
 	public HashMap readBatch(String sqlstr, HashMap args, Object[] idxArr){
@@ -314,7 +308,6 @@ public final class MySql implements DbDriver {
 
 	}
 	
-	
 	//-
 	public void selectDb(String myDb){
 		
@@ -323,19 +316,17 @@ public final class MySql implements DbDriver {
 		
 	}
 	
-	
-	//-
+	//- @todo
 	public int getLastInsertedId(){
 		return 0;
 	}
-	
 	
 	//- 
 	public int getAffectedRows(){
 		return 0;
 	}
 	
-	//-
+	//- @todo
 	protected void free(Statement stmt){
 		try{
 			if(stmt != null){
@@ -369,7 +360,6 @@ public final class MySql implements DbDriver {
         //- when to make hard close or soft close to pool?
         this.freeConn();
     }
-	
 	
 }
 

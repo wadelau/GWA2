@@ -1,6 +1,4 @@
 <%
-//import java.util.HashMap;
-
 /* Files Administration, handling all file transations across the site.
  * v0.1
  * wadelau@gmail.com, wadelau@ufqi.com
@@ -8,7 +6,6 @@
  * Ported into Java by wadelau@ufqi.com, Dec 27, 2018
  */
  
-
 %><%@page import="java.io.*,
 java.util.regex.*"%><%
 %><%@include file="./FileSystem.class.jsp"%><%
@@ -73,7 +70,6 @@ public final class Filea { //- files administrator
 		return hm;
 	
 	}
-	
 	
 	//- 
 	public HashMap write(String myfile, String contents, HashMap args){

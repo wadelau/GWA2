@@ -1,5 +1,4 @@
 <%
-
 /* File Driver, Linux, implements FileDriver
  * v0.1
  * wadelau@gmail.com, Xenxin@ufqi.com
@@ -12,7 +11,6 @@
 %><%!
 
 public final class FileSystem implements FileDriver {
-
 
     private final static String Log_Tag = "inc/FileSystem ";
 
@@ -59,7 +57,6 @@ public final class FileSystem implements FileDriver {
 
 	}
 	
-
 	//-
 	public HashMap write(String myfile, String contents, HashMap args){
 	
@@ -90,7 +87,6 @@ public final class FileSystem implements FileDriver {
 
 	}
 	
-	
 	//-
 	public boolean open(String myfile){
         //- @todo
@@ -98,7 +94,6 @@ public final class FileSystem implements FileDriver {
 
         return hasOpened;
     } 
-
 
     //-
     public void close(){

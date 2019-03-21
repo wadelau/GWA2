@@ -18,7 +18,7 @@ public class WebApp implements WebAppInterface{
 	protected HashMap hm = new HashMap(); //- runtime container, local, regional
 	public HashMap hmf = new HashMap(); //- persistent storage, global
 	private String myId = "id";
-	private String myIdName = "myId";
+	private static String myIdName = "myId";
 	private final String[] timeFieldArr = new String[]{"inserttime", "createtime", "savetime",
 		"modifytime", "edittime", "updatetime"};
     private final static String Log_Tag = "inc/WebApp";
@@ -67,6 +67,13 @@ public class WebApp implements WebAppInterface{
 		}
 	}
 	
+	//-
+	public WebApp(){
+		//- for constructor override 
+		this(new HashMap());
+		//debug("inc/Webapp: no args: dba:["+dba+"] sessiona:["+sessiona+"]");
+	}
+	
     //- destructor
     //- equivalent to __destruct , Tue Aug  7 09:37:17 UTC 2018
     public void finalize(){
@@ -75,14 +82,6 @@ public class WebApp implements WebAppInterface{
         }
         //debug(Log_Tag+" finalize is called to clean up....");
     }
-
-	
-	//-
-	public WebApp(){
-		//- for constructor override 
-		this(new HashMap());
-		//debug("inc/Webapp: no args: dba:["+dba+"] sessiona:["+sessiona+"]");
-	}
 	
 	//-
 	public void set(String k, Object v){
@@ -191,14 +190,14 @@ public class WebApp implements WebAppInterface{
 		return hm;
 	}
 
-	//-
+	//- @override
     //- simple db query
 	public HashMap getBy(String fields, String args){
 		HashMap hmCache = new HashMap();
 		return this.getBy(fields, args, hmCache);
 	}
 
-	//-
+	//- @override
     //- direct to read objects
 	public HashMap getBy(String fields, HashMap args){
 		return this.getBy(fields, null, args);
@@ -271,13 +270,13 @@ public class WebApp implements WebAppInterface{
 		return hm;
 	}
 
-    //-
+    //- @override
     //- simple db save
     public HashMap setBy(String fields, String args){
         return setBy(fields, args, null);
     }
 
-    //-
+    //- @override
     //- direct write objects
     public HashMap setBy(String fields, HashMap xargs){
         return setBy(fields, null, xargs);
@@ -361,7 +360,8 @@ public class WebApp implements WebAppInterface{
 
 	} 
 
-	//-
+	//- @override
+	//- execBy with no cache
 	public HashMap execBy(String sql, String args){
 		HashMap hmCache = new HashMap();
 		return this.execBy(sql, args, hmCache);
@@ -410,7 +410,6 @@ public class WebApp implements WebAppInterface{
 
 	}
 
-	
 	//-
 	public String getTbl(){
 		return this.get("tbl");
@@ -463,7 +462,7 @@ public class WebApp implements WebAppInterface{
 	}
  
     //- private methods
-    //-
+    //- read an object 
     private HashMap readObject(String type, HashMap args){
         HashMap rtnobj = new HashMap();
         type = type==null ? "" : type;
@@ -514,7 +513,7 @@ public class WebApp implements WebAppInterface{
         return rtnobj;
     }
 
-    //-
+    //- write an object to somewhere
     private HashMap writeObject(String type, HashMap args){
         HashMap rtnobj = new HashMap();
         type = type==null ? "" : type;
@@ -564,6 +563,7 @@ public class WebApp implements WebAppInterface{
     }
 
     //-
+	//- set back cache when successful retrieve
     private boolean _setCache(HashMap hm, String fields){
         //- built-in cache successful resultset
         boolean issucc = false;

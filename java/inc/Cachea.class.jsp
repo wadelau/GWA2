@@ -100,7 +100,6 @@ public final class Cachea { //- cache administrator
 	
 }
 
-
 //----
 //- interface of CacheDriver
 public interface CacheDriver{
