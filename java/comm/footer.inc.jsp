@@ -61,6 +61,7 @@ if(fmt.equals("")){
                 tplcont = (String)hmtmp.get(1);
             }
 		}
+		tplcont = tplcont==null ? "" : tplcont;
 
         String jsondata = hanjst.map2Json(data);
 
@@ -68,6 +69,7 @@ if(fmt.equals("")){
         String[] repTags = new String[]{"images", "css", "js", "pics"};
         for(int ti=0; ti<repTags.length; ti++){
             outx.append("ti:["+ti+"] reptag:["+repTags[ti]+"]");
+			tplcont = tplcont.replaceAll("'"+repTags[ti]+"/", "'"+viewdir+"/"+repTags[ti]+"/");
             tplcont = tplcont.replaceAll("\""+repTags[ti]+"/",  "\""+viewdir +"/"+repTags[ti]+"/"); 
         }
         tplcont = tplcont.replace(hanjstJsonDataTag, jsondata);

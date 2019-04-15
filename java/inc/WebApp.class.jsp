@@ -18,7 +18,7 @@ public class WebApp implements WebAppInterface{
 	protected HashMap hm = new HashMap(); //- runtime container, local, regional
 	public HashMap hmf = new HashMap(); //- persistent storage, global
 	private String myId = "id";
-	private static String myIdName = "myId";
+	private final String myIdName = "myId";
 	private final String[] timeFieldArr = new String[]{"inserttime", "createtime", "savetime",
 		"modifytime", "edittime", "updatetime"};
     private final static String Log_Tag = "inc/WebApp";
