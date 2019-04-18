@@ -48,6 +48,7 @@ if((new File(realModfs)).exists()){
 	crsPage.put("mytpl", mytpl);
 	crsPage.put("fmt", fmt);
 	crsPage.put("url", url);
+	crsPage.put("sid", sid);
 		user.set("time-in-index", ""+(new Date()));
 	crsPage.put("user", user.toHash()); //- save an object properties to a hashmap, then restore the instance in another page
 

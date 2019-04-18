@@ -16,5 +16,6 @@ act = (String)crsPage.get("act");
 mytpl = (String)crsPage.get("mytpl");
 fmt = (String)crsPage.get("fmt");
 url = (String)crsPage.get("url");
+sid = (String)crsPage.get("sid");
 
 %>

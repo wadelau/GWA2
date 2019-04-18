@@ -26,6 +26,7 @@ public class News extends WebApp{
 		this.set("email.2", "%163%");
 		this.set("realname", "%");
 		this.set("orderby", "id desc");
+		String baseCK = "mod-news";
 		
 		HashMap userInfo = this.getBy("id, email, realname, updatetime", 
 				"(email like ?  or email like ?) and realname like ?",

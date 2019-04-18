@@ -41,7 +41,7 @@ else if(act.equals("dosignin")){
 	user.set("realname", "Zhenxing Liu");
 	user.set("orderby", "id desc");
 	user.set("pagesize", 5);
-	HashMap hm = user.setBy("email,realname, updatetime", null);
+	HashMap hm = user.setBy("email,realname, updatetime", "");
 
 	outx.append("\twrite-in-ctrl/user-insert: return hm:["+hm.toString()+"]\n\n");
 	
