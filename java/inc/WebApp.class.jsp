@@ -474,6 +474,9 @@ public class WebApp implements WebAppInterface{
             if(this.cachea != null){
                 rtnobj = (HashMap)this.cachea.get((String)args.get("key"));
             }
+			else{
+				rtnobj.put(0, false);
+			}
             if((boolean)rtnobj.get(0)){
                 rtnobj.put(0, true);
                 rtnobj.put(1, rtnobj.get(1));
@@ -492,6 +495,9 @@ public class WebApp implements WebAppInterface{
             if(this.filea != null){
                 rtnobj = (HashMap)this.filea.read((String)args.get("file"), hmtmp);
             }
+			else{
+				rtnobj.put(0, false);
+			}
             if((boolean)rtnobj.get(0)){
                 rtnobj.put(0, true);
                 rtnobj.put(1, rtnobj.get(1));
@@ -537,7 +543,9 @@ public class WebApp implements WebAppInterface{
                     }
                 }
             }
-            
+            else{
+				rtnobj.put(0, false);
+			}
             if((boolean)rtnobj.get(0)){
                 rtnobj.put(0, true);
                 rtnobj.put(1, rtnobj.get(1));

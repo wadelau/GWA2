@@ -12,7 +12,7 @@ public void includeCtrl(){
 		//-
 		//- page header and footer
 
-		sid = "" + (new java.util.Random()).nextInt();
+		//sid = "" + (new java.util.Random()).nextInt();
 
 		//outx.append("\t/ctrl/include: sid:["+sid+"]\n");
 

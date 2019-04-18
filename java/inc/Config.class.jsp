@@ -25,7 +25,7 @@ if(true){
 	hmconf.put("db_enable_socket_pool", true); //- Fri Jul 20 13:21:41 UTC 2018
 
 	//- cache
-	hmconf.put("enable_cache", true);
+	hmconf.put("enable_cache", false); // true
 	hmconf.put("cachehost", "localhost");
 	hmconf.put("cacheport", 8800);
 	hmconf.put("cachedriver", "MEMCACHED"); //- REDISX, XCACHEX
