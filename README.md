@@ -128,7 +128,7 @@ ctrl/user.php
 
   act=my
 
-在控制器中处理逻辑，然后指定要加载的模板，引入 smarty （自2019年起，模板引擎改为 Hanjst/汉吉斯特）
+在控制器中处理逻辑，然后指定要加载的模板，引入 smarty （自2019年起，模板引擎改为 [Hanjst/汉吉斯特](https://ufqi.com/dev/hanjst/)）
 
 ###3. Create view, 创建视图页面
 view/default/signin.html
