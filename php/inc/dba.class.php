@@ -167,7 +167,9 @@ class DBA {
 	//-
 	function close(){
 	    # @todo, long conn?
-		$this->dbconn->close();
+		if($this->dbconn){
+			$this->dbconn->close();
+		}
 	    return true;
 	}
 }

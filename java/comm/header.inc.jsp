@@ -26,7 +26,7 @@ outx.append("\n\tcomm/header: requestURL:["+request.getRequestURL()+"] servletPa
 rtvdir = rtvdir.equals("") ? "." : rtvdir;
 
 sid = Wht.get(request, "sid");
-if(sid.equals("")){ sid = "" + (new java.util.Random()).nextInt(999999); }
+if(sid.equals("")){ sid = "" + ((new java.util.Random()).nextInt((999999-100000)+1) + 100000); }
 url = rtvdir + "/?sid=" + sid; 
 
 user = new User();

@@ -20,7 +20,21 @@ public static final class Zeea{
 	//- methods, public
 	public static String md5(String txt){
 		return getMD(txt, "MD5");
-	} 
+	}
+	
+	//- sha1
+	public static String sha1(String txt){
+		return getMD(txt, "SHA-1");
+	}
+	
+	//- sha256
+	public static String sha256(String txt){
+		return getMD(txt, "SHA-256");
+	}
+	
+	//-sha512
+	public static String sha512(String txt){
+		return getMD(txt, "SHA-512");
 
 	//- methods, private
 	private static String getMD(String txt, String hashType){

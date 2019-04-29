@@ -278,7 +278,7 @@ class WebApp implements WebAppInterface{
                 $hm = $this->getBy($fields, $conditions);
             }
         }
-		else if(colonPos !== false){ 
+		else if($colonPos !== false){ 
 		    # read from file: or http(s): or cache
 			$hm = $this->readObject($type=$fields, $args=$conditions);
 		}

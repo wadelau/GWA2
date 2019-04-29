@@ -129,13 +129,13 @@ class MYSQLIX {
 			else{
 				$hm[0] = false;
 				$hm[1] = array('sayError'=>'No record. 200607050101.');
-				debug("inc/mysqlix: readSingle failed. errno:".$this->getErrno()." err:".$this->getError());
+				debug("inc/mysqlix: readSingle failed for sql:[$sql]. errno:".$this->getErrno()." err:".$this->getError());
 			}
 		}
 		else{
 			$hm[0] = false;
 			$hm[1] = array('sayError'=>'No record. 200607050202.');
-			debug("inc/mysqlix: readSingle failed. errno:".$this->getErrno()." err:".$this->getError());
+			debug("inc/mysqlix: readSingle failed for sql:[$sql]. errno:".$this->getErrno()." err:".$this->getError());
 		}
 		return $hm;
 		
@@ -169,7 +169,7 @@ class MYSQLIX {
 			mysqli_free_result($result);
 		}
 		else{
-			debug("inc/mysqlix: readBatch failed. errno:".$this->getErrno()." err:".$this->getError());
+			debug("inc/mysqlix: readBatch failed for sql:[$sql]. errno:".$this->getErrno()." err:".$this->getError());
 		}
 		if(count($rtnarr)> 0){
 			$hm[0] = true;
@@ -323,7 +323,8 @@ class MYSQLIX {
 	#	
 	function close(){
 		if( $this->m_link ){
-			mysqli_close($this->m_link) or $this->sayErr();
+			//mysqli_close($this->m_link) or $this->sayErr();
+			$this->m_link->close(); # ? or $this->sayErr();
 		}
 		return 0;
 	}
