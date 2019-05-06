@@ -462,6 +462,22 @@ public class WebApp implements WebAppInterface{
 		return this.hmf;
 	}
  
+	//- get list by ids
+	//- Xenxin@ufqi, 11:25 Monday, May 6, 2019
+	public HashMap getListByIds(String ids){
+		HashMap hmrtn = new HashMap();
+		final String tmpIds = ids; final String tmpTbl = this.getTbl();
+		hmrtn = this.execBy("select * from "+tmpTbl+" where id in ("+ids+")", "", 
+			(new HashMap(){{ put("key", tmpTbl+"-list-"+tmpIds);}}));
+		if((boolean)hmrtn.get(0)){
+			hmrtn = (HashMap)hmrtn.get(1);
+		}
+		else{
+			//- @todo
+		}
+		return hmrtn;
+	}
+ 
     //- private methods
     //- read an object 
     private HashMap readObject(String type, HashMap args){

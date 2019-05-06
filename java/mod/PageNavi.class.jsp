@@ -5,11 +5,12 @@
  * Fri Jul  6 15:38:12 UTC 2018
  */
 
-%><% // @include file="../inc/WebApp.class.jsp" //- relocated to comm/preheader.inc
-
 %><%!
 
 public class PageNavi extends WebApp{
+	
+	// constants
+	private static final String logTag = "mod/PageNavi ";
 	
 	//- variables
 	private HashMap para = null;
@@ -86,6 +87,7 @@ public class PageNavi extends WebApp{
             else{
                 this.para.put(xname, xvalue);
             }
+			//debug("trans attributes: xname:"+xname+" xval:"+xvalue);
             this.hmf.put(xname, this.para.get(xname));
             this.parahm.put(xname, xvalue);
         }
@@ -115,6 +117,11 @@ public class PageNavi extends WebApp{
 		StringBuffer naviStr = new StringBuffer();	
 		this.para = this.hmf;
 		String tmpurl = "";
+		if(this.get("totalcount").equals("") && !this.get("pntc").equals("")){
+			this.set("totalcount", this.get("pntc"));
+			this.para.put("totalcount", this.get("pntc"));
+			this.para.put("pntc", this.get("pntc"));
+		}
 		if(Wht.parseInt(this.get("totalcount")) > 0){
 			this.para.put("pntc", this.hmf.get("totalcount"));
 			tmpurl = (String)this.hmf.get("url");
@@ -167,6 +174,11 @@ public class PageNavi extends WebApp{
 		HashMap navihm = new HashMap();
 		this.para = this.hmf;
 		String tmpurl = "";
+		if(this.get("totalcount").equals("") && !this.get("pntc").equals("")){
+			this.set("totalcount", this.get("pntc"));
+			this.para.put("totalcount", this.get("pntc"));
+			this.para.put("pntc", this.get("pntc"));
+		}
 		if(Wht.parseInt(this.get("totalcount")) > 0){
 			this.para.put("pntc", this.hmf.get("totalcount"));
 			tmpurl = (String)this.hmf.get("url");
@@ -199,6 +211,7 @@ public class PageNavi extends WebApp{
 					navihm.put("pnpn", i);
 				}
 				pageArr[pj] = i; pj++;
+				//debug(logTag+"page i:"+i+" pj:"+pj);
 			}
 		}
         navihm.put("pages", pageArr);
@@ -294,6 +307,7 @@ public class PageNavi extends WebApp{
         StringBuffer strb = new StringBuffer();
         this.parahm.forEach((k, v)->{
             String xname = (String)k; String xvalue = (String)v;
+			//debug("getCondition xname:"+xname+" xval:"+xvalue);
             if(!xname.equals("pnsk") && xname.indexOf("pnsk") == 0){
                 String field = xname.substring(4);
                 String linkField = field;
@@ -305,7 +319,7 @@ public class PageNavi extends WebApp{
                 //- for select
                 if(true){
                     String tmpv = Wht.get(this.request, field);
-                    if(!tmpv.equals(xvalue)){
+                    if(!tmpv.equals("") && !tmpv.equals(xvalue)){
                         xvalue = tmpv;
                     }
                 }
@@ -374,13 +388,17 @@ public class PageNavi extends WebApp{
                     else{
                         strb.append(field).append(" ")
                             .append(fieldopv).append(" ").append("?");
+						obj.set(field, xvalue);
                     }
                 }
-                
             }
             });
         str = strb.toString();
-
+		if(str.equals("")){
+		}
+		else{
+			str = str.substring(4); // rm first seg of pnsm
+		}
 		return str;
 	}
 
