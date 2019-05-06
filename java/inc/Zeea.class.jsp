@@ -35,7 +35,8 @@ public static final class Zeea{
 	//-sha512
 	public static String sha512(String txt){
 		return getMD(txt, "SHA-512");
-
+	}
+	
 	//- methods, private
 	private static String getMD(String txt, String hashType){
 		String mdStr = "";
