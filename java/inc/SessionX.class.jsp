@@ -25,20 +25,35 @@ public final class SessionX implements SessionDriver {
 	}	
 	
 	//- methods, public
+		//- generate an uniqe secure id
 	public String generateSid(User user, HttpServletRequest request){
 		String sid = "";
 		String sep = this.Data_Sep;
+		String params = user.getId(); // userid, +lang?
+		String signData = this._getSignData(params, request);
+		sid = this._md5Remedy(Zeea.sha1(signData));
+		sid = sid + this.Sep_Tag_For_Cookie + params;
 		return sid;
 	}
-
-	//-
+	
+	//- validate a foreign id
 	public HashMap checkSid(User user, HttpServletRequest request, String sid){
 		HashMap hmrtn = new HashMap();
 		boolean isValid = false;
+		String[] sidArr = sid.split("\\"+this.Sep_Tag_For_Cookie);
+		String recvSid = sidArr[0];
 		String params = "";
-        	if(isValid){
+		if(sidArr.length > 1){
+			params = sidArr[1]; //- more segmentations?
+        }
+		String signData = this._getSignData(params, request);
+		String genSid = this._md5Remedy(Zeea.sha1(signData));
+		if(genSid.equals(recvSid)){
+			isValid = true;
+		}
+		if(isValid){
 			hmrtn.put(0, true);
-			hmrtn.put(1, params); 
+			hmrtn.put(1, params); // userid?
 		}
 		else{
 			hmrtn.put(0, false);

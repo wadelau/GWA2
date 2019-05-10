@@ -43,6 +43,13 @@ public class User extends WebApp{
 		this.setTbl("gwa2_info_usertbl");	
 	}
 
+	//- get unique secureid
+	public String generateSecureId(HttpServletRequest request){
+		String sid = "";
+		sid = this.sessiona.generateSid(this, request);
+		return sid;
+	}
+
 	//-
 	public String hiUser(){
 	
@@ -65,10 +72,7 @@ public class User extends WebApp{
 		userInfo.put("delete-in-User-by-rmBy", userInfo2);
 
 		return (String)this.get("iname") + ", Welcome! "+ userInfo.toString();
-
 	}
-
-	
 
 }
 
