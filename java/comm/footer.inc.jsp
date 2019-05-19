@@ -4,25 +4,19 @@
 
 outx.append("\n\toutput in comm/footer: "+(new Date())+" mytpl:["+mytpl+"]\n");
 
-
 if(fmt.equals("")){
-
 	//- @todo
-
-	if(mytpl.equals("")){
-		
+	if(mytpl.equals("")){		
 		out.println(outx);
-		
 	}
 	else{
-
         //- template engine
         HanjstTemplate hanjst = new HanjstTemplate();
 
 		//- mytpl
         debug("mytpl:"+mytpl);
 		data.put("mytpl", mytpl);
-		data.put("rtvdir", rtvdir);
+		//data.put("rtvdir", rtvdir); // relocate into header.inc
 		data.put("url", url);
 		data.put("sid", sid);
 		data.put("userid", user.getId());

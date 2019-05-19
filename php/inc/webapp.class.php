@@ -9,7 +9,6 @@
  * imprvs on time field, Tue, 13 Mar, 2018 15:12:44
  */
 
-
 if(!defined('__ROOT__')){
   define('__ROOT__', dirname(dirname(__FILE__)));
 }
@@ -212,8 +211,9 @@ class WebApp implements WebAppInterface{
 		else{
 			# write to db
 			$sql = "";
-			$isupdate = 0;
-			if($this->getId() == '' && ($conditions == null || $conditions == '')){
+			$isupdate = 0; $tmpId = $this->getId();
+			if(($tmpId == '' || $tmpId == '0') 
+					&& ($conditions == null || $conditions == '')){
 				$sql = "insert into ".$this->getTbl()." set ";
 			}
 			else{

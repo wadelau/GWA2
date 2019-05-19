@@ -5,9 +5,8 @@
 //- inherit crsPage from caller
 HashMap crsPage = (HashMap)request.getAttribute("crsPage");
 
-outx = (StringBuffer)crsPage.get("outx");
 data = (HashMap)crsPage.get("data");
-
+outx = (StringBuffer)crsPage.get("outx");
 user = new User((HashMap)crsPage.get("user"));
 	outx.append("ctrl/ctrlheader: time-from-index: ["+user.get("time-in-index")+"]");
 

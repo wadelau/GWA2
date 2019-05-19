@@ -23,7 +23,7 @@ outx.append("\n\tcomm/header: requestURL:["+request.getRequestURL()+"] servletPa
 		+"] rtvdir:["
 		+rtvdir+"] appdir:["+appdir+"] 1607100803.\n"); //- appdir:["+appdir+"] 
 
-rtvdir = rtvdir.equals("") ? "." : rtvdir;
+rtvdir = rtvdir.equals("") ? "." : rtvdir; data.put("rtvdir", rtvdir);
 
 sid = Wht.get(request, "sid");
 if(sid.equals("")){ sid = "" + ((new java.util.Random()).nextInt((999999-100000)+1) + 100000); }

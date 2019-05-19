@@ -9,8 +9,8 @@
 %><%@include file="./Conn.class.jsp"%><%
 %><%@include file="./Dba.class.jsp"%><%
 %><%@include file="./Cachea.class.jsp"%><%
-%><%@include file="./Sessiona.class.jsp"%><%!
-%><%@include file="./Zeea.class.jsp"%><%!
+%><%@include file="./Sessiona.class.jsp"%><%
+%><%@include file="./Zeea.class.jsp"%><%
 %><%@include file="./Filea.class.jsp"%><%!
 
 public class WebApp implements WebAppInterface{
@@ -20,8 +20,8 @@ public class WebApp implements WebAppInterface{
 	private String myId = "id";
 	private final String myIdName = "myId";
 	private final String[] timeFieldArr = new String[]{"inserttime", "createtime", "savetime",
-		"modifytime", "edittime", "updatetime"};
-    private final static String Log_Tag = "inc/WebApp";
+		"modifytime", "edittime", "updatetime", "dinserttime", "dupdatetime"};
+    private final static String logTag = "inc/WebApp";
 
 	Dba dba = null;
 	Cachea cachea = null;
@@ -80,13 +80,22 @@ public class WebApp implements WebAppInterface{
         if(this.dba != null){
             this.dba.close();
         }
-        //debug(Log_Tag+" finalize is called to clean up....");
+        //debug(logTag+" finalize is called to clean up....");
     }
 	
 	//-
 	public void set(String k, Object v){
 		if(k == null || k.equals("")){
-			//- @todo ?
+			//- batchly set
+			if(v instanceof HashMap){
+				HashMap tmpMap = (HashMap)v;
+				for(Object tmpk : tmpMap.keySet()){
+					this.set((String)tmpk, tmpMap.get(tmpk));
+				}
+			}
+			else{
+				debug(logTag+" unknown object:["+v+"]");
+			}
 		}
 		else{
 			this.hmf.put(k, v);	
@@ -117,7 +126,6 @@ public class WebApp implements WebAppInterface{
        this.hmf.remove(k); 
     }
 	
-	//-
 	/* mandatory return $hm = (0 => true|false, 1 => string|array); in GWA2 PHP
 	 * Thu Jul 21 11:31:47 UTC 2011, wadelau@gmail.com
 	 * update by extending to readObject by wadelau, Sat May  7 11:06:37 CST 2016
@@ -130,10 +138,10 @@ public class WebApp implements WebAppInterface{
         if(colonPos < 0 && hmCache != null && hmCache.size() > 0){
             hm = this.readObject("cache:", hmCache);
             if((boolean)hm.get(0)){
-                debug(Log_Tag + ": read cache succ. args:"+hmCache);
+                debug(logTag + ": read cache succ. args:"+hmCache);
             }
             else{
-                debug(Log_Tag + ": read cache fail. try db with args:"+hmCache);
+                debug(logTag + ": read cache fail. try db with args:"+hmCache);
                 this.set("cache:" + fields, hmCache.get("key"));
                 hm = this.getBy(fields, args);
             }
@@ -218,8 +226,9 @@ public class WebApp implements WebAppInterface{
         else{
         //- to db
 		StringBuffer sqls = new StringBuffer();
-		boolean isUpdate = false;
-		if(this.getId().equals("") && (args == null || args.equals(""))){
+		boolean isUpdate = false; String tmpId = this.getId();
+		if((tmpId.equals("") ||tmpId.equals("0")) 
+				&& (args == null || args.equals(""))){
 			sqls.append("insert into ").append(this.getTbl()).append(" set ");
 		}
 		else{
@@ -245,7 +254,7 @@ public class WebApp implements WebAppInterface{
 		if(args == null || args.equals("")){
 			if(this.getId().equals("")){
 				if(isUpdate){
-					debug(Log_Tag + " unconditonal update is forbidden. 1607072133.");
+					debug(logTag + " unconditonal update is forbidden. 1607072133.");
 					hm.put("0", false);
 					hm.put("1", (new HashMap()).put("errordesc", "unconditonal update is forbidden. 1607072133."));
 					isSqlReady = false;
@@ -295,10 +304,10 @@ public class WebApp implements WebAppInterface{
             hm = this.readObject("cache:", hmCache);
             if((boolean)hm.get(0)){
                 //-
-                debug(Log_Tag + " execBy read cache succ..."+hmCache);
+                debug(logTag + " execBy read cache succ..."+hmCache);
             }
             else{
-                debug(Log_Tag + " execBy read cache failed and try db...");
+                debug(logTag + " execBy read cache failed and try db...");
                 this.set("cache:" + origSql, hmCache.get("key"));
                 hm = this.execBy(sql, args);
             }
@@ -399,7 +408,7 @@ public class WebApp implements WebAppInterface{
 		}
 		
 		if(isSqlReady){
-			System.out.println(Log_Tag + " rmBy: sql:["+sqlb.toString()+"]");
+			System.out.println(logTag + " rmBy: sql:["+sqlb.toString()+"]");
 			hm = this.dba.update(sqlb.toString(), this.hmf);	
 			if(!this.getId().equals("")){
 				this.setId("");		

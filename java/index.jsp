@@ -65,6 +65,8 @@ if((new File(realModfs)).exists()){
 	setCrsPageResponse(crsPage, response);
 
 	// variables needs to be retrieved explictly 
+	data = (HashMap)crsPage.get("data");
+	outx = (StringBuffer)crsPage.get("outx");
 	mod = (String)crsPage.get("mod");
 	act = (String)crsPage.get("act");
 	mytpl = (String)crsPage.get("mytpl");
@@ -85,9 +87,7 @@ else{
 
 //- something shared across the app, out of comm/header
 if(true){
-	
 	%><%@include file="./ctrl/ctrl.inc.jsp"%><%
-	
 }
 
 //- footer
