@@ -1,4 +1,4 @@
-<%@page language="java" pageEncoding="UTF-8" autoFlush="true"%><%
+<%@page language="java" pageEncoding="UTF-8" autoFlush="true" session="false"%><%
 /* -GWA2 is ported into Java
  * Wadelau@ufqi.com
  * v0.1, Thu Jun  9 14:02:51 CST 2016

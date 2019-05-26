@@ -7,13 +7,12 @@
 
 %><%@page import="com.google.gson.Gson,
 com.google.gson.GsonBuilder"
-%><% // @include file="../inc/WebApp.class.jsp" //- relocated into comm/preheader.inc
-%><%
 %><%!
 
 public class HanjstTemplate extends WebApp{
 	
 	private static final String Log_Tag = "mod/Template ";
+    private String[] repPathTags = new String[]{"images", "css", "js", "pics"};
 	
 	//- constructor ?
 	public HanjstTemplate(){
@@ -22,16 +21,51 @@ public class HanjstTemplate extends WebApp{
         //- @todo
 	}
 
-    //-
+    //- read tpl contents
+	public String readTemplate(String mytpl, String tpldir, String viewdir){
+		String tplcont = "";
+		HashMap hmtmp = this.getBy("file:", null, (new HashMap(){{put("file", tpldir+"/"+mytpl);}}));
+		if((boolean)hmtmp.get(0)){
+			tplcont = (String)hmtmp.get(1);
+			tplcont = this.replacePath(tplcont, viewdir);
+		}
+		return tplcont;
+	}
+	
+	//- HashMap 2 JSON
     public String map2Json(HashMap hmdata){
         String rtnStr = "";
         GsonBuilder gsonMapBuilder = new GsonBuilder();
         Gson gsonObject = gsonMapBuilder.create();
-
         rtnStr = gsonObject.toJson(hmdata);
-
         return rtnStr;
     }
+
+    //- replace resrc path
+    public String replacePath(String tplcont, String viewdir){
+		tplcont = tplcont==null ? "" : tplcont;
+        String[] repTags = this.repPathTags; 
+        for(int ti=0; ti<repTags.length; ti++){
+			tplcont = tplcont.replaceAll("'"+repTags[ti]+"/", "'"+viewdir+"/"+repTags[ti]+"/");
+            tplcont = tplcont.replaceAll("\""+repTags[ti]+"/",  "\""+viewdir +"/"+repTags[ti]+"/"); 
+        }
+        return tplcont;
+    }
+	
+	//- replace elements
+	public String replaceElement(String tplcont, HashMap replaceList){
+		tplcont = tplcont==null ? "" : tplcont;
+		if(replaceList == null){
+			return tplcont;
+		}
+		else{
+			//debug(tplcont); debug(replaceList);
+			for(Object tmpk : replaceList.keySet()){
+				tplcont = tplcont.replaceAll((String)tmpk, String.valueOf(replaceList.get(tmpk)));
+			}
+		}
+		return tplcont;
+	}
 
 }
 %>

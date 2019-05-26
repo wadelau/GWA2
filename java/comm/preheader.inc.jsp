@@ -1,23 +1,17 @@
 <%@page 
-import="java.util.Date,
-java.util.HashMap,
-java.util.Map,
-java.util.Iterator,
-java.util.Arrays,
-java.util.Random,
+import="java.util.*,
 java.text.SimpleDateFormat,
-java.io.File"
+java.io.File,
+com.ufqi.gwa2.mod.Base62x"
 language="java" 
 pageEncoding="UTF-8"%><%
 
-//- import="_jsp._dev._gwa2test._java._inc.*" 
-
 //-  preheader, embedded in all
-
 System.setProperty("sun.jnu.encoding", "UTF-8");
 System.setProperty("file.encoding", "UTF-8"); //- set " -Dfile.encoding=utf8 " in jvm start script
 request.setCharacterEncoding("UTF-8");
 
+//- global objects only
 //- all I/O toolsets
 %><%@include file="./Wht.tools.inc.jsp"%><%
 //- global configs
@@ -26,17 +20,19 @@ request.setCharacterEncoding("UTF-8");
 %><%@include file="../inc/WebApp.class.jsp"%><%
 //- user
 %><%@include file="../mod/User.class.jsp"%><%
+//- language
+%><%@include file="../mod/Language.class.jsp"%><%
 //- template
 %><%@include file="../mod/HanjstTemplate.class.jsp"%><%
 
 //- global variables across the app, embedded in two types of files: /index, /ctrl/xxx
 //- need to init before manipulate
 %><%!String sid, appdir, siteid, fmt, mytpl, mod, act, rtvdir, url;
-HashMap data; StringBuffer outx; User user; %><%
+HashMap data; StringBuffer outx; User user; Language lang; HanjstTemplate hanjst; %><%
 
 data = new HashMap(); //- for tpl data container
 
-outx = new StringBuffer(); //- for $out in -PHP
+outx = new StringBuffer(); //- same as $out in -PHP for row strings output
 
 %><%!
 /*
@@ -92,5 +88,4 @@ public static void debug(String obj){
 	debug((Object)obj, null, null);
 }
 
-//- for urlencode / escape, etc
-%><%@include file="../mod/Base62x.class.jsp"%>
+%>

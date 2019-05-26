@@ -1,4 +1,7 @@
-<%
+<%@page import="java.text.SimpleDateFormat,
+java.text.DateFormat,
+java.util.Date,
+java.util.Calendar"%><%
 /*
  * @abstract: Web and/or HTTP Tools, some utils in common in the sys
  * @author: wadelau@hotmail.com
@@ -259,6 +262,26 @@ public final static class Wht{
 		}
 	}
 
+	//- get a string from an object, e.g. HashMap
+	public static String getString(Object obj, String myk){
+		String s = "";
+		if(obj instanceof HashMap){
+			HashMap hmobj = (HashMap)obj;
+			s = (String)hmobj.get(myk);
+			s = s==null ? "" : s;
+		}
+		return s;
+	}
+	
+	//- get day by diff
+	public static Date getDay(int adjustDay){
+		Calendar ca = Calendar.getInstance();
+		Date now = new Date();
+		ca.setTime(now);
+		ca.add(Calendar.DAY_OF_YEAR, adjustDay);
+		Date target = ca.getTime();
+		return target;
+	}
 }
 
 %>
