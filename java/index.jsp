@@ -3,9 +3,12 @@
  * Wadelau@ufqi.com
  * v0.1, Thu Jun  9 14:02:51 CST 2016
  * v0.2, Thu Jul 28 04:19:21 CST 2016
+ * v0.3, Tue Jul  2 12:02:28 HKT 2019, + global thread-safe
  */
 
 // the application entry...
+
+synchronized(this){ //- global thread-safe, bgn
 
 //-  entry header
 %><%@include file="./comm/header.inc.jsp"%><%
@@ -49,7 +52,6 @@ if((new File(realModfs)).exists()){
 	crsPage.put("fmt", fmt);
 	crsPage.put("url", url);
 	crsPage.put("sid", sid);
-		user.set("time-in-index", ""+(new Date()));
 	crsPage.put("user", user.toHash()); //- save an object properties to a hashmap, then restore the instance in another page
 
 	//- append to request to cross page
@@ -65,24 +67,24 @@ if((new File(realModfs)).exists()){
 	setCrsPageResponse(crsPage, response);
 
 	// variables needs to be retrieved explictly 
-	data = (HashMap)crsPage.get("data");
-	outx = (StringBuffer)crsPage.get("outx");
+    //
+    data = (HashMap)crsPage.get("data");
+    outx = (StringBuffer)crsPage.get("outx");
 	mod = (String)crsPage.get("mod");
 	act = (String)crsPage.get("act");
 	mytpl = (String)crsPage.get("mytpl");
 	fmt = (String)crsPage.get("fmt");
 	url = (String)crsPage.get("url");
+	act = (String)crsPage.get("act");
 
 	user = new User((HashMap)crsPage.get("user")); //- wadelau@ufqi.com on Wed Jul 27 00:02:08 CST 2016
-	outx.append("/index: time-in-index-restore: ["+user.get("time-in-index")+"]");
+	//outx.append("/index: time-in-index-restore: ["+user.get("time-in-index")+"] userid:["+user.getId()+"]");
 	
 }
 else{
-
 	//- no exist//- continue this way
-	outx = new StringBuffer("\n/index: Unknown mod:["+mod+"] with act:["+act+"] modfs:["+modfs+"]. 201107080706.\n");	
+	outx.append("\n/index: Unknown mod:["+mod+"] with act:["+act+"] modfs:["+modfs+"]. 201107080706.\n");	
 	//- #todo: log
-
 }
 
 //- something shared across the app, out of comm/header
@@ -92,5 +94,7 @@ if(true){
 
 //- footer
 %><%@include file="./comm/footer.inc.jsp"%><%
+
+} //- global thread-safe, end
 
 %>
