@@ -509,9 +509,10 @@ public class WebApp implements WebAppInterface{
             else{
                 hmtmp.put("errcode", 1606140931);
                 hmtmp.put("errordesc", rtnobj.get(1));
+                final HashMap hmtmp2 = hmtmp;
                 rtnobj = new HashMap(){{
                         put(0, false);
-                        put(1, hmtmp);
+                        put(1, hmtmp2);
                     }}; 
             }
         }
@@ -530,9 +531,10 @@ public class WebApp implements WebAppInterface{
             else{
                 hmtmp.put("errcode", 1901021637);
                 hmtmp.put("errordesc", rtnobj.get(1));
+                final HashMap hmtmp2 = hmtmp;
                 rtnobj = new HashMap(){{
                         put(0, false);
-                        put(1, hmtmp);
+                        put(1, hmtmp2);
                     }};
             }
         }
@@ -578,9 +580,10 @@ public class WebApp implements WebAppInterface{
             else{
                 hmtmp.put("errcode", 1606140930);
                 hmtmp.put("errordesc", rtnobj.get(1));
+                final HashMap hmtmp2 = hmtmp;
                 rtnobj = new HashMap(){{
                         put(0, false);
-                        put(1, hmtmp);
+                        put(1, hmtmp2);
                     }}; 
             }
         }
@@ -605,9 +608,10 @@ public class WebApp implements WebAppInterface{
             boolean noExtra = true;
             String key = (String)this.get("cache:" + fields, noExtra);
             if(key != null && !key.equals("")){
+            	final HashMap hmtmp2 = hm;
                 this.setBy("cache:", (new HashMap(){{
                     put("key", key);
-                    put("value", hm.get(1));
+                    put("value", hmtmp2.get(1));
                     }}));
                 this.set("cache:" + fields, "");
                 issucc = true;

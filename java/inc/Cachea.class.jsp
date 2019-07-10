@@ -40,16 +40,17 @@ public final class Cachea { //- cache administrator
     //- methods
     public HashMap get(String key){
        Object myobj = this.myDriver.get(key); 
+       final Object tmpObj = myobj;
        if(myobj != null){
             return (new HashMap(){{
                 put(0, true);
-                put(1, myobj);
+                put(1, tmpObj);
                 }});
         }
         else{
             return (new HashMap(){{
                 put(0, false);
-                put(1, "error:"+myobj); 
+                put(1, "error:"+tmpObj); 
                 }});
         }
     }
@@ -62,16 +63,17 @@ public final class Cachea { //- cache administrator
     //-
     public HashMap set(String key, Object value, int seconds){
         boolean issucc = this.myDriver.set(key, value, seconds); 
+        final boolean tmpSucc = issucc;
         if(issucc){
             return (new HashMap(){{
                 put(0, true);
-                put(1, issucc);
+                put(1, tmpSucc);
                 }});
         }
         else{
             return (new HashMap(){{
                 put(0, false);
-                put(1, "error:"+issucc); 
+                put(1, "error:"+tmpSucc); 
                 }});
         }
     }
@@ -79,16 +81,17 @@ public final class Cachea { //- cache administrator
     //-
     public HashMap rm(String key){
         boolean issucc = this.myDriver.rm(key);
+        final boolean tmpSucc = issucc;
         if(issucc){
             return (new HashMap(){{
                 put(0, true);
-                put(1, issucc);
+                put(1, tmpSucc);
                 }});
         }
         else{
             return (new HashMap(){{
                 put(0, false);
-                put(1, "error:"+issucc); 
+                put(1, "error:"+tmpSucc); 
                 }});
         }
     }
