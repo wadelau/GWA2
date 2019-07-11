@@ -486,6 +486,22 @@ public class WebApp implements WebAppInterface{
 		}
 		return hmrtn;
 	}
+	
+	//- get ids from a hashmap
+	public String getIds(HashMap hm, String idName){
+        String myIds = ""; 
+        if(hm != null && hm.size()>0){
+            HashMap hmtmp = new HashMap();
+            for(Object key : hm.keySet()){
+                hmtmp = (HashMap)hm.get(key);
+                myIds += Wht.getString(hmtmp, idName)+",";
+            }
+            if(Wht.endsWith(myIds, ",")){
+                myIds = myIds.substring(0, myIds.length()-1);
+            }
+        }
+        return myIds;
+    }
  
     //- private methods
     //- read an object 
