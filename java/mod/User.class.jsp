@@ -50,6 +50,27 @@ public class User extends WebApp{
 		return sid;
 	}
 
+	//- get cookie sid
+	public String getCookieSid(){
+		String sid = "";
+		sid = ""; //- @todo
+		return sid;
+	}
+	
+	//- get user id from cookie
+	public String getUserIdByCookie(HttpServletRequest request){
+		String sid = "";
+		sid = ""; //- @todo
+		return sid;
+	}
+	
+	//- get lang id from cookie
+	public String getLangByCookie(HttpServletRequest request){
+		String sid = "";
+		sid = ""; //- @todo
+		return sid;
+	}
+
 	//-
 	public String hiUser(){
 	
