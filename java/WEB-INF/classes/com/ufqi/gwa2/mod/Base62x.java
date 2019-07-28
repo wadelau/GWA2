@@ -2,6 +2,7 @@
 /* 
  * relocated from ./mod/Base62x.class.jsp
  * Xenxin@ufqi, 22:48 Tuesday, April 23, 2019
+ * bugfix with input.length==1, 21:57 Saturday, July 27, 2019
  */
 package com.ufqi.gwa2.mod;
 
@@ -66,7 +67,9 @@ public final class Base62x{ //- remove static?
 		int bpos = Base62x.bpos;
 		int xpos = Base62x.xpos;
 		int ascmax = Base62x.ascmax;
-
+		
+		try{
+			//- main enc logic
 		int[] rb62x = Base62x.fillRb62x(b62x, bpos, xpos);
 		boolean isnum = false;
 		if(ibase > 0){ isnum = true; }
@@ -87,7 +90,7 @@ public final class Base62x{ //- remove static?
 			ascidx = (int[])setResult.get("ascidx");
 			ascrlist = (byte[])setResult.get("ascrlist");
 
-			byte[] op = new byte[inputlen*2]; //- extend to 3/2 or 2 theoritical maxium length of base62x 
+			byte[] op = new byte[inputlen*2+1]; //- extend to 3/2 or 2 theoritical maxium length of base62x, cover length==1, 21:56 Saturday, July 27, 2019 
 			int i=0; int m=0;
 
 			if(isasc){
@@ -165,6 +168,11 @@ public final class Base62x{ //- remove static?
 			System.arraycopy(op, 0, op2, 0, m);	
 			osb.append(new String(op2));
 		}
+			//- main enc logic, end
+		}
+		catch(Exception ex0727){
+			ex0727.printStackTrace();
+		}
 
 		return osb.toString();
 
@@ -186,6 +194,8 @@ public final class Base62x{ //- remove static?
 		int xpos = Base62x.xpos;
 		int ascmax = Base62x.ascmax;
 
+		try{
+			//- main dec logic
 		int[] rb62x = Base62x.fillRb62x(b62x, bpos, xpos);
 		boolean isnum = false;
 		if(obase > 0){ isnum = true; }
@@ -338,7 +348,11 @@ public final class Base62x{ //- remove static?
 			System.arraycopy(op, 0, op2, 0, m);	
 			osb.append(new String(op2)); //, StandardCharsets.UTF_8
 		}
-
+			//- main dec logic, end
+		}
+		catch(Exception ex072721){
+			ex072721.printStackTrace();
+		}
 		return osb.toString();
 	
 	}
