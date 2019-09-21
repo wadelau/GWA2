@@ -20,7 +20,6 @@ public void includeCtrl(){
 
 		data.put("time", (new Date()));
 
-
 	}
 
 }
@@ -65,7 +64,14 @@ public void setCrsPageResponse(HashMap crsPage, javax.servlet.http.HttpServletRe
 
 	}
 	catch(Exception ex){
-		ex.printStackTrace();	
+		ex.printStackTrace();
+		/*
+		 * in case that not system console and collect output to specified log file
+		 * 08:48 Thursday, September 19, 2019
+		java.io.StringWriter sw = new java.io.StringWriter();
+		ex.printStackTrace(new java.io.PrintWriter(sw));
+		String exceptionStr = sw.toString();
+		*/
 	}
 
 }

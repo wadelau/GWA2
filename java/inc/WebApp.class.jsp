@@ -292,7 +292,6 @@ public class WebApp implements WebAppInterface{
         return setBy(fields, null, xargs);
     }
     
-
 	//- initial added on Mon Jan 23 12:20:24 GMT 2012 by wadelau@ufqi.com
 	//- ported from GWA2PHP by wadelau, Sun Jul 17 22:13:39 CST 2016
 	public HashMap execBy(String sql, String args, HashMap hmCache){
@@ -365,9 +364,7 @@ public class WebApp implements WebAppInterface{
 		sql = null; sqlx = null; args = null;
 
         }
-
 		return hm;
-
 	} 
 
 	//- @override
