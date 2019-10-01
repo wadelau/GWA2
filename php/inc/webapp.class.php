@@ -94,8 +94,15 @@ class WebApp implements WebAppInterface{
 	//-
 	function set($field, $value=null){ # update, Sat May 16 08:54:54 CST 2015
 		if($field == null || $field == ''){
-		    # @todo ?
-		    return false;
+		    if(is_array($value)){
+                foreach($value as $k=>$v){
+                    $this->hmf[$k] = $v;
+                }   
+            }
+            else{
+                debug("inc/WebApp: set null to unknown...");
+                return false;
+            }
 		}
 		else{
     	    if($value === null){
@@ -170,8 +177,10 @@ class WebApp implements WebAppInterface{
 	}
 	
 	//-
-	function setTbl($tbl){
-		$tblpre = GConf::get('tblpre');
+	function setTbl($tbl, $tblPre=null){
+		$tblpre = '';
+		if($tblPre == null){ $tblpre = GConf::get('tblpre'); }
+		else{ $tblpre = $tblPre; }
 		if($tblpre != '' && strpos($tbl, $tblpre) !== 0){
 			$tbl = $tblpre.$tbl;
 		}

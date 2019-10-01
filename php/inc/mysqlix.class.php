@@ -95,7 +95,7 @@ class MYSQLIX {
 		}
 		else{
 			$hm[0] = false;
-			$hm[1] = array('sayError'=>'Query failed. 201107080506.');
+			$hm[1] = array('sayError'=>'Query failed for ['.$sql.']. 201107080506.');
 		}
 		return $hm; 
 
