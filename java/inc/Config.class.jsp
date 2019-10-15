@@ -62,20 +62,17 @@ public static class Config {
 
 	private static HashMap conf = new HashMap();
 	
-	
 	public static void set(String key, Object obj){
 		
 		Config.conf.put(key, obj);
 	
 	}
 	
-	
 	public static Object get(String key){
 	
 		return Config.conf.get(key);
 		
 	}
-	
 	
 	public static void setConf(HashMap myConf){
 		
@@ -91,13 +88,11 @@ public static class Config {
 		entries = null;
 	}
 	
-	
 	public static HashMap getConf(){
 		
 		return Config.conf;
 		
 	}
-	
 	
 }
 

@@ -32,7 +32,7 @@ if($isdbg){
     ini_set("display_errors", 1);
 }
 else{
-    header("Cache-Control: max-age=604800"); # a week?
+    header("Cache-Control: public, max-age=604800"); # a week?
     error_reporting(E_ERROR | E_PARSE);
     ini_set('error_reporting', E_ERROR | E_PARSE);
     ini_set("display_errors", 0);
