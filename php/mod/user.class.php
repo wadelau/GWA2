@@ -14,9 +14,10 @@ class User extends WebApp{
 	
 	var $sep = "|";
 	var $eml = "email";
+	var $lang = null;
     
 	//-
-	function __construct(){
+	function __construct($args=null){
 		//-
 		$this->setTbl(GConf::get('tblpre').'info_siteusertbl');
 		
@@ -25,6 +26,17 @@ class User extends WebApp{
 		# In order to run a parent constructor, a call to parent::__construct()
 		#     within the child constructor is required.
 		parent::__construct();
+		
+		# lang
+	    if(array_key_exists('lang', $args)){
+			$this->lang = $args['lang'];   
+			#debug("mod/pagenavi: lang:".serialize($this->lang)." welcome:".$this->lang->get('welcome'));
+		}
+		else{
+			#debug("mod/pagenavi: lang: not config. try global?");
+			global $lang;
+			$this->lang = $lang; # via global?
+		}
 		
 	}
 	

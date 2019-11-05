@@ -336,6 +336,7 @@ class WebApp implements WebAppInterface{
      */
     function execBy($sql, $conditions=array(), $withCache=null){
         $hm = array();
+		$sql = trim($sql);
         $origSql = $sql;
         if($withCache != null){
             $hm = $this->readObject($type='cache:', $args=$withCache);

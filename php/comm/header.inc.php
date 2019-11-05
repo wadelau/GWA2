@@ -1,6 +1,6 @@
 <?php
 
-global $sid, $appdir, $siteid, $user, $userid, $isdbg;
+global $sid, $appdir, $siteid, $user, $userid, $isdbg, $lang;
 date_default_timezone_set("Europe/London"); # +0000
 session_start(); # in developping stage, using php built-in session manager
 
@@ -60,6 +60,41 @@ if(array_key_exists(UID, $_SESSION) && $_SESSION[UID] != ''){
 	$data['islogin'] = 1;
 	$data['userid'] = $userid;
 	$data['username'] = $user->getUserName();
+}
+
+# language
+$ilang = "zh"; 
+if(true){
+	$icoun = "CN"; $langconf = array();
+	$reqtlang = Wht::get($_REQUEST, 'lang');
+	if($reqtlang == ''){
+		$langs = trim($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+		$sepPos = strpos($langs, ',');
+		if($sepPos > 0){
+			$langs = substr($langs, 0, $sepPos);	
+		}
+		if(strpos($langs, '-') > 0){
+			$tmpArr = explode('-', $langs);
+			$ilang = $tmpArr[0]; $tmpArr[1];
+		}
+		else{
+			$ilang = "zh";
+		}
+	}
+	else{
+		$ilang = $reqtlang;	
+	}
+	$langconf['language'] = $ilang;
+	$lang = new Language($langconf);
+	debug("comm/header: ilang:".$lang->getTag()." welcome:".$lang->get("welcome"));
+	$data['lang']['welcome'] = $lang->get('welcome');
+	$data['lang']['agentname'] = $lang->get('lang_agentname');
+	$data['lang']['appchnname'] = $lang->get('lang_appchnname');
+	//- set to cookie if necessary, @todo
+}
+//- optional
+if($_REQUEST['lang'] != ''){
+	$sid = Wht::get($_REQUEST, 'sid').'.'.Wht::get($_REQUEST, 'lang');	
 }
 
 # page header format
