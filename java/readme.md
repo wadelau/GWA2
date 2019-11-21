@@ -24,3 +24,16 @@ if os language is not set to unicode or utf-8,
 	usually in appserver_home/bin
 	
 	see [GWA2Java i18n](http://ufqi.com/blog/gwa2-java-i18n/) for more details.
+
+## For not root dir with Tomcat
+
+if running with symbolic link(soft link, need restart):
+    
+	$tomcatDir/conf//conf/context.xml :
+    <Resources allowLinking="true"></Resources>
+
+append classpaths to environments (need restart):
+	
+    $tomcatDir/conf/catalina/catalina.properties :
+    shared.loader="/www/webroot/pages/work/WEB-INF/classes","/www/webroot/pages/work/WEB-INF/lib/*.jar"
+                                                                    
