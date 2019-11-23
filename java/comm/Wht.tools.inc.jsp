@@ -9,7 +9,6 @@ java.util.Calendar"%><%
  * @update: Fri Jun 10 10:57:21 CST 2016, revised for -GWA2
  * @ver: 0.2
  */
-
 %><%!
 
 public final static class Wht{
@@ -67,7 +66,6 @@ public final static class Wht{
 		s = s.replaceAll("<", "&lt;");
 		s = s.replaceAll("\"", "&quot;");
 		return s;
-
 	}
 
 	/*
@@ -95,7 +93,6 @@ public final static class Wht{
     public static int parseInt(Object obj){
         return Wht.parseInt(String.valueOf(obj));
     }
-        
 
 	/*
 	 * inString, find where the string in another string, which separated by ","
@@ -229,7 +226,6 @@ public final static class Wht{
 		return remoteip;
 	}
 
-
 	/*
 	 * checkClientUA
 	 * @param String myua, my current user-agent
@@ -261,17 +257,6 @@ public final static class Wht{
 			return false;
 		}
 	}
-
-	//- get a string from an object, e.g. HashMap
-	public static String getString(Object obj, String myk){
-		String s = "";
-		if(obj instanceof HashMap){
-			HashMap hmobj = (HashMap)obj;
-			s = (String)hmobj.get(myk);
-			s = s==null ? "" : s;
-		}
-		return s;
-	}
 	
 	//- get day by diff
 	public static Date getDay(int adjustDay){
@@ -282,6 +267,70 @@ public final static class Wht{
 		Date target = ca.getTime();
 		return target;
 	}
-}
+	
+	//- get a string from an object, e.g. HashMap
+	public static String getString(Object obj, String myk){
+		String s = "";
+		if(obj instanceof HashMap){
+			HashMap hmobj = (HashMap)obj;
+			s = (String)hmobj.get(myk);
+			s = s==null ? "" : s;
+		}
+		return s;
+	}
+	//- get a booean from an object, e.g. HashMap
+	//- becareful! getBoolean(hm, "0") != getBoolean(hm, 0)
+	public static boolean getBoolean(Object obj, String myk){
+		boolean tf = false;
+		if(obj instanceof HashMap){
+			HashMap hmobj = (HashMap)obj;
+			Object tmpobj = (Object)hmobj.get(myk);
+            if(tmpobj != null){
+                tf = (boolean)tmpobj;
+            }
+		}
+		return tf;
+	}
+	//- get a booean from an object, e.g. HashMap
+	//- becareful! getBoolean(hm, "0") != getBoolean(hm, 0)
+	public static boolean getBoolean(Object obj, int myk){
+		boolean tf = false;
+		tf = Wht.getBoolean(obj, ""+myk);
+		return tf;
+	}
+    //- init a hashMap with pairs
+    public static HashMap initHashMap(String keys, String values){
+        HashMap hmRtn = new HashMap();
+        if(keys.indexOf(",") > -1){
+            String[] keyArr = keys.split(",");
+            String[] valueArr = values.split(","); int ki = 0;
+            for(String k : keyArr){
+                hmRtn.put(k, valueArr[ki]); ki++;
+            }
+        }
+        else{
+            hmRtn.put(keys, values);
+        }
+        return hmRtn;
+    }
 
+    //- rm x chars from end 
+    public static String rmEnd(String s, int ilen){
+        return s = s.substring(0, s.length()-ilen);
+    }
+	
+	//- set an element into a 2-d map
+	public static HashMap set2DMap(HashMap firstMap, String secMapKey, 
+			String key, Object val){
+		boolean hasDone = false;
+		if(firstMap!=null){
+			HashMap secMap = (HashMap)firstMap.get(secMapKey);
+			if(secMap==null){ secMap = new HashMap(); }
+			secMap.put(key, val);
+			firstMap.put(secMapKey, secMap);
+			hasDone = true;
+		}
+		return firstMap;
+	}
+}
 %>

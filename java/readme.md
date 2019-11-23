@@ -36,4 +36,9 @@ append classpaths to environments (need restart):
 	
     $tomcatDir/conf/catalina/catalina.properties :
     shared.loader="/www/webroot/pages/work/WEB-INF/classes","/www/webroot/pages/work/WEB-INF/lib/*.jar"
-                                                                    
+
+## Coding in Eclipse as Dynamic Java Web Application
+
+Keep subdirectories:
+	.setting
+	WebContent
