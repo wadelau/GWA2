@@ -42,3 +42,11 @@ append classpaths to environments (need restart):
 Keep subdirectories:
 	.setting
 	WebContent
+	
+## Source file format: Unix, UTF-8, No BOM
+if no such source file format, please put the line in each ctrl script:
+	<%@page language="java" pageEncoding="UTF-8"%>
+	
+	Otherwise, it will raise illegal characters in page out.
+	
+	

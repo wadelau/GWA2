@@ -42,12 +42,12 @@ if(fmt.equals("")){
             data.put("embedtpl", intplcont); // same with tpl
 		}
 		else{
-			//- standalone, possible with innertpl
+			//- standalone, possible with innertpl -> embedtpl
             tplcont = hanjst.readTemplate(mytpl, tpldir, viewdir);
             String innertpl = (String)data.get("innertpl");
             if(innertpl != null && !innertpl.equals("")){
                 String intplcont = hanjst.readTemplate(innertpl, tpldir, viewdir);
-                data.put("innertpl", intplcont);  
+                data.put("embedtpl", intplcont);  
             }
 		}
 		tplcont = tplcont==null ? "" : tplcont;

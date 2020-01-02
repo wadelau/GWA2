@@ -140,6 +140,10 @@ public final static class Wht{
 		}
 		return matched;
 	}
+	//-
+	public static boolean inList(String needle, String haystack){
+		return Wht.inList(needle, haystack, ",");
+	}
 
 	/*
 	 * startsWith, batchly java.lang.String.startsWith, with haystack split by "|"
@@ -273,8 +277,9 @@ public final static class Wht{
 		String s = "";
 		if(obj instanceof HashMap){
 			HashMap hmobj = (HashMap)obj;
-			s = (String)hmobj.get(myk);
-			s = s==null ? "" : s;
+			s = String.valueOf(hmobj.get(myk));
+            s = s==null ? "" : s;
+            s = s.equals("null") ? "" : s;
 		}
 		return s;
 	}
@@ -332,5 +337,10 @@ public final static class Wht{
 		}
 		return firstMap;
 	}
+	
+	 //- rdmInt
+    public static int rdmInt(){
+        return ((new java.util.Random()).nextInt((999999) + 100000);
+    }
 }
 %>

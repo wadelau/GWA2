@@ -471,15 +471,23 @@ public class WebApp implements WebAppInterface{
 	//- get list by ids
 	//- Xenxin@ufqi, 11:25 Monday, May 6, 2019
 	public HashMap getListByIds(String ids){
-		HashMap hmrtn = new HashMap();
+		HashMap hmrtn = null; //new HashMap();
 		final String tmpIds = ids; final String tmpTbl = this.getTbl();
 		hmrtn = this.execBy("select * from "+tmpTbl+" where id in ("+ids+")", "", 
 			(new HashMap(){{ put("key", tmpTbl+"-list-"+tmpIds);}}));
 		if((boolean)hmrtn.get(0)){
 			hmrtn = (HashMap)hmrtn.get(1);
+			HashMap hmtmp = null; HashMap hmNew = new HashMap();
+            String tmpId = null;
+            for(Object key : hmrtn.keySet()){
+                hmtmp = (HashMap)hmrtn.get(key);
+                tmpId = Wht.getString(hmtmp, "id");
+                hmNew.put(tmpId, hmtmp);
+            }
+            hmrtn = hmNew;
 		}
 		else{
-			//- @todo
+			hmrtn = new HashMap();
 		}
 		return hmrtn;
 	}
