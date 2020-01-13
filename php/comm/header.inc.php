@@ -200,6 +200,7 @@ if(true){
     }
 }
 
+//-
 function exception_handler($exception) {
 	echo '<div class="alert alert-danger">';
 	echo '<b>Fatal error</b>:  Uncaught exception \'' . get_class($exception) . '\' with message ';
@@ -209,5 +210,22 @@ function exception_handler($exception) {
 	echo '</div>';
 }
 set_exception_handler('exception_handler');
-
+//-
+//- securityFileCheck , 
+//- Xenxin@ufqi
+// 11:17 Thursday, December 19, 2019
+function securityFileCheck($fv){
+	$rtn = $fv;
+	$rtn = realpath($rtn);
+	$badChars = array(';', '%3B', ' ', "%20", '&', "%26", "..", "//", './', "\\", '\.');
+	$rtn = str_replace($badChars, '', $rtn);
+	if(!preg_match('/^(?:[a-z0-9_\-\/#~]|\.(?!\.))+$/iD', $rtn)){
+		$rtn = '';
+	}
+	if(strpos($rtn, '/') === 0 && !inList($rtn, '/www,/var,/tmp,/var')){
+		$rtn = '';
+	}
+	#debug('comm/header: fv:'.$fv.'->'.$rtn);
+	return $rtn;
+}
 ?>

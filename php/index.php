@@ -12,7 +12,6 @@ if(0){ # in some scenarios, this should be set as 0 to disable this function glo
 		chdir(dirname(__FILE__));
 		include("./comm/cmdline.inc.php");
 		chdir(dirname(__FILE__));
-
 	}
 }
 
@@ -29,7 +28,7 @@ if($mod == ""){
 $data['mod'] = $mod;
 $data['act'] = $act;
 #$data['baseurl'] = $baseurl;
-
+$mod = securityFileCheck($mod); # enhanced, 08:23 Friday, January 10, 2020
 if(file_exists("./ctrl/".$mod.".php")){
 	include("./ctrl/".$mod.".php");
 }
