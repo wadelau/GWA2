@@ -7,7 +7,18 @@ General Web Application Architecture.
 ----
 [-NatureDNS](http://ufqi.com/naturedns) : [-GWA2](http://ufqi.com/naturedns/search?q=-gwa2) , [-吉娃兔](http://ufqi.com/naturedns/search?q=-吉娃兔)
 
-* Speak in Java, PHP, Perl, Aspx and Python
+* GWA2 speaks in Java ![](https://cn.bing.com/th?id=AMMS_3ab989ddcf0158808db9f2bcd199abc1&w=110&h=110&c=7&rs=1&qlt=80&pcl=f9f9f9&cdv=1&dpr=1.1&pid=16.1) , 
+
+* GWA2 speaks in PHP ![](https://cn.bing.com/th?id=AMMS_22939a371373b00dadf52557666432cf&w=110&h=110&c=7&rs=1&qlt=80&pcl=f9f9f9&cdv=1&dpr=1.1&pid=16.1) , 
+
+* GWA2 speaks in Perl ![](http://www.horter.de/i2c/i2c-beispiele/perl_logo2.gif) , 
+
+* GWA2 speaks in Aspx ![](http://www.slashcoding.com/wp-content/uploads/2013/09/asp-net-logo.gif) , and 
+
+* GWA2 speaks in Python ![Python](https://www.python.org/static/img/python-logo.png) .
+
+GWA2 is cross-scripts programming framework for web applications.
+
 
 * From Interface to Interactions
 
