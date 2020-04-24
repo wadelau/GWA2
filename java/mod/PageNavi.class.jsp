@@ -4,7 +4,6 @@
  * wadelau@ufqi.com,
  * Fri Jul  6 15:38:12 UTC 2018
  */
-
 %><%!
 
 public class PageNavi extends WebApp{
@@ -295,7 +294,10 @@ public class PageNavi extends WebApp{
 	//-
 	public String getCondition(WebApp obj, User user){
 		String str = "";
-		String pnsmx = Wht.get(this.request, "pnsm");
+		String pnsmx = this.get("pnsm");
+        if(pnsmx.equals("")){
+            pnsmx = Wht.get(this.request, "pnsm");
+        }
 		pnsmx = pnsmx.equals("") ? "or" : "and";
         final String pnsm = pnsmx; //- used in enclosing hm.forEach
 		

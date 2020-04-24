@@ -224,8 +224,13 @@ public final static class Wht{
 		if (remoteip.startsWith("127.0")){
 			remoteip=get(request,"myip");
 		}
-		if(remoteip.equals("") && request.getHeader("X-Forwarded-For")!=null){
-			remoteip=request.getHeader("X-Forwarded-For");
+		if(remoteip.equals("")){
+			if(request.getHeader("X-Forwarded-For")!=null){
+				remoteip=request.getHeader("X-Forwarded-For");
+			}
+			else{
+				remoteip = "0.0.0.0";
+			}
 		}
 		return remoteip;
 	}
@@ -262,13 +267,20 @@ public final static class Wht{
 		}
 	}
 	
-	//- get day by diff
+	//- get date in diff days
 	public static Date getDay(int adjustDay){
+		return getDateDiff(adjustDay*86400);
+	}
+	
+	//- get date by diff in second
+	//- Xenxin, 09:11 Saturday, April 18, 2020
+	public static Date getDateDiff(int mySecond){
 		Calendar ca = Calendar.getInstance();
 		Date now = new Date();
 		ca.setTime(now);
-		ca.add(Calendar.DAY_OF_YEAR, adjustDay);
+		ca.add(Calendar.SECOND, mySecond);
 		Date target = ca.getTime();
+		now = null; ca = null;
 		return target;
 	}
 	
