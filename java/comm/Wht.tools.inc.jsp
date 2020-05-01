@@ -352,7 +352,7 @@ public final static class Wht{
 	
 	 //- rdmInt
     public static int rdmInt(){
-        return ((new java.util.Random()).nextInt((999999) + 100000);
+        return ((new java.util.Random()).nextInt((999999) + 100000));
     }
 }
 %>

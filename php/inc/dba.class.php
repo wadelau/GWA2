@@ -18,6 +18,7 @@ class DBA {
 	var $conf = null; 
 	var $dbconn = null;
 	var $sql_operator_list = array(); # first chars of ansi sql operators
+	var $Sql_Sep_List_Right = array();
 
 	//-construct
 	function __construct($dbconf=null){
@@ -31,6 +32,8 @@ class DBA {
 		$this->sql_operator_list = array(' '=>1,'^'=>1,'~'=>1,':'=>1,'!'=>1,'/'=>1,
 				'*'=>1,'&'=>1,'%'=>1,'+'=>1,'='=>1,'|'=>1,
 				'>'=>1,'<'=>1,'-'=>1,'('=>1,')'=>1,','=>1);
+		//- remedy on Thu Apr 30 10:06:39 CST 2020
+		$this->Sql_Sep_List_Right = array(" "=>1, ")"=>1, ","=>1);
 	}	
 
 	#
@@ -89,10 +92,15 @@ class DBA {
 		return $hm;
 	}
 
-	# added on Sun Jul 17 22:19:15 UTC 2011 by wadelau@gmail.com
+	# added on Sun Jul 17 22:19:15 UTC 2011 by wadelau@gmail.com, 
+	# + paramPosArr, 11:18 Thursday, April 30, 2020
 	# sort the parameter in order
 	# return sorted array 
 	function hm2idxArray($sql, $hmvars){
+		#$sql = "select * from order_maintbl where id in (88,87,84,83,79) and (istate=? or istate=?) order by id desc";
+		#$hmvars['istate'] = 2;
+		#$hmvars['istate.2'] = 3;
+		#$hmvars['id'] = 86;
 		$idxarr = array();
 		$tmparr = array();
 		$tmpposarr = array();
@@ -100,6 +108,7 @@ class DBA {
         $selectpos = strpos($sql, "select ");
 		$sqloplist = $this->sql_operator_list;
         #print_r($hmvars);
+		//- compute position of each field
 		if(is_array($hmvars)){
 			foreach($hmvars as $k => $v){
 		        if($k == ''){
@@ -142,8 +151,26 @@ class DBA {
 			error_log(__FILE__.": illegal array found with hmvars.");				
 		}
 		$sqlLen = strlen($sql);
-		$tmpi = 0;
-		$kSerial = array();
+		$tmpi = 0; $tmpidx = -1; 
+		//- figure out each param mark, i.e., "?"
+		$paramPosArr = array();
+		$sqlSepListR = $this->Sql_Sep_List_Right;
+		foreach($sqlSepListR as $sqlSepR=>$tmpv){
+			$tmpidx = strpos($sql, '?'.$sqlSepR);	
+			while($tmpidx > 0){
+				$paramPosArr[$tmpi] = $tmpidx;
+				$tmpidx = strpos($sql, '?'.$sqlSepR, $tmpidx+1);		
+				$tmpi++;
+			}
+			#debug("inc/Dba: sep:".$sqlSepR." tmpi:$tmpi paramPosArr:".serialize($paramPosArr));
+		}
+		if(substr($sql, -1) == '?'){
+			$paramPosArr[$tmpi] = $sqlLen - 1;	
+		}
+		#debug("inc/Dba: paramPosArr:".serialize($paramPosArr));
+		//- sort each field by its pos
+		$keyPosArr = array(); $keyPosI = 0;
+		$kSerial = array(); $tmpi = 0;
 		for($i=0;$i<$sqlLen;$i++){
 		    if(array_key_exists($i, $tmparr)){
 		        $k = $tmparr[$i];
@@ -151,11 +178,46 @@ class DBA {
 		        $idxarr[$tmpi] = $tmparr[$i].($ki=='' ? '' : '.'.($ki+1));
 		        $tmpi++;
 		        $kSerial[$k]++;
+				$keyPosArr[$keyPosI++] = $i;
 		    }
 		    else{
 		        # @todo;
 		    }
 		}
+		#debug("inc/Dba: keyPosArr:".serialize($keyPosArr));
+		//- match each param mark with its field
+		$hasMark = false; $lastKeyPos = -1; $nextKeyPos = -1;
+		$idxArr2 = array(); $idxArrI = 0;
+		$keyPos = 0; $paramPos = 0;
+		foreach($keyPosArr as $kpos=>$vpos){
+			$keyPos = $vpos;
+			if($keyPos > 0){
+				$nextKeyPos = $keyPosArr[$kpos+1];
+				#debug("inc/Dba: kpos:$kpos keyPos:$keyPos nextKeyPos:$nextKeyPos");
+				$hasMark = false;
+				foreach($paramPosArr as $kppos=>$vppos){
+					$paramPos = $vppos;
+					if($paramPos > $keyPos){
+						if($nextKeyPos > 0){
+							if($paramPos < $nextKeyPos){
+								$hasMark = true;
+							}
+						}
+						else{
+							$hasMark = true;	
+						}
+					}
+					#debug("\tinc/Dba: kppos:$kpos paramPos:$paramPos hasMark:$hasMark");
+					if($hasMark){
+						$idxArr2[$idxArrI++] = $idxarr[$kpos];
+						break;
+					}
+				}
+			}
+		}
+		//- put it out
+		$idxarr = $idxArr2;
+		#debug("inc/Dba: idxArr:".serialize($idxarr)." sql:".$sql." hmvars:".serialize($hmvars));
 		return $idxarr;
 	}
 

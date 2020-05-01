@@ -107,6 +107,7 @@ sub update($ $) {
 }
 
 # sort object
+# @todo, need to be updated with its Java or PHP version.
 sub _sortObject($ $){
 	my @rtn = (); # [] as a ref, same as {} to hash as a ref
 	my $self = shift;

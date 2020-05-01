@@ -4,13 +4,12 @@
 /* 
  * Han JavaScript Template Engine
  * --- The template semantic, syntax and its engine ---
- * 基于JavaScript通用HTML页面模板引擎
- * --- 模板语义, 语法及解析引擎 ---
- *
+ * 基于JavaScript通用HTML页面模板语言及其解析引擎
  * @Born with GWA2， General Web Application Architecture
  * @Xenxin@ufqi.com, Wadelau@hotmail.com
  * @Since July 07, 2016, refactor on Oct 10, 2018
- * @Ver 1.1
+ * @More at the page footer.
+ * @Ver 1.6
  */
 
 "use strict"; //- we are serious
@@ -25,7 +24,6 @@ window.HanjstDefault = {
 	"JsonDataId": "Hanjstjsondata", //- an html element id which holds server response json data
 	"LogTag": "Hanjst", //- inner usage
 	"ParseTag": "__JSTPL__",  //- inner usage
-	"IncludeScriptTag": "Hanjst_INCLUDE_SCRIPT", //- inner usage
 	"IsDebug": false, //- verbose output in console
 };
 
@@ -48,45 +46,73 @@ window.Hanjst = window.HanjstDefault;
 		var errMsg="Hanjst undefined. 201812011128"; 
 		console.log(errMsg); return errMsg;
 	}
-	var timeCostBgn = (new Date()).getTime();
-	
+    else{
+        var myNav = navigator.userAgent.toLowerCase();
+        if(myNav != null && myNav.indexOf("msie") > -1){
+		    var errMsg="MSIE is too old. \nPlease update it to one of "
+                +"\nMS Edge, Google Chrome or Mozilla Firefox.\n201906161036"; 
+            window.alert(errMsg); console.log(errMsg); console.log("UA:"+myNav);
+            return errMsg;
+        }
+    }
+
 	//- constants
-	const parseTag = window.Hanjst.ParseTag; const unParseTag = '__NOT' + parseTag;
-	const tplVarTag = window.Hanjst.TplVarTag; const jsonDataId = window.Hanjst.JsonDataId; 
-	const logTag = window.Hanjst.LogTag+" "; const isDebug = window.Hanjst.IsDebug; 
-	const includeScriptTag = window.Hanjst.IncludeScriptTag;
-	const includeScriptTagBgn = includeScriptTag + '_BGN';
-	const includeScriptTagEnd = includeScriptTag + '_END';
+	var parseTag = window.Hanjst.ParseTag; var unParseTag = '__NOT' + parseTag;
+	var tplVarTag = window.Hanjst.TplVarTag; var jsonDataId = window.Hanjst.JsonDataId; 
+	var logTag = window.Hanjst.LogTag+" "; var isDebug = window.Hanjst.IsDebug;
 	
-	//- handle server response in json, 
-	//- parse it into global variables starting with this tplVarTag, ie, $ as the default.
+	var timeCostBgn = 0; var myDate = new Date();
+    if(isDebug){ timeCostBgn = myDate.getTime(); }
 	var pageJsonElement = document.getElementById(jsonDataId);
+	//- check parent node
+	if(pageJsonElement){
+		var parentName = pageJsonElement.parentNode.nodeName;
+		if(parentName.toLowerCase() != 'body'){
+			console.log(logTag+'Error! parentNode:['+parentName+'] should be "BODY". Please consider to put '+logTag+' codes block under <body>. 201906040809.');
+		} 
+	}
+	//- handle server response in json,
+	//- parse it into global variables starting with this tplVarTag, ie, $ as the default.
 	var tplData = {}; // data holder
 	if(pageJsonElement){
 		var tplDataStr = pageJsonElement.innerText;
 		try{
+			tplDataStr = tplDataStr.trim();
 			tplData = JSON.parse(tplDataStr);
 		}
-		catch(e0939){ console.log(e0939);}
-		if(!tplData['copyright_year']){ tplData['copyright_year'] = (new Date()).getFullYear(); }
+		catch(e0939){ console.log(e0939); console.log('Error! pageJsonElement in malformat JSON. 201911071307.'); }
+		if(!tplData['copyright_year']){ tplData['copyright_year'] = myDate.getFullYear(); }
+		if(!tplData['time_stamp']){ tplData['time_stamp'] = timeCostBgn; }
 		//- parse json keys as global variables
 		//- variables starting with tplVarTag, i.e., $ as default
+		if(window){
+			//- window ready...
+		}
+		else{
+			window = {}; //- when and why?	
+			console.log('window undefined error. 201812011122.'); 
+		}
 		for(var $k in tplData){
 			//console.log("k:"+$k+" v:"+tplData[$k]);
 			if($k != null && $k != ''){
 				var $v = tplData[$k];
 				$k = tplVarTag + $k;
-				if(window){ window[$k] = $v; }
-				else{ console.log('window undefined error. 201812011122.'); }
+				if(typeof window[$k] != 'undefined'){
+						console.log(logTag+': Variables:['+$k+'] conflict error. '+
+							+' Please consider rename one of window.'+$k+' or pageJsonData.'+
+							+' 201904202305.');
+				}
+				else{
+					window[$k] = $v; //- globally unique
+				}
 			}
 		}
 		//- hide raw data
-		//pageJsonElement.style.height = '0px';
 		pageJsonElement.style.visibility = 'hidden'; // hide json data element
 		tplDataStr = null;
 	}
 	else{
-        window.$copyright_year = (new Date()).getFullYear();
+        window[tplVarTag+'copyright_year'] = myDate.getFullYear();
 		console.log(logTag+'pageJsonElement:['+jsonDataId+'] has error. 201812010927'); 
 	}
 	tplData = null;
@@ -94,15 +120,13 @@ window.Hanjst = window.HanjstDefault;
 	//- main function
 	//- parse all tag blocks
 	if(isDebug){ console.log(logTag+"aft parse copyright_year:"+$copyright_year); }
-	var renderTemplate = function(window, document, tplHTML){
-		
-		//- tpl keywords and patterns
-		var tplRe = /\{((for|if|while|else|switch|break|case|\$|\/|var|let)[^}]*)\}/gm;
-		
+	//- inner renderTemplate
+	var _renderTemplateRecurse = function(window, document, tplHTML){
 		//- collect tpl content
-		var match, tplRaw, tplObject;
-		tplObject = document.body || document; 
-		if(!tplHTML || tplHTML == ''){
+		var match, tplRaw, tplObject, firstContent; // firstContent for contents in first page
+		tplObject = document.body || document;
+        //console.log(tplObject);
+		if(tplHTML == null || tplHTML == ''){
 			tplRaw = tplObject.innerHTML;
 			//console.log(tplRaw);
 			var tmppos = tplRaw.indexOf(' id="'+jsonDataId+'"');
@@ -119,33 +143,36 @@ window.Hanjst = window.HanjstDefault;
 			}
 		}
 		else{ tplRaw = tplHTML; }
-        tplRaw = _remedyMemoLine(tplRaw);
-		//tplRaw = tplRaw.replace(/[\n\r]/g, '');
-		//tplRaw = tplRaw.replace(/<!--.*?-->/g, '');
-		//console.log(tplRaw);
-		
-		var tplSegment = []; var lastpos = 0;
-		var staticStr, ipos, matchStr, exprStr;	
-		
+        tplRaw = _remedyMemoLine(tplRaw); firstContent = tplRaw;
+		if(tplHTML == null || tplHTML == ''){ 
+			Hanjst.tplObject = tplObject; Hanjst.firstContent = firstContent;
+		}
+
 		//- prepare-1
-		//- parse include parts
+		//- parse include parts recursively
 		var includeRe = /\{include [file|content]*="([^\}]*?)"\}/gm;
-		var segi, segStr, tplRawNew, tmpCont;
-		lastpos = 0; tplRawNew = tplRaw;
+		var tplRawNew, tmpCont, matchStr, exprStr;	
+		tplRawNew = tplRaw;
 		while(match = includeRe.exec(tplRaw)){
 			//console.log(match);
 			matchStr = match[0]; exprStr = match[1];
 			tmpCont = (new Function("return "+exprStr+";")).apply();
-            tmpCont = _remedyMemoLine(tmpCont);
-			//tmpCont = tmpCont.replace(/[\n\r]/g, '');
-			//tmpCont = tmpCont.replace(/<!--.*?-->/g, '');
-			if(tmpCont.indexOf('<script') > -1){
-				tmpCont = includeScriptTagBgn + tmpCont + includeScriptTagEnd;
+			if(tmpCont != null && tmpCont != ''){
+				tmpCont = _renderTemplateRecurse(window, document, tmpCont);
 			}
 			tplRawNew = tplRawNew.replace(matchStr, tmpCont);
 		}
 		tplRaw = tplRawNew;
 		//console.log(tplRaw);
+		return tplRaw;
+	}
+	
+	//- main & entry call
+	var renderTemplate = function(window, document, tplHTML){
+		var tplSegment = [], tplRawNew, match, matchStr, exprStr; 
+		var staticStr, ipos, segi, segStr, lastpos = 0;
+		var tplRaw = _renderTemplateRecurse(window, document, tplHTML);
+		var firstContent = Hanjst.firstContent;
 		
 		//- parepare-2
 		//- fix innerHTML bug {if="" for tpl embedded in <>
@@ -193,66 +220,71 @@ window.Hanjst = window.HanjstDefault;
 		//- parse original scripts
 		var scriptRe = /<script[^>]*>(.*?)<\/script>/gm;
 		var hasScript = false; var isIncludeScript = false; 
-		var asyncScriptArr = []; var isAsync = false; var srcPos = -1; var endTagPos = -1;
+		var asyncScriptArr = []; var isAsync = false; var srcPos = -1;
+		var regExp1906 = new RegExp("'", 'gm');
 		for(var $prei in tplSegmentPre){
 			tplRawNew = tplSegmentPre[$prei];
 			if(tplRawNew.indexOf(unParseTag) > -1){ // literal scripts
 				tplSegment.push(tplRawNew);
 			}
 			else{
-				lastpos = 0; srcPos = -1; endTagPos = -1;
+				lastpos = 0; srcPos = -1; isIncludeScript = false;
 				while(match = scriptRe.exec(tplRawNew)){
 					//console.log(match);
 					ipos = match.index;
 					staticStr = tplRawNew.substring(lastpos, ipos);
-					if(staticStr.indexOf(includeScriptTagBgn) > -1){
-						isIncludeScript = true;
-						staticStr = staticStr.replace(includeScriptTagBgn, '');
-					}
-					matchStr = match[0];
-					exprStr = match[1];
-					srcPos = matchStr.indexOf(' src='); 
-                    endTagPos = staticStr.indexOf(includeScriptTagEnd);
+					matchStr = match[0]; exprStr = match[1];
+					srcPos = matchStr.indexOf(' src=');
+					if(srcPos > 0){ isIncludeScript = firstContent.indexOf(matchStr)>-1 ? false : true; }
+					else{ isIncludeScript = firstContent.indexOf(exprStr)>-1 ? false : true; }
 					if(matchStr.indexOf(' async') > -1){ isAsync = true; }else{ isAsync = false; }
-					if(isIncludeScript){
-						if(isDebug){ console.log(logTag+"includeScript:"+exprStr+" matchStr:"+matchStr); }
-						_appendScript(exprStr, matchStr);
+					if(isAsync || isIncludeScript){
+						if(exprStr != null && exprStr != ''){
+							if(exprStr.indexOf('document.write') > -1){
+								/* should skip */
+								if(isDebug){ console.log(logTag+"found 'document.write' and skip..."); }
+							}
+							else{
+								if(isAsync){
+									//asyncScriptArr.push(exprStr);
+									/* failed for function defined? */
+									exprStr = exprStr.replace(regExp1906, "\\'");
+									tplSegment.push('var tmpTimer'+ipos+'=window.setTimeout(function(){try{'
+										+'Hanjst.appendScript(\''+exprStr+'\', \'\');'
+										+'}catch(tmpErr){if('+isDebug+'){console.log("'+logTag
+										+' found error with embed scripts:\"+JSON.stringify(tmpErr)+\"");}};}, '
+										+ 'parseInt(Math.random()*200+100));'); //- why two seconds?
+								}
+								else{
+									if(isDebug){ 
+										console.log(logTag+"includeScript:"+exprStr+" matchStr:"+matchStr);
+									}
+									appendScript(exprStr, matchStr);
+								}
+							}
+						}
+						else if(srcPos > 0){
+							if(isAsync){
+								matchStr = matchStr.replace(regExp1906, "\\'");
+								tplSegment.push('var tmpTimer'+ipos+'=window.setTimeout(function(){try{ Hanjst.appendScript(\'\', \''+matchStr+'\');' 
+										+'}catch(tmpErr){if('+isDebug+'){console.log("'+logTag
+										+' found error with embed src scripts:\"+JSON.stringify(tmpErr)+\"");}};}, '
+										+ 'parseInt(Math.random()*200+100));');
+							}
+							else{
+								appendScript(exprStr, matchStr);
+							}
+						}
 					}
-					if(endTagPos > -1){
-						isIncludeScript = false;
-						staticStr = staticStr.replace(includeScriptTagEnd, '');
+					else{
+						if(isDebug){ console.log(logTag+"found scripts:["+matchStr+"] skiped for isIncludeScript:["+isIncludeScript+"] or isAsync:["+isAsync+"]"); }
 					}
 					tplSegment.push(parseTag + staticStr);
-					//- exclude src= in parent tpl
-                    if(isIncludeScript || srcPos < 0){
-                        if(exprStr != null && exprStr != ''){
-                            if(exprStr.indexOf('document.write') > -1){
-                                /* should skip */
-                                if(isDebug){ console.log(logTag+"found 'document.write' and skip..."); }
-                            }
-                            else{
-                                if(isAsync){
-                                    //asyncScriptArr.push(exprStr); // @todo
-                                    tplSegment.push('var tmpTimerI=window.setTimeout(function(){try{'+exprStr
-                                        +'}catch(tmpErr){if('+isDebug+'){console.log("'+logTag
-                                        +' found error with embed scripts:\"+JSON.stringify(tmpErr)+\"")}};}, '
-                                        + 'parseInt(Math.random()*2000+500));'); //- why two seconds?
-                                }
-                                else{
-                                    tplSegment.push(exprStr);
-                                }
-                            }
-                        }
-                    }
 					lastpos = ipos + matchStr.length;
 					hasScript = true;
 				}
 				if(hasScript){
 					staticStr = tplRawNew.substring(lastpos); // remainings
-					if(staticStr.indexOf(includeScriptTagEnd) > -1){
-						isIncludeScript = false;
-						staticStr = staticStr.replace(includeScriptTagEnd, '');
-					}
 					tplSegment.push(parseTag + staticStr);
 				}
 				else{
@@ -261,14 +293,17 @@ window.Hanjst = window.HanjstDefault;
 				}
 			}
 		}
+		Hanjst.asyncScriptArr = asyncScriptArr;
 		//console.log(tplSegment);
 		
 		//- main body of the main function
 		//- loop over tplSegment for tags interpret
-		var tpl2code, tpl2codeArr; segStr = ''; segi = 0;
-		tpl2codeArr = []; tpl2codeArr.push("var tpl2js = []; var blockLoopCount = 0;");
+		segStr = ''; segi = 0; var tpl2codeArr = []; var tpl2code = '';
+		tpl2codeArr.push("var tpl2js = []; var blockLoopCount = 0;");
 		var blockBeginRe, tmpmatch, needSemiComma, containsDot, containsBracket;
-		var tmpArr, containsEqual, tmpIfPos, hasLoopElse, loopElseStr;
+		var tmpArr, containsEqual, tmpIfPos, hasLoopElse, loopElseStr, bracketPos, dotPos;
+		//- tpl keywords and patterns
+		var tplRe = /\{((for|if|while|else|switch|break|case|\$|\/|var|let)[^}]*)\}/gm;
 		for(segi in tplSegment){ //- loop over segments besides originals
 			segStr = tplSegment[segi];
 			if(segStr.indexOf(unParseTag) > -1){ //- literal scripts
@@ -288,7 +323,7 @@ window.Hanjst = window.HanjstDefault;
 					staticStr = staticStr.replace(/"/g, '\\"');
 					if(staticStr != ''){
 						if(hasLoopElse){
-							loopElseStr = staticStr;
+							loopElseStr += staticStr; // empty after every loop at end
 						}
 						else{
 							tpl2codeArr.push("\ttpl2js.push(\""+staticStr+"\");");
@@ -301,17 +336,26 @@ window.Hanjst = window.HanjstDefault;
 						//- functions and variables
 						if(exprStr.match(/(\+|\-|\*|\/|=|~|!|\()/gm)){
 							//- functions call
-							if(exprStr.indexOf('(') > -1){ containsBracket = true;} 
-							if(exprStr.indexOf('.') > -1){ containsDot = true; }
+							bracketPos = exprStr.indexOf('(');
+							dotPos = exprStr.indexOf('.');
+							if( bracketPos > -1){ containsBracket = true;} 
+							if( dotPos > -1){ containsDot = true; }
 							if(exprStr.indexOf('=') > -1){ containsEqual = true; }
-							if(containsBracket && !containsDot && !containsEqual){
+                            if(containsBracket && !containsDot && !containsEqual){
 								//- private, $aFunc($a)
 								exprStr = exprStr.substring(1);
 								tpl2codeArr.push("\ttpl2js.push("+exprStr+");");
 							}
 							else if(containsDot && !containsEqual){
-								//- built-in, $a.substring(0, 5)
-								tpl2codeArr.push("\ttpl2js.push("+exprStr+");");
+								if(dotPos < bracketPos){
+									//- built-in, $a.substring(0, 5)
+									tpl2codeArr.push("\ttpl2js.push("+exprStr+");");
+								}
+								else{
+									//- built-in, $aFunc(0.5)
+									exprStr = exprStr.substring(1);
+									tpl2codeArr.push("\ttpl2js.push("+exprStr+");");
+								}
 							}
 							else{
 								//- variables operations, $a++
@@ -320,7 +364,12 @@ window.Hanjst = window.HanjstDefault;
 						}
 						else{
 							//- variables access, $a
-							tpl2codeArr.push("\ttpl2js.push("+exprStr+");");
+							if(hasLoopElse){
+								loopElseStr += "\"+"+exprStr+"+\""; // why only this? allow limited support for variables in xxxelse scope.
+							}
+							else{
+								tpl2codeArr.push("\ttpl2js.push("+exprStr+");");
+							}
 						}
 					}
 					else if(exprStr.match(/.*({|;|}).*/gm)
@@ -346,8 +395,8 @@ window.Hanjst = window.HanjstDefault;
 								else if(tmpmatch[2].indexOf('eachelse') == 0
 									|| tmpmatch[2].indexOf('else') == 0){ 
 									//- foreachelse, forelse, whileelse
-									hasLoopElse = true;
-									exprStr = '\tblockLoopCount += 1';
+									tpl2codeArr.push('\tblockLoopCount += 1;'); //- skip first else sentence
+									exprStr = '';  hasLoopElse = true;
 								}
 								if(tmpmatch[2].indexOf('(') == -1 && !hasLoopElse){
 									if(isDebug){
@@ -358,7 +407,7 @@ window.Hanjst = window.HanjstDefault;
 								}
 							}
 							else{
-								if(isDebug){ console.log("not blockBegin? "+exprStr+""); }
+								if(isDebug){ console.log("not blockBegin? ["+exprStr+"]"); }
 							}
 							if(!hasLoopElse){ 
 								exprStr += '{'; needSemiComma = false;
@@ -381,21 +430,28 @@ window.Hanjst = window.HanjstDefault;
 							if(hasLoopElse){
 								exprStr += '\n\tif(blockLoopCount < 1){ tpl2js.push("'
 									+loopElseStr+'"); }';
-								hasLoopElse = false;
+								hasLoopElse = false; loopElseStr = ''; //- re-init
 								exprStr += '\n\tblockLoopCount = 0;';
 							}
 						}
-						if(exprStr.indexOf('t;') > -1){
-							exprStr = exprStr.replace('&gt;', '>');
-							exprStr = exprStr.replace('&lt;', '<');
+						if(exprStr != ''){
+							if(exprStr.indexOf('t;') > -1){
+								exprStr = exprStr.replace('&gt;', '>');
+								exprStr = exprStr.replace('&lt;', '<');
+							}
+							if(needSemiComma){ exprStr += ';'; }
+							if(exprStr.match(/ (eq|lt|gt) /)){
+								exprStr = exprStr.replace('eq', '==')
+									.replace('lt', '<')
+									.replace('gt', '>');
+							}
 						}
-						if(needSemiComma){ exprStr += ';'; }
-						if(exprStr.match(/ (eq|lt|gt) /)){
-							exprStr = exprStr.replace('eq', '==')
-								.replace('lt', '<')
-								.replace('gt', '>');
+						if(hasLoopElse){ // skip first sentence
+							loopElseStr += exprStr;
 						}
-						tpl2codeArr.push("\n" + exprStr);
+						else{
+							tpl2codeArr.push("\n" + exprStr);
+						}
 					}
 					lastpos = ipos + matchStr.length;
 				}
@@ -407,53 +463,45 @@ window.Hanjst = window.HanjstDefault;
 				}
 			}
 		} // end of loop over tplSegment
+		tplRaw = null; tplSegment = null;
 		
 		//- append returns to tpl2code
 		tpl2codeArr.push("return tpl2js.join('');");
-		tpl2code = tpl2codeArr.join("\n"); tpl2codeArr = null;
-		tpl2code = "try{ " + tpl2code + "\n}\ncatch(e1635){ console.log(\""
-			+ logTag + "code exec failed.\"); console.log(e1635); "
-			+ " return ''+JSON.stringify(e1635); }\n";
+		tpl2code = tpl2codeArr.join("\n"); Hanjst.tpl2code = tpl2code; tpl2codeArr = null;
+		tpl2code = "try{ " + tpl2code + "\n}\ncatch(e1635){ var errMsg=JSON.stringify(e1635, Object.getOwnPropertyNames(e1635)); console.log(e1635);"
+            + "var tmpRegexp=/>\:([0-9]+)\:([0-9]+)/gm; var tmpRegexp2=/\"lineNumber\":([0-9]+)/gm; var tmpmatch=null; var tmpLineno=0; var tmpCharno=0; if(tmpmatch=tmpRegexp.exec(errMsg)){ tmpLineno=parseInt(tmpmatch[1]); tmpCharno=tmpmatch[2];}else if(tmpmatch=tmpRegexp2.exec(errMsg)){tmpLineno = parseInt(tmpmatch[1]);}; if(tmpLineno>0){ if(tmpLineno<4){ tmpLineno = 4;}; var tmpArr=Hanjst.tpl2code.split(\"\\n\");  errMsg += \"<p>Line \"+(tmpLineno-1)+\": \"+tmpArr[tmpLineno-4].replace(/</g, '&lt;')+\"</p>\";  errMsg += \"<p>Line \"+tmpLineno+\": \"+tmpArr[tmpLineno-3].replace(/</g, '&lt;')+\"</p>\"; errMsg += \"<p>Line \"+(tmpLineno+1)+\": \"+tmpArr[tmpLineno-2].replace(/</g, '&lt;')+\"</p>\"; console.log('errMsg:['+errMsg+']'); }else{ errMsg+=\"regExp:\"+tmpRegexp+\" failed.\";}\n"
+			+ "errMsg=\"<p>"+ logTag +"template code exec failed.</p><p>\"+errMsg+\"</p>\";"
+			+ "return errMsg; }\n";
 		
 		//- merge data and compile
 		var tplParse = '';		
 		if(isDebug){ console.log(logTag + "tpl2code:"+tpl2code); }
-		//tplParse = (function(){ return (new Function(tpl2code).apply(window)); }).apply();
-		tplParse = (new Function(tpl2code)).apply(window);
-		if(isDebug){ console.log("tplParse:"+tplParse); }
-		tplObject.innerHTML = tplParse;
-		//- release objects		
-		tpl2code = null; tpl2codeArr = null; 
-		tplRaw = null; tplParse = null; tplSegment = null;
-		
-		//- oncomplete? @todo
-        if(true){
-            if(isDebug){
-                asyncScriptArr.push("console.log((new Date())+' "+logTag+" async scripts exec....');");
-            }
-            var asyncScripts = asyncScriptArr.join("\n");
-            if(isDebug){
-                console.log(logTag+"asyncScripts: "+asyncScripts);
-            }
-            try{
-				//- exec async scripts... @todo 
-		        (new Function(asyncScripts)).apply(window);
-            }
-            catch(e190115){};
+        try{
+		    //tplParse = (function(){ return (new Function(tpl2code).apply(window)); }).apply();
+		    tplParse = (new Function(tpl2code)).apply(window);
+		    if(isDebug){ console.log("tplParse:"+tplParse); }
         }
-		
+        catch(e1200){
+            console.log(JSON.stringify(e1200, Object.getOwnPropertyNames(e1200)));
+        }
+		Hanjst.tplObject.innerHTML = tplParse;
+		//- release objects		
+		tpl2code = null; Hanjst.tpl2code = null; tplParse = null;
 	};
 	
-	//- inner methods
 	//- append embedded scripts into current runtime
-	var _appendScript = function(myCode, myElement) {
+	var appendScript = function(myCode, myElement) {
+		if(myCode == '' && myElement == ''){
+			return ;
+		}
+		else{
 		var s = document.createElement('script');
 		s.type = 'text/javascript';
 		var code = myCode;
         if((code == null || code == '') 
 			&& myElement != null && myElement != ''){
             //- in case of, <script src=""/></script>
-	        var srcRe = /<script .*? src="([^"]*)"[^>]*>/gm;
+	        var srcRe = /<script[^>]* src=["|']+([^"]*)["|']+[^>]*>/gm;
 			var tmpmatch, tmpmatch2, mySrc, tmpval;
             if(tmpmatch = srcRe.exec(myElement)){
                 //console.log(tmpmatch);
@@ -470,28 +518,32 @@ window.Hanjst = window.HanjstDefault;
                 }
             }
             else{
+				//console.log(logTag+" not found src?:["+myElement+"]");
                 mySrc = '';
             }
+			//console.log((new Date())+" appendScript: mySrc:"+mySrc);
             s.src = mySrc; 
         }
-        if(true){
-            try{
-                if(code != null && code != ''){
-                    code = "try{"+code+"}catch(tmpErr){ if("+isDebug+"){console.log(\""+logTag
-                        +"append embed failed 201901151438:\"+JSON.stringify(tmpErr)); } }";
-                }
-                s.appendChild(document.createTextNode(code));
-                document.body.appendChild(s);
-            }
-            catch(e){
-                s.text = code;
-                document.body.appendChild(s);
-            }
-        }
+		try{
+			if(code != null && code != ''){
+				code = "try{"+code+"}catch(tmpErr){ if(true){console.log(\""+logTag
+					+"append embed failed 201901151438:\"); console.log(tmpErr);} }";
+			}
+			s.appendChild(document.createTextNode(code));
+			document.body.appendChild(s);
+		}
+		catch(e){
+			s.text = code;
+			document.body.appendChild(s);
+		}
 		if(isDebug){
-			console.log('_appendScript: '+myCode+'/'+myElement+' has been appended.');
+			console.log(logTag+(new Date())+' appendScript: ['+myCode+']/['+myElement+'] has been appended.');
+		}
+		return ;
 		}
 	};
+	//- export for async call
+	Hanjst.appendScript = appendScript;
 	
 	//- inner methods
 	//- search fields within a regexp match
@@ -621,21 +673,79 @@ window.Hanjst = window.HanjstDefault;
         return myCont;
     };
 	
+	//- show image in async way
+	//- 13:08 Friday, April 10, 2020, revised 12:25 Saturday, April 18, 2020
+	var showImageAsync = function(imgId){
+		var defSrc='data:image/png;base64,MA=='; //-?
+		if(typeof imgId == "undefined" || imgId == null || imgId == ''){
+			return ;	
+		}
+		else{
+			Hanjst.asyncScriptArr.push('if(true){var imageTimerX=window.setTimeout(function(){var tmpObj=document.getElementById(\''+imgId+'\');if(tmpObj){var dataSrc=tmpObj.getAttribute(\'data-src\');if(dataSrc&&dataSrc!=\'\'){tmpObj.src=dataSrc;}}}, 100);}');
+		}
+		return ;
+	}
+	//- export to window and Hanjst
+	if(typeof window.showImageAsync == 'undefined'){
+		window.showImageAsync = Hanjst.showImageAsync = showImageAsync;
+	}
+	else{
+		console.log(logTag + " function 'showImageAsync' conflicts. try to rename showImageAsync to another one.");
+	}
+	
 	//- invoke the magic Hanjst
     var _callRender = function(){ //- wait longer?
         renderTemplate(window, document, null);
         if(isDebug){
-            console.log(logTag + "parse time \
-                cost: "+(((new Date()).getTime() - timeCostBgn)/1000) + "s");
+            console.log(logTag + "parse time cost: "+(((new Date()).getTime() - timeCostBgn)/1000)+"s");
+        }
+		//- oncomplete and raise asyncScripts
+        if(true){
+            var loadingLayer;
+            if(typeof Hanjst.LoadingLayerId != 'undefined'){
+                loadingLayer = document.getElementById(Hanjst.LoadingLayerId);
+            }
+            else{
+                loadingLayer = document.getElementById('Hanjstloading');
+            }
+            if(loadingLayer){
+                loadingLayer.style.display = 'none';
+				loadingLayer.style.width = 0; loadingLayer.style.height = 0;
+				if(isDebug){ console.log((new Date())+" "+logTag+" loadingLayer is quiting...."); }
+            }
+            
+			//(new Function(asyncScripts)).apply(window); //- ?
+			//appendScript(asyncScripts, ''); //- in case of functions defined?
+			if(Hanjst.asyncScriptArr.length > 0){
+				var tmpTimerAsync=window.setTimeout(function(){try{
+						Hanjst.appendScript(Hanjst.asyncScriptArr.join("\n"), '');
+						Hanjst.asyncScriptArr = []; //- re-init
+					}
+					catch(tmpErr){
+						if(Hanjst.isDebug){ 
+							console.log("Hanjst: found error with asyncScripts:"+JSON.stringify(tmpErr));
+						}
+					};
+				}, parseInt(Math.random()*100)+200);
+			}
+            
         }
     };
-    if(window.document.body){
-        document.body.onload = _callRender; //- earlier fire than the one below
-        if(isDebug){ console.log(logTag + " fire with document.onload "+(new Date())); }
+	
+	//- set a trigger to Hanjst
+    if(false){
+        if(window.document.body){
+            document.addEventListener('load', _callRender); //- earlier fire than the one below
+            if(isDebug){ console.log(logTag + " fire with document.onload "+(new Date())); }
+        }
+        else{
+            _callRender();
+        };
     }
     else{
-        window.onload = _callRender;
-    };
+        //- exec without delay, sync mode, immediately...
+        _callRender();
+    }
 	
 })(window); //- anonymous Hanjst main func end
 //- ----------------- MAGIC COMPLETE -----------------
@@ -663,5 +773,17 @@ window.Hanjst = window.HanjstDefault;
  * Fri Jan 11 13:48:28 UTC 2019, +codes refine
  * Tue Jan 15 11:53:30 UTC 2019, remove html comments, imprvs with appendScript
  * Mon Feb 11 06:18:18 UTC 2019, +callRender
+ * 13:54 Friday, April 19, 2019, + check for undefined $xxx 
+ * 12:48 Saturday, April 27, 2019, + readable error reporting for template erros
+ * 19:19 Sunday, May 19, 2019, + renderTemplateRecurse for deep-in include files.
+ * 18:44 Friday, May 31, 2019, + allow limited support for variables in xxxelse scope, bugfix for includeScript.
+ * 07:58 6/2/2019, + imprvs with _appendScript to appendScript for async call.
+ * 16:31 Wednesday, June 5, 2019, + imprvs with parentNode=BODY
+ * 19:18 Monday, June 10, 2019, + bugfix for asyncScripts.
+ * 22:29 Thursday, June 13, 2019, + loadingLayer. "<div id="Hanjstloading" style="width: 100%; height: 100%; z-index: 99;"> Xxxx Loading... 加载中... </div>" .
+ * 21:36 Thursday, June 20, 2019, + warning for MSIE browsers.
+ * Sun Nov 24 11:50:36 CST 2019, + undefined exceptions.
+ * 10:12 Monday, December 2, 2019, + time_stamp.
+ * 10:34 Friday, April 10, 2020, + func showImageAsync
  *** !!!WARNING!!! PLEASE DO NOT COPY & PASTE PIECES OF THESE CODES!
  */

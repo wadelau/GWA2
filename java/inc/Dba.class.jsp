@@ -26,6 +26,7 @@ public final class Dba { //- db administrator
 				">","<","-","(",")",","
 				}
 			));
+	private final String[] Sql_Sep_List_Right = new String[]{" ", ")", ","}; //- 22:45 Wednesday, April 29, 2020
     private final static String Log_Tag = "inc/Dba ";
 
 	//- constructor	
@@ -131,13 +132,12 @@ public final class Dba { //- db administrator
 	
 	}
 	
-	//-- sort ? and its variable name
+	//-- sort param ? and its variable name
+	//- bugfix on 23:03 Wednesday, April 29, 2020 
 	public Object[] sortObject(String sqlstr, HashMap hmvar){
-		
 		Object[] obj = new Object[1];
 		if(hmvar != null){
-			int ki=0;
-			String k=null;
+			int ki=0; String k=null;
 			int hmsize=hmvar.size();
 			obj=new Object[hmsize+1];
 			int sqlLen=sqlstr.length();
@@ -147,12 +147,12 @@ public final class Dba { //- db administrator
 			int selectPos = sqlstr.indexOf("select ");
 			int wherePos = sqlstr.indexOf(" where ");
 			HashSet sqloplist = this.Sql_Operator_List;
-			int keyLen = 0;
-			int keyPos = -1;
-			String preK = null;
-			String aftK = null;
-			
+			int keyLen = 0; int keyPos = -1;
+			String preK = null; String aftK = null;
+			//- compute position of each field
+			int[] keyPosArr = new int[sqlLen]; int keyPosI = 0;
 			Iterator itr=hmvar.keySet().iterator();
+			int lastKeyPos = -1;
 			while(itr.hasNext()){
 				k=(String)itr.next();
 				k = k==null ? "" : k;
@@ -178,11 +178,13 @@ public final class Dba { //- db administrator
 							else{
 								tmpobj[keyPos] = k;
 							}
+							//System.out.println("inc/Dba: sortObject: k:["+k+"] pos:["+keyPos+"] lastKeyPos:["+lastKeyPos+"] preK:["+preK+"] aftK:["+aftK+"] sql:["+sqlstr+"] ");
 						}
 						else{
 							//System.out.println("Dba.sortObject: found illegal key preset. k:["+k+"] pos:["
 							//		+keyPos+"] preK:["+preK+"] aftK:["+aftK+"] sql:["+sqlstr+"]");
 						}
+						lastKeyPos = keyPos;
 						keyPos = sqlstr.indexOf(k,  tmpidx);
 					}
 				}
@@ -190,9 +192,28 @@ public final class Dba { //- db administrator
 					//System.out.println("Dba.sortObject: no such key:["+k+"] in sql:["+sqlstr+"]");
 				}
 			}
+			//- figure out each param mark, i.e., "?"
+			int tmpi = 0;  int paramPos = 0;
+			int[] paramPosArr = new int[sqlLen]; tmpi = 0;
+			for(String SqlSepR : this.Sql_Sep_List_Right){
+				tmpidx = sqlstr.indexOf("?"+SqlSepR);
+				while(tmpidx > -1){
+					paramPosArr[tmpi] = tmpidx;
+					//System.out.println("inc/Dba: tmpi:"+tmpi+" paramPos:"+tmpidx);
+					tmpidx = sqlstr.indexOf("?"+SqlSepR, tmpidx+1); 
+					tmpi++;
+				}
+			}
+			if(sqlstr.substring(sqlLen-1, sqlLen).equals("?")){
+				paramPosArr[tmpi] = sqlLen - 1;
+			}
+			//System.out.println("inc/Dba: 22-tmpi:"+tmpi+" paramPos:"+tmpidx+" lastChar:"+sqlstr.substring(sqlLen-1, sqlLen));
 			
-			int tmpi = 0; Object kiso = null; String kis = null;
+			//- sort each field by its pos
+			tmpi = 0; Object kiso = null; String kis = null;
 			HashMap<String, Integer> kSerial = new HashMap<String, Integer>();
+			int tmpj = 0; lastKeyPos = -1;
+			tmpi = tmpj = 0;
 			for(int i=0; i<sqlLen; i++){
 				k = (String)tmpobj[i];
 				if(k != null){
@@ -207,18 +228,53 @@ public final class Dba { //- db administrator
 						obj[tmpi] = k + "." + (ki+1);
 						kSerial.put(k, ki+1);
 					}
+					//System.out.println("inc/Dba: i:["+i+"] tmpi:["+tmpi+"] k:["+k+"] obj-k:"+obj[tmpi]);
+					keyPosArr[keyPosI++] = i;
 					tmpi++;
-					//System.out.println("inc/Dba: tmpi:["+tmpi+"] k:["+k+"]");
+					lastKeyPos = i;
 				}
 			}
+			//- match each param mark with its field
+			boolean hasMark = false; 
+			tmpi = tmpj = 0;  lastKeyPos = -1; int nextKeyPos = -1;
+			Object[] obj2 = new Object[hmsize+1]; int obj2i = 0;
+			int keyPosArrLen = sqlLen - 1; int paramPosArrLen = sqlLen-1;
+			while(tmpj < keyPosArrLen){
+				keyPos = keyPosArr[tmpj];
+				if(keyPos > 0){
+					//System.out.println("inc/Dba: keyPosArr: key-i:["+tmpj+"] keyPos:["+keyPos+"] lastKeyPos:"+lastKeyPos+" k:"+obj[tmpj]);
+					nextKeyPos = keyPosArr[tmpj+1];
+					hasMark = false;  tmpi = 0;
+					while(tmpi < paramPosArrLen){
+						paramPos = paramPosArr[tmpi];
+						if(paramPos > 0){
+							if(paramPos > keyPos){
+								if(nextKeyPos > 0){
+									if(paramPos < nextKeyPos){
+										hasMark = true;
+									}
+								}
+								else{
+									hasMark = true;
+								}
+							}
+							//System.out.println("\tinc/Dba: paramPosArr: param-i:["+tmpi+"] paramPos:["+paramPos+"] lastKeyPos:"+lastKeyPos+" nextKeyPos:"+nextKeyPos+" hasMark:"+hasMark);
+							if(hasMark){ obj2[obj2i++] = obj[tmpj]; break; }
+						}
+						tmpi++;
+					}
+					lastKeyPos = keyPos;
+				}
+				tmpj++;
+			}
 			
-			itr=null;
-			tmpobj=null;
+			//- put it out
+			obj = obj2;
+			
+			itr=null; tmpobj=null; obj2 = null;
 			
 		}
-		
-		//System.out.println("inc/Dba: obj:["+obj+"]");
-
+		//System.out.println("inc/Dba: obj:["+obj+"] vars:["+hmvar+"]");
 		return obj;
 	
 	}
