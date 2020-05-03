@@ -153,12 +153,13 @@ class DBA {
 		$sqlLen = strlen($sql);
 		$tmpi = 0; $tmpidx = -1; 
 		//- figure out each param mark, i.e., "?"
-		$paramPosArr = array();
+		$paramPosArr = array(); $minParamPos = $sqlLen - 1;
 		$sqlSepListR = $this->Sql_Sep_List_Right;
 		foreach($sqlSepListR as $sqlSepR=>$tmpv){
 			$tmpidx = strpos($sql, '?'.$sqlSepR);	
 			while($tmpidx > 0){
 				$paramPosArr[$tmpi] = $tmpidx;
+				if($tmpidx < $minParamPos){ $minParamPos = $tmpidx; }
 				$tmpidx = strpos($sql, '?'.$sqlSepR, $tmpidx+1);		
 				$tmpi++;
 			}
@@ -170,7 +171,7 @@ class DBA {
 		#debug("inc/Dba: paramPosArr:".serialize($paramPosArr));
 		//- sort each field by its pos
 		$keyPosArr = array(); $keyPosI = 0;
-		$kSerial = array(); $tmpi = 0;
+		$kSerial = array(); $tmpi = 0; $maxKeyPos = 0;
 		for($i=0;$i<$sqlLen;$i++){
 		    if(array_key_exists($i, $tmparr)){
 		        $k = $tmparr[$i];
@@ -179,6 +180,7 @@ class DBA {
 		        $tmpi++;
 		        $kSerial[$k]++;
 				$keyPosArr[$keyPosI++] = $i;
+				if($i > $maxKeyPos){ $maxKeyPos = $i; }
 		    }
 		    else{
 		        # @todo;
@@ -187,36 +189,42 @@ class DBA {
 		#debug("inc/Dba: keyPosArr:".serialize($keyPosArr));
 		//- match each param mark with its field
 		$hasMark = false; $lastKeyPos = -1; $nextKeyPos = -1;
-		$idxArr2 = array(); $idxArrI = 0;
-		$keyPos = 0; $paramPos = 0;
-		foreach($keyPosArr as $kpos=>$vpos){
-			$keyPos = $vpos;
-			if($keyPos > 0){
-				$nextKeyPos = $keyPosArr[$kpos+1];
-				#debug("inc/Dba: kpos:$kpos keyPos:$keyPos nextKeyPos:$nextKeyPos");
-				$hasMark = false;
-				foreach($paramPosArr as $kppos=>$vppos){
-					$paramPos = $vppos;
-					if($paramPos > $keyPos){
-						if($nextKeyPos > 0){
-							if($paramPos < $nextKeyPos){
-								$hasMark = true;
+		if($minParamPos < $maxKeyPos){
+			$idxArr2 = array(); $idxArrI = 0;
+			$keyPos = 0; $paramPos = 0;
+			foreach($keyPosArr as $kpos=>$vpos){
+				$keyPos = $vpos;
+				if($keyPos > 0){
+					$nextKeyPos = $keyPosArr[$kpos+1];
+					#debug("inc/Dba: kpos:$kpos keyPos:$keyPos nextKeyPos:$nextKeyPos");
+					$hasMark = false;
+					foreach($paramPosArr as $kppos=>$vppos){
+						$paramPos = $vppos;
+						if($paramPos > $keyPos){
+							if($nextKeyPos > 0){
+								if($paramPos < $nextKeyPos){
+									$hasMark = true;
+								}
+							}
+							else{
+								$hasMark = true;	
 							}
 						}
-						else{
-							$hasMark = true;	
+						#debug("\tinc/Dba: kppos:$kpos paramPos:$paramPos hasMark:$hasMark");
+						if($hasMark){
+							$idxArr2[$idxArrI++] = $idxarr[$kpos];
+							break;
 						}
-					}
-					#debug("\tinc/Dba: kppos:$kpos paramPos:$paramPos hasMark:$hasMark");
-					if($hasMark){
-						$idxArr2[$idxArrI++] = $idxarr[$kpos];
-						break;
 					}
 				}
 			}
+			//- override
+			$idxarr = $idxArr2; $idxArr2 = null;
 		}
-		//- put it out
-		$idxarr = $idxArr2;
+		else{
+			//- bypass: (a, b, c) ...(?, ?, ?)
+			//- bypass: single param: a=?
+		}
 		#debug("inc/Dba: idxArr:".serialize($idxarr)." sql:".$sql." hmvars:".serialize($hmvars));
 		return $idxarr;
 	}

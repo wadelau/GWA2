@@ -193,13 +193,14 @@ public final class Dba { //- db administrator
 				}
 			}
 			//- figure out each param mark, i.e., "?"
-			int tmpi = 0;  int paramPos = 0;
+			int tmpi = 0;  int paramPos = 0; int minParamPos = sqlLen - 1;
 			int[] paramPosArr = new int[sqlLen]; tmpi = 0;
 			for(String SqlSepR : this.Sql_Sep_List_Right){
 				tmpidx = sqlstr.indexOf("?"+SqlSepR);
 				while(tmpidx > -1){
 					paramPosArr[tmpi] = tmpidx;
 					//System.out.println("inc/Dba: tmpi:"+tmpi+" paramPos:"+tmpidx);
+					if(tmpidx < minParamPos){ minParamPos = tmpidx; }
 					tmpidx = sqlstr.indexOf("?"+SqlSepR, tmpidx+1); 
 					tmpi++;
 				}
@@ -210,7 +211,7 @@ public final class Dba { //- db administrator
 			//System.out.println("inc/Dba: 22-tmpi:"+tmpi+" paramPos:"+tmpidx+" lastChar:"+sqlstr.substring(sqlLen-1, sqlLen));
 			
 			//- sort each field by its pos
-			tmpi = 0; Object kiso = null; String kis = null;
+			tmpi = 0; Object kiso = null; String kis = null; int maxKeyPos = 0;
 			HashMap<String, Integer> kSerial = new HashMap<String, Integer>();
 			int tmpj = 0; lastKeyPos = -1;
 			tmpi = tmpj = 0;
@@ -232,46 +233,53 @@ public final class Dba { //- db administrator
 					keyPosArr[keyPosI++] = i;
 					tmpi++;
 					lastKeyPos = i;
+					if(i > maxKeyPos){ maxKeyPos = i; }
 				}
 			}
 			//- match each param mark with its field
 			boolean hasMark = false; 
 			tmpi = tmpj = 0;  lastKeyPos = -1; int nextKeyPos = -1;
-			Object[] obj2 = new Object[hmsize+1]; int obj2i = 0;
-			int keyPosArrLen = sqlLen - 1; int paramPosArrLen = sqlLen-1;
-			while(tmpj < keyPosArrLen){
-				keyPos = keyPosArr[tmpj];
-				if(keyPos > 0){
-					//System.out.println("inc/Dba: keyPosArr: key-i:["+tmpj+"] keyPos:["+keyPos+"] lastKeyPos:"+lastKeyPos+" k:"+obj[tmpj]);
-					nextKeyPos = keyPosArr[tmpj+1];
-					hasMark = false;  tmpi = 0;
-					while(tmpi < paramPosArrLen){
-						paramPos = paramPosArr[tmpi];
-						if(paramPos > 0){
-							if(paramPos > keyPos){
-								if(nextKeyPos > 0){
-									if(paramPos < nextKeyPos){
+			
+			if(minParamPos < maxKeyPos){
+				Object[] obj2 = new Object[hmsize+1]; int obj2i = 0;
+				int keyPosArrLen = sqlLen - 1; int paramPosArrLen = sqlLen-1;
+				while(tmpj < keyPosArrLen){
+					keyPos = keyPosArr[tmpj];
+					if(keyPos > 0){
+						//System.out.println("inc/Dba: keyPosArr: key-i:["+tmpj+"] keyPos:["+keyPos+"] lastKeyPos:"+lastKeyPos+" k:"+obj[tmpj]);
+						nextKeyPos = keyPosArr[tmpj+1];
+						hasMark = false;  tmpi = 0;
+						while(tmpi < paramPosArrLen){
+							paramPos = paramPosArr[tmpi];
+							if(paramPos > 0){
+								if(paramPos > keyPos){
+									if(nextKeyPos > 0){
+										if(paramPos < nextKeyPos){
+											hasMark = true;
+										}
+									}
+									else{
 										hasMark = true;
 									}
 								}
-								else{
-									hasMark = true;
-								}
+								//System.out.println("\tinc/Dba: paramPosArr: param-i:["+tmpi+"] paramPos:["+paramPos+"] lastKeyPos:"+lastKeyPos+" nextKeyPos:"+nextKeyPos+" hasMark:"+hasMark);
+								if(hasMark){ obj2[obj2i++] = obj[tmpj]; break; }
 							}
-							//System.out.println("\tinc/Dba: paramPosArr: param-i:["+tmpi+"] paramPos:["+paramPos+"] lastKeyPos:"+lastKeyPos+" nextKeyPos:"+nextKeyPos+" hasMark:"+hasMark);
-							if(hasMark){ obj2[obj2i++] = obj[tmpj]; break; }
+							tmpi++;
 						}
-						tmpi++;
+						lastKeyPos = keyPos;
 					}
-					lastKeyPos = keyPos;
+					tmpj++;
 				}
-				tmpj++;
+				//- override
+				obj = obj2; obj2 = null;
+			}
+			else{
+				//- bypass: (a, b, c) ...(?, ?, ?)
+				//- bypass: single param: a=?
 			}
 			
-			//- put it out
-			obj = obj2;
-			
-			itr=null; tmpobj=null; obj2 = null;
+			itr=null; tmpobj=null; 
 			
 		}
 		//System.out.println("inc/Dba: obj:["+obj+"] vars:["+hmvar+"]");
