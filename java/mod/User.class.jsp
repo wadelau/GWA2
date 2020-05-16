@@ -60,6 +60,9 @@ public class User extends WebApp{
 	//- get user id from cookie
 	public String getUserIdByCookie(HttpServletRequest request){
 		String sid = "";
+		if(this.sessiona != null){
+			//- @todo
+		}
 		sid = ""; //- @todo
 		return sid;
 	}
@@ -67,6 +70,9 @@ public class User extends WebApp{
 	//- get lang id from cookie
 	public String getLangByCookie(HttpServletRequest request){
 		String sid = "";
+		if(this.sessiona != null){
+			//- @todo
+		}
 		sid = ""; //- @todo
 		return sid;
 	}

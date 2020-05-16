@@ -142,6 +142,9 @@ class PageNavi extends WebApp{
             }
             #print "$i: [$str] totalpage:[$totalpage]\n";
         }
+		if(!isset($pageArr['pnpn'])){
+			$pageArr['pnpn'] = 1;
+		}
         $pageArr['pnps'] = $para['pnps'];
 
        return $pageArr;

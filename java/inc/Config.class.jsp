@@ -13,6 +13,9 @@
 if(true){
 
 	HashMap hmconf = new HashMap();
+	
+	//- overall
+	hmconf.put("is_debug", false);
 
 	//- db info
 	hmconf.put("dbhost", "localhost");

@@ -244,13 +244,14 @@ public final static class Wht{
 	public static boolean checkClientUA(String myua, String targetua, HttpServletRequest request) {
 		//--check whether a special ua is some kind of client in very beginning, added on 20090108
 		boolean matched=false;
-
-		if(getHeader(request,"User-Agent").equals("")){
-			if(!myua.equals("")){
-				if(myua.toUpperCase().startsWith(targetua)){
-					matched=true;
-				}
-			}	
+		if(myua==null || myua.equals("")){
+			myua = getHeader(request,"User-Agent");
+		}
+		if(!myua.equals("")){
+			targetua = targetua.toUpperCase();
+			if(myua.toUpperCase().indexOf(targetua)){
+				matched=true;
+			}
 		}
 		return matched;
 	}

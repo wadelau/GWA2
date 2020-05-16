@@ -43,33 +43,61 @@ if($smttpl != ''){
 		$smt->assign($k, $v);
 	}
 	
-	if(1){
-		$markfile = $appdir."/tmp/tpl_last_modified.tmp"; # todo: cache the modified tpl file
+	# template handling
+	# try cache tpl content first
+	$tplCacheKey = "gwa2_tpl_cache_key_main_"; $tplCacheExpire = $_CONFIG['cacheexpire']; # 5 mins?
+	$tplCacheReady = true; $tplTmpTag = ".tmp";
+	$enableTplCache = false;
+	if(!$_CONFIG['is_debug'] && $_CONFIG['enable_cache']){ $enableTplCache = true; }
+	else{ $tplCacheReady = false; }
+	if($enableTplCache){
+		$tplCache = $user->getBy("cache:", "", $args=array("key"=>$tplCacheKey));
+		if(!$tplCache[0]){
+			$tplCacheReady = false;
+			debug("comm/footer: read tpl cache fail.".serialize($tplCache));
+		}
+		if(tplCacheReady){
+			$tplCache = $user->getBy("cache:", "", $args=array("key"=>$tplCacheKey.$smttpl));
+			if(!$tplCache[0]){
+				$tplCacheReady = false;
+				debug("comm/footer: read tpl cache fail.".serialize($tplCache));
+			}
+		}
+	}
+	# real actions for replacements in tpl
+	if(!$tplCacheReady){
 		$s_indextpl = $viewdir."/index.html";
 		$s_smttpl = $viewdir."/".$smttpl;
-
 		$indexcontent = file_get_contents($s_indextpl);
 		$tplcontent = file_get_contents($s_smttpl);
-
-		$resrclist = array("images","css","js","pics");
+		$resrclist = array("images","css","js","pics", "styles", "scripts");
 		foreach($resrclist as $k=>$v){
 			$indexcontent = preg_replace("/\"$v\//", "\"".$reqdir."/view/".$siteid."/$v/", $indexcontent);
 			$tplcontent = preg_replace("/\"$v\//", "\"".$reqdir."/view/".$siteid."/$v/", $tplcontent);
 		}
-
-		file_put_contents($s_indextpl.".tmp", $indexcontent);
-		file_put_contents($s_smttpl.".tmp", $tplcontent);
+		file_put_contents($s_indextpl.$tplTmpTag, $indexcontent);
+		file_put_contents($s_smttpl.$tplTmpTag, $tplcontent);
+		if($enableTplCache){
+			$tplCache = $user->setBy("cache:", $args=array("key"=>$tplCacheKey, "expire"=>$tplCacheExpire, "value"=>1));
+			if(!$tplCache[0]){
+				debug("comm/footer: set tpl cache fail.".serialize($tplCache));
+			}
+			$tplCache = $user->setBy("cache:", $args=array("key"=>$tplCacheKey.$smttpl, "expire"=>$tplCacheExpire, "value"=>1));
+			if(!$tplCache[0]){
+				debug("comm/footer: set tpl cache fail.".serialize($tplCache));
+			}
+		}
 	}
 	# for conflicts between smarty {} and javascript {}, using {literal}{/literal}
 	if($display_style == $_CONFIG['display_style_index']){
-		$smttpl = $smttpl.".tmp";
+		$smttpl = $smttpl.$tplTmpTag;
 		$smt->assign('smttpl', $smttpl);
-		$smt->display('index.html.tmp'); 
+		$smt->display('index.html'.$tplTmpTag); 
 		# use index.html, $smttpl would be embedded in index.html by smarty, updated on Sun Jul 29 09:59:29 CST 2012
 	}
 	else if($display_style == $_CONFIG['display_style_smttpl']){
 		//$smt ->assign('respobj', $data['respobj']);
-		$smt->display($smttpl.".tmp"); # use template file only
+		$smt->display($smttpl.$tplTmpTag); # use template file only
 		//var_dump($data);
 	}
 	else{

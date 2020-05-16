@@ -274,18 +274,21 @@ class WebApp implements WebAppInterface{
 	function getBy($fields, $conditions, $withCache=null){
         $hm = array();
 		$colonPos =  strpos($fields, ':'); 
-		#if($fields == 'cache:' && $withCache != null){
-        if($colonPos === false && $withCache != null){
+		$isGetCache = $fields=='cache:' ? true : false;
+		if($withCache == ''){ $withCache = null; }
+        if($withCache != null && ($colonPos === false || $isGetCache)){
             $hm = $this->readObject($type='cache:', $args=$withCache);
             if($hm[0]){
                 #debug(__FILE__.": get from cache succ. ckstr:[".$this->toString($withCache)."]");
             }
-            else{
+            else if(!$isGetCache){
                 $this->set('cache:'.$fields.'-'.$conditions, $ckstr=$withCache['key']);
-                #debug(__FILE__.": get from cache failed, rtn:[".$this->toString($hm)."], try db.
-                #        ckstr:[".$ckstr."]");
+                #debug(__FILE__.": get from cache failed, rtn:[".$this->toString($hm)."], try db. ckstr:[".$ckstr."]");
                 $hm = $this->getBy($fields, $conditions);
             }
+			else{
+				# get cache but failed.
+			}
         }
 		else if($colonPos !== false){ 
 		    # read from file: or http(s): or cache
@@ -338,6 +341,7 @@ class WebApp implements WebAppInterface{
         $hm = array();
 		$sql = trim($sql);
         $origSql = $sql;
+		if($withCache == ''){ $withCache = null; }
         if($withCache != null){
             $hm = $this->readObject($type='cache:', $args=$withCache);
             if($hm[0]){

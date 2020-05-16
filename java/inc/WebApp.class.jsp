@@ -135,16 +135,21 @@ public class WebApp implements WebAppInterface{
 		HashMap hm = new HashMap();
         //- from cache
 		int colonPos = fields.indexOf(":");
-        if(colonPos < 0 && hmCache != null && hmCache.size() > 0){
+		boolean isGetCache = fields.indexOf("cache:") > -1 ? true : false;
+        if(hmCache != null && hmCache.size() > 0 
+			&& (colonPos < 0 || isGetCache))){
             hm = this.readObject("cache:", hmCache);
             if((boolean)hm.get(0)){
                 debug(logTag + ": read cache succ. args:"+hmCache);
             }
-            else{
+            else if(!isGetCache){
                 debug(logTag + ": read cache fail. try db with args:"+hmCache);
                 this.set("cache:" + fields, hmCache.get("key"));
                 hm = this.getBy(fields, args);
             }
+			else{
+				//- get cache but failed.
+			}
         }
         else if( colonPos > -1){ //- from objects
             hm = this.readObject(fields, hmCache);
@@ -583,7 +588,7 @@ public class WebApp implements WebAppInterface{
                 else{
                     if(args.containsKey("expire")){
                         rtnobj = this.cachea.set((String)args.get("key"),
-                                    args.get("value"), (Integer)args.get("expire"));
+                                    args.get("value"), Integer.valueOf((String)args.get("expire")));
                     }
                     else{
                         rtnobj = this.cachea.set((String)args.get("key"),

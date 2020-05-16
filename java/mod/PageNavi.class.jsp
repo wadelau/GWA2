@@ -213,6 +213,9 @@ public class PageNavi extends WebApp{
 				//debug(logTag+"page i:"+i+" pj:"+pj);
 			}
 		}
+		if(!navihm.containsKey("pnpn")){
+			navihm.put("pnpn", 1);
+		}
         navihm.put("pages", pageArr);
 
 		return navihm;

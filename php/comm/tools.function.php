@@ -175,7 +175,6 @@ function base62x($s, $dec=0, $numType=null){
     return $s2;
 }
 
-
 //--- page navigator utils
 
 /**
@@ -480,6 +479,22 @@ function debug($obj, $tag='', $output=null){
 		return $ip;
 		
 	 }
+	 
+	 #
+     public static function checkClientUa($myua='', $targetua, $user=null){
+        $isMatch = false;
+        if($myua == null || $myua == ''){
+            $myua = $_SERVER['HTTP_USER_AGENT'];
+        }
+		if($myua != ''){
+			$targetua = strtolower($targetua);
+			$myua = strtolower($myua);
+			if(inString($targetua, $myua)){
+				$isMatch = true;
+			}
+		}
+        return $isMatch;
+     }
  
  }
  
@@ -493,5 +508,4 @@ function debug($obj, $tag='', $output=null){
  	$scriptname = $scriptname[0];
  	return $smttpl = $scriptname.'_'.($act==''?'main':$act).'.html';
  }
- 
- 
+  
