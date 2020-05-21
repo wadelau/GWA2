@@ -37,7 +37,7 @@ if(fmt.equals("")){
         }
 		//- try tpl cache first
 		boolean enableTplCache = false; boolean tplCacheReady = true;
-		String tplCacheKey = "hanjst_tpl_cache_key_main_"; 
+		String tplCacheKey = "hanjst_tpl_cache_key_main_"+viewdir+"_"; 
 		int tplCacheExpire = (int)Config.get("cacheexpire"); 
 		if(!(boolean)Config.get("is_debug") && (boolean)Config.get("enable_cache")){ enableTplCache = true; }
 		else{ tplCacheReady = false;}

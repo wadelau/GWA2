@@ -45,7 +45,7 @@ if($smttpl != ''){
 	
 	# template handling
 	# try cache tpl content first
-	$tplCacheKey = "gwa2_tpl_cache_key_main_"; $tplCacheExpire = $_CONFIG['cacheexpire']; # 5 mins?
+	$tplCacheKey = "gwa2_tpl_cache_key_main_".$viewdir."_"; $tplCacheExpire = $_CONFIG['cacheexpire']; # 5 mins?
 	$tplCacheReady = true; $tplTmpTag = ".tmp";
 	$enableTplCache = false;
 	if(!$_CONFIG['is_debug'] && $_CONFIG['enable_cache']){ $enableTplCache = true; }
