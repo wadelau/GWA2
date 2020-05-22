@@ -340,7 +340,8 @@ class WebApp implements WebAppInterface{
     function execBy($sql, $conditions=array(), $withCache=null){
         $hm = array();
 		$sql = trim($sql);
-        $origSql = $sql;
+		if($sql != null && $sql != ''){
+			$origSql = $sql;
 		if($withCache == ''){ $withCache = null; }
         if($withCache != null){
             $hm = $this->readObject($type='cache:', $args=$withCache);
@@ -400,6 +401,11 @@ class WebApp implements WebAppInterface{
                 $this->_setCache($hm, $origSql);
             }
         }
+		}
+		else{
+			$hm[0] = false;
+			$hm[1] = array("errordesc"=>"sql:["+sql+"] is null.", "errorcode"=>"1607172158");
+		}
         return $hm;
     }
 

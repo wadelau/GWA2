@@ -320,7 +320,7 @@ public class WebApp implements WebAppInterface{
         //- db
 		String sqlx = null;
 		int pos = -1;
-		if(sql == null){
+		if(sql == null || sql.equals("")){
 			hm.put("0", false);
 			hm.put("1", (new HashMap()).put("errordesc", "sql:["+sql+"] is null. 1607172158.")); 
 		}
