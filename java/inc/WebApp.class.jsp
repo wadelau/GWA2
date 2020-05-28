@@ -257,7 +257,7 @@ public class WebApp implements WebAppInterface{
 		sqls.delete(sqlsLen-2, sqlsLen); //- drop ", "
 		boolean isSqlReady = true;
 		if(args == null || args.equals("")){
-			if(this.getId().equals("")){
+			if(tmpId.equals("") || tmpId.equals("0")){
 				if(isUpdate){
 					debug(logTag + " unconditonal update is forbidden. 1607072133.");
 					hm.put("0", false);

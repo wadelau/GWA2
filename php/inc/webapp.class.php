@@ -243,7 +243,7 @@ class WebApp implements WebAppInterface{
 			$sql = substr($sql,0,strlen($sql)-2); //- drop ", " at the end, Sun Jul 17 22:51:44 UTC 2011
 			$issqlready = 1;
 			if($conditions == null || $conditions == ""){
-				if($this->getId() != ""){
+				if($tmpId != '' && $tmpId != '0'){
 					$sql .= " where ".$this->myId."=?";
 				}
 				else if($isupdate == 1){
