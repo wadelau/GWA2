@@ -1,7 +1,5 @@
 # GWA2
-General Web Application Architecture. 
-
-通用網絡應用架構.
+General Web Application Architecture.  通用網絡應用架構.
 
 ![gwa2](http://ufqi.com/blog/wp-content/uploads/2016/09/gwa2-logo-201606.v2.png)
 ----
@@ -17,7 +15,8 @@ General Web Application Architecture.
 
 * GWA2 speaks in Python ![Python](https://www.python.org/static/img/python-logo.png) .
 
-GWA2 is cross-scripts programming framework for web applications.
+
+### GWA2 is cross-scripts programming framework for web applications.
 
 
 * From Interface to Interactions
@@ -95,9 +94,9 @@ gwa2更新多数据库驱动支持
 
 # An Example Functional Module (User)
 
-##User module, 用户模块
+## User module, 用户模块
 
-###0. Create table, 建用戶表
+### 0. Create table, 建用戶表
 ```sql
 create table gmis_usertbl(
   id int(11) not null auto_increment,
@@ -114,7 +113,7 @@ create table gmis_usertbl(
 );
 ```
 
-###1. Create module class, 创建对象类
+### 1. Create module class, 创建对象类
 mod/user.class.php
 
 继承  inc/webapp.class.php 
@@ -122,7 +121,7 @@ mod/user.class.php
 实现   inc/webapp.interface.php 
 
 
-###2. Create controller, 创建控制器
+### 2. Create controller, 创建控制器
 ctrl/user.php
 
 引入 mod/user.class 并实例化
@@ -141,7 +140,8 @@ ctrl/user.php
 
 在控制器中处理逻辑，然后指定要加载的模板，引入 smarty （自2019年起，模板引擎改为 [Hanjst/汉吉斯特](https://ufqi.com/dev/hanjst/)）
 
-###3. Create view, 创建视图页面
+
+### 3. Create view, 创建视图页面
 view/default/signin.html
 
 其中 view 是模块目录， default 是默认风格
@@ -158,7 +158,13 @@ view/default/signin.html
 /index.php?mod=user&act=xxxx
 
 
-# Install
+# Installation for GWA2 in PHP
 
-Please put all files under a sub directory and init from the script ./install.php
+Please put all files under a sub directory and init from the script ./install.php .
+
+For GWA2 in Java and other languages versions, manual work is still in need.
+
+
+
+
 
