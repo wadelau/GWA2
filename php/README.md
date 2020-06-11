@@ -4,7 +4,7 @@
 General Web Application Architecture (GWA2) has been implemented in PHP.
 GWA2 in PHP helps developers make web applications in PHP scripts with simple yet powerful framework support.
 
-Years of time and many projects have validated that GWA2 in PHP is reliable and extendable for critical mission with almost every web application.
+Years of time and many projects have validated and proved that GWA2 in PHP is reliable and extendable for critical mission with almost every web application.
 
 ## PHP 5.3+ required, but PHP 7.0+ recommended
 
