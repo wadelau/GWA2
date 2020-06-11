@@ -30,7 +30,7 @@ All source files, scripts and data are recommended encoded in UTF-8.
 ## Security enhanced
 
 Multiple projects written in GWA2 in PHP had passed strict black-box and/or white-box security tests and penetration.
-
+.
 
 
 ## Real and Live Instance: gMIS 
