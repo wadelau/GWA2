@@ -15,6 +15,8 @@ General Web Application Architecture.  通用網絡應用架構.
 
 * GWA2 speaks in Python ![Python](https://www.python.org/static/img/python-logo.png) .
 
+.
+
 
 ### GWA2 is cross-scripts programming framework for web applications.
 
@@ -62,6 +64,10 @@ General Web Application Architecture.  通用網絡應用架構.
 
 *-Perl* Version
 
+*-Python* Version
+
+
+
 ----
 
 ***[GWA2 Updates](http://ufqi.com/blog/category/computer-tech/%E9%80%9A%E7%94%A8%E7%BD%91%E7%BB%9C%E5%BA%94%E7%94%A8%E6%9E%B6%E6%9E%84/)***
@@ -96,7 +102,8 @@ gwa2更新多数据库驱动支持
 
 ## User module, 用户模块
 
-### 0. Create table, 建用戶表
+### 0. Create data table, 建用戶表
+
 ```sql
 create table gmis_usertbl(
   id int(11) not null auto_increment,
@@ -153,9 +160,12 @@ view/default/signin.html
   view/default/logout.html
 
   view/default/my.html
+  
 
-###4. Define routing, 在入口定义路由
+### 4. Define routing, 在入口定义路由
 /index.php?mod=user&act=xxxx
+
+.
 
 
 # Installation for GWA2 in PHP
