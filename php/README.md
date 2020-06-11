@@ -17,8 +17,11 @@ GWA2 in PHP have been deployed with Apache HTTPD and Nginx， tested and worked 
 subdirectory ./mod for Module, ./view for View, and ./ctrl for Controller.
 
   Regarding to View, its default template engine,
+  
     -Smarty is deprecated in next release, 
+    
     -Hanjst is recommended for future. 
+    
     Read GWA2 in Java or https://ufqi.com/blog/gwa2-8-years-with-smarty-to-hanjst/ for more.
 
 
@@ -36,6 +39,7 @@ Multiple projects written in GWA2 in PHP had passed strict black-box and/or whit
 ## Real and Live Instance: gMIS 
 
 gMIS / general Management Information System is based GWA2 in PHP.
+
 gMIS may be the most-welcome and successful instance of GWA2 in PHP.
 
 Read more on gMIS: https://ufqi.com/dev/gmis/
