@@ -9,7 +9,7 @@
  * @Xenxin@ufqi.com, Wadelau@hotmail.com
  * @Since July 07, 2016, refactor on Oct 10, 2018
  * @More at the page footer.
- * @Ver 1.6
+ * @Ver 1.9
  */
 
 "use strict"; //- we are serious
@@ -63,34 +63,45 @@ window.Hanjst = window.HanjstDefault;
 	
 	var timeCostBgn = 0; var myDate = new Date();
     if(isDebug){ timeCostBgn = myDate.getTime(); }
-	var pageJsonElement = document.getElementById(jsonDataId);
-	//- check parent node
-	if(pageJsonElement){
-		var parentName = pageJsonElement.parentNode.nodeName;
-		if(parentName.toLowerCase() != 'body'){
-			console.log(logTag+'Error! parentNode:['+parentName+'] should be "BODY". Please consider to put '+logTag+' codes block under <body>. 201906040809.');
-		} 
+	var tplData = {}; // data holder
+	if(window.hasOwnProperty(jsonDataId)){
+		tplData = window[jsonDataId];
+		if(isDebug){ console.log(logTag+'jsonDataId:['+jsonDataId+'] has found in script. 202006031802.'); } 
 	}
+	else{
+		var pageJsonElement = document.getElementById(jsonDataId);
+		//- check parent node
+		if(pageJsonElement){
+			var parentName = pageJsonElement.parentNode.nodeName;
+			if(parentName.toLowerCase() != 'body'){
+				console.log(logTag+'Error! parentNode:['+parentName+'] should be "BODY". Please consider to put '+logTag+' codes block under <body>. 201906040809.');
+			} 
+		}
+		if(pageJsonElement){
+			var tplDataStr = pageJsonElement.innerText;
+			try{
+				tplDataStr = tplDataStr.trim();
+				tplData = JSON.parse(tplDataStr);
+			}
+			catch(e0939){ console.log(e0939); console.log('Error! pageJsonElement in malformat JSON. 201911071307.'); }
+			//- hide raw data
+			pageJsonElement.style.visibility = 'hidden'; // hide json data element
+			tplDataStr = null;
+		}
+		else{
+			console.log(logTag+'pageJsonElement:['+jsonDataId+'] has error. 201812010927'); 
+		}
+	} //- end of pageJsonElement
 	//- handle server response in json,
 	//- parse it into global variables starting with this tplVarTag, ie, $ as the default.
-	var tplData = {}; // data holder
-	if(pageJsonElement){
-		var tplDataStr = pageJsonElement.innerText;
-		try{
-			tplDataStr = tplDataStr.trim();
-			tplData = JSON.parse(tplDataStr);
-		}
-		catch(e0939){ console.log(e0939); console.log('Error! pageJsonElement in malformat JSON. 201911071307.'); }
+	if(tplData){
 		if(!tplData['copyright_year']){ tplData['copyright_year'] = myDate.getFullYear(); }
 		if(!tplData['time_stamp']){ tplData['time_stamp'] = timeCostBgn; }
 		//- parse json keys as global variables
 		//- variables starting with tplVarTag, i.e., $ as default
-		if(window){
-			//- window ready...
-		}
-		else{
+		if(!window){
 			window = {}; //- when and why?	
-			console.log('window undefined error. 201812011122.'); 
+			console.log(logTag + 'window undefined error. 201812011122.'); 
 		}
 		for(var $k in tplData){
 			//console.log("k:"+$k+" v:"+tplData[$k]);
@@ -107,13 +118,9 @@ window.Hanjst = window.HanjstDefault;
 				}
 			}
 		}
-		//- hide raw data
-		pageJsonElement.style.visibility = 'hidden'; // hide json data element
-		tplDataStr = null;
 	}
 	else{
-        window[tplVarTag+'copyright_year'] = myDate.getFullYear();
-		console.log(logTag+'pageJsonElement:['+jsonDataId+'] has error. 201812010927'); 
+		console.log(logTag+'tplData:['+tplData+'] has error. 202006041759.'); 
 	}
 	tplData = null;
 	
@@ -298,12 +305,12 @@ window.Hanjst = window.HanjstDefault;
 		
 		//- main body of the main function
 		//- loop over tplSegment for tags interpret
-		segStr = ''; segi = 0; var tpl2codeArr = []; var tpl2code = '';
+		segStr = ''; segi = 0; var tpl2codeArr = []; var tpl2code = ''; var varList = [];
 		tpl2codeArr.push("var tpl2js = []; var blockLoopCount = 0;");
 		var blockBeginRe, tmpmatch, needSemiComma, containsDot, containsBracket;
 		var tmpArr, containsEqual, tmpIfPos, hasLoopElse, loopElseStr, bracketPos, dotPos;
 		//- tpl keywords and patterns
-		var tplRe = /\{((for|if|while|else|switch|break|case|\$|\/|var|let)[^}]*)\}/gm;
+		var tplRe = /\{((for|if|while|else|switch|break|case|\$|\/|var|let|=)[^}]*)\}/gm;
 		for(segi in tplSegment){ //- loop over segments besides originals
 			segStr = tplSegment[segi];
 			if(segStr.indexOf(unParseTag) > -1){ //- literal scripts
@@ -358,8 +365,9 @@ window.Hanjst = window.HanjstDefault;
 								}
 							}
 							else{
-								//- variables operations, $a++
+								//- variables operations, $a++, $a=1
 								tpl2codeArr.push(exprStr + ';');
+								if(containsEqual){ varList.push(exprStr); }
 							}
 						}
 						else{
@@ -368,6 +376,7 @@ window.Hanjst = window.HanjstDefault;
 								loopElseStr += "\"+"+exprStr+"+\""; // why only this? allow limited support for variables in xxxelse scope.
 							}
 							else{
+								exprStr = _enSafeExpr(exprStr, varList);
 								tpl2codeArr.push("\ttpl2js.push("+exprStr+");");
 							}
 						}
@@ -375,6 +384,7 @@ window.Hanjst = window.HanjstDefault;
 					else if(exprStr.match(/.*({|;|}).*/gm)
 						&& exprStr.indexOf('t;') == -1){ 
 						// exceptions, &gt; &lt;
+						matchStr = matchStr.replace(/"/g, '\\"');
 						tpl2codeArr.push("\ttpl2js.push(\""+matchStr+"\");");
 						if(isDebug){
 						console.log(logTag + "illegal tpl sentence:["+matchStr
@@ -434,6 +444,10 @@ window.Hanjst = window.HanjstDefault;
 								exprStr += '\n\tblockLoopCount = 0;';
 							}
 						}
+						else if(exprStr.indexOf('=') == 0){ //- {=$i+2} , 11:40 6/11/2020
+							exprStr = exprStr.substring(1);
+							exprStr = "\ttpl2js.push("+exprStr+")";
+						}
 						if(exprStr != ''){
 							if(exprStr.indexOf('t;') > -1){
 								exprStr = exprStr.replace('&gt;', '>');
@@ -475,14 +489,15 @@ window.Hanjst = window.HanjstDefault;
 		
 		//- merge data and compile
 		var tplParse = '';		
-		if(isDebug){ console.log(logTag + "tpl2code:"+tpl2code); }
+		if(isDebug){ console.log(logTag + "tpl2code:\n"+tpl2code); }
         try{
 		    //tplParse = (function(){ return (new Function(tpl2code).apply(window)); }).apply();
 		    tplParse = (new Function(tpl2code)).apply(window);
 		    if(isDebug){ console.log("tplParse:"+tplParse); }
         }
         catch(e1200){
-            console.log(JSON.stringify(e1200, Object.getOwnPropertyNames(e1200)));
+			console.log(JSON.stringify(e1200, Object.getOwnPropertyNames(e1200)));
+			//window.alert(tmpStr);
         }
 		Hanjst.tplObject.innerHTML = tplParse;
 		//- release objects		
@@ -660,8 +675,14 @@ window.Hanjst = window.HanjstDefault;
     //- inner method
     //- remedy for comment lines in JavaScript
     var _remedyMemoLine = function(myCont){
-        var memoRe = /[^(:|"|'|=)]\/\/(.*?)[\n\r]+/gm; // "//-" patterns
-        var match, matchStr, segStr; var myContNew = myCont;
+		var memoRe = /\/\*([^]+?)\*\//gm; // "/* ... */" patterns
+		var match, matchStr, segStr; var myContNew = myCont;
+		while(match = memoRe.exec(myCont)){
+			//console.log("memoRe:match:"); console.log(match);
+            matchStr = match[0]; segStr = match[1];
+            myContNew = myContNew.replace(matchStr, "/*"+logTag+"DISCARD_MEMO_LINES*/");
+		}
+        memoRe = /[^(:|"|'|=)]\/\/(.*?)[\n\r]+/gm; // "//-" patterns
 		while(match = memoRe.exec(myCont)){
             //console.log("memoRe:match:"); console.log(match);
             matchStr = match[0]; segStr = match[1];
@@ -672,6 +693,67 @@ window.Hanjst = window.HanjstDefault;
 		myCont = myCont.replace(/<!--.*?-->/g, '');
         return myCont;
     };
+	
+	//- inner method
+	//- _enSafeExpr
+	var _enSafeExpr = function(expr, varList){
+		var newExpr = expr;
+		if(expr.length > 0 && expr.startsWith(tplVarTag)){
+			var tmpPos = expr.indexOf('[');
+			var tmpExprArr = []; var tmpK = '';
+			if(tmpPos > -1){ //- objects access
+				tmpK = expr.substring(0, tmpPos);
+				if(window.hasOwnProperty(tmpK)){
+					//console.log(logTag+"_enSafeExpr: 00 goood! defined! tmpK:["+tmpK+"] tmpPos:"+tmpPos);
+				}
+				else{
+					if(isDebug){ console.log(logTag+"_enSafeExpr: 00 bad, NotDefined. tmpK:["+tmpK+"] tmpPos:"+tmpPos); }
+					tmpExprArr.push(tmpK);
+				}
+				if(expr.indexOf(']]') == -1){
+					tmpPos = expr.indexOf('[', tmpPos+1);
+					while(tmpPos > -1){
+						tmpK = expr.substring(0, tmpPos);
+						tmpExprArr.push(tmpK);
+						//console.log(logTag+"_enSafeExpr: 11 bad, NotDefined. tmpK:["+tmpK+"] tmpPos:"+tmpPos);
+						tmpPos = expr.indexOf('[', tmpPos+1);
+					}
+				}
+				else{
+					//- @todo: $hashList[$otherList['k2']['k3']]
+				}
+			}
+			else{ //- simple variables
+				tmpK = expr;
+				if(window.hasOwnProperty(tmpK)){
+					//console.log(logTag+"_enSafeExpr: 0000 goood! defined! tmpK:["+tmpK+"] tmpPos:"+tmpPos);
+				}
+				else{
+					if(isDebug){ console.log(logTag+"_enSafeExpr: 0000 bad, NotDefined. tmpK:["+tmpK+"] tmpPos:"+tmpPos); }
+					tmpExprArr.push(tmpK);
+				}
+			}
+			var arrSize = tmpExprArr.length; var hasDeclared = false; var targetC = 0;
+			for(var i=arrSize-1; i>-1; i--){
+				tmpK = tmpExprArr[i];
+				hasDeclared = false;
+				for(var j in varList){
+					if(varList[j].indexOf(tmpK+'=') > -1){
+						hasDeclared = true;
+						break;
+					} 
+				}
+				if(!hasDeclared){
+					newExpr = "(typeof "+tmpK+" == 'undefined') ? '' : ("+newExpr+")";
+					targetC++;
+				}
+			}
+			if(isDebug && targetC > 0){
+				console.log(logTag+"_enSafeExpr: undefined detected! expr:["+expr+"] newExpr:"+newExpr); 
+			}
+		}
+		return newExpr;
+	};
 	
 	//- show image in async way
 	//- 13:08 Friday, April 10, 2020, revised 12:25 Saturday, April 18, 2020
@@ -785,5 +867,8 @@ window.Hanjst = window.HanjstDefault;
  * Sun Nov 24 11:50:36 CST 2019, + undefined exceptions.
  * 10:12 Monday, December 2, 2019, + time_stamp.
  * 10:34 Friday, April 10, 2020, + func showImageAsync
+ * 17:49 Wednesday, May 20, 2020, + _enSafeExpr.
+ * 09:52 Thursday, June 4, 2020, + import jsonDataId with script.
+ * 11:42 6/11/2020, + {=$i+2} support.
  *** !!!WARNING!!! PLEASE DO NOT COPY & PASTE PIECES OF THESE CODES!
  */
