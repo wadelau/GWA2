@@ -249,7 +249,7 @@ public final static class Wht{
 		}
 		if(!myua.equals("")){
 			targetua = targetua.toUpperCase();
-			if(myua.toUpperCase().indexOf(targetua)){
+			if(myua.toUpperCase().indexOf(targetua) > -1){
 				matched=true;
 			}
 		}

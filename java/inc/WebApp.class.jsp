@@ -137,7 +137,7 @@ public class WebApp implements WebAppInterface{
 		int colonPos = fields.indexOf(":");
 		boolean isGetCache = fields.indexOf("cache:") > -1 ? true : false;
         if(hmCache != null && hmCache.size() > 0 
-			&& (colonPos < 0 || isGetCache))){
+			&& (colonPos < 0 || isGetCache)){
             hm = this.readObject("cache:", hmCache);
             if((boolean)hm.get(0)){
                 debug(logTag + ": read cache succ. args:"+hmCache);
