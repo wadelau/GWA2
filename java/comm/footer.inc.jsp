@@ -112,8 +112,8 @@ if(fmt.equals("")){
         tplcont = hanjst.replaceElement(tplcont, (HashMap)data.get("outReplaceList"));
 		tplcont = tplcont.replace(hanjstJsonDataTag, jsondata);
 		
-		//- @todo cache final tpls ?
-		out.println("<!--" + outx +" \n -->" + tplcont); 
+		//- print out contents
+		out.println(tplcont + "<!--" + outx +" \n -->"); 
 	
 	}
 }

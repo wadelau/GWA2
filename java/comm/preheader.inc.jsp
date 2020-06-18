@@ -27,7 +27,7 @@ request.setCharacterEncoding("UTF-8");
 
 //- global variables across the app, embedded in two types of files: /index, /ctrl/xxx
 //- need to init before manipulate
-%><%!String sid, appdir, siteid, fmt, mytpl, mod, act, rtvdir, url;
+%><%!String sid, appdir, siteid, fmt, mytpl, mod, act, rtvdir, url, userid;
 HashMap data; StringBuffer outx; User user; Language lang; HanjstTemplate hanjst; %><%
 
 data = new HashMap(); //- for tpl data container

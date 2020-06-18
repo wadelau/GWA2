@@ -17,4 +17,6 @@ fmt = (String)crsPage.get("fmt");
 url = (String)crsPage.get("url");
 sid = (String)crsPage.get("sid");
 
+userid = user.getId();
+
 %>

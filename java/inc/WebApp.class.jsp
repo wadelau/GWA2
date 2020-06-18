@@ -391,7 +391,7 @@ public class WebApp implements WebAppInterface{
 		StringBuffer sqlb = new StringBuffer("delete from ");
 		sqlb.append(this.getTbl()).append(" where ");
 
-		if(!args.equals("")){
+		if(args.equals("")){
 			if(this.getId().equals("")){
 				hm.put(0, false);
 				hm.put(1, (new HashMap()).put("errordesc", 

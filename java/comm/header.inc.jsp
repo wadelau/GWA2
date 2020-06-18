@@ -29,8 +29,8 @@ url = rtvdir + "/?sid=" + sid;
 //- user
 user = new User();
 if(true){
-	String tmpUserId = user.getUserIdByCookie(request);
-	if(!tmpUserId.equals("")){ user.setId(tmpUserId); }
+	userid = user.getUserIdByCookie(request);
+	if(!tmpUserId.equals("")){ user.setId(userid); }
 }
 //- lang
 if(true){
