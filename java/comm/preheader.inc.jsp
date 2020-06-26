@@ -15,7 +15,7 @@ request.setCharacterEncoding("UTF-8");
 //- all I/O toolsets
 %><%@include file="./Wht.tools.inc.jsp"%><%
 //- global configs
-%><%@include file="../inc/Config.class.jsp"%><%!
+%><%@include file="../inc/Config.class.jsp"%><%
 //- parent of all objects
 %><%@include file="../inc/WebApp.class.jsp"%><%
 //- user
@@ -31,7 +31,6 @@ request.setCharacterEncoding("UTF-8");
 HashMap data; StringBuffer outx; User user; Language lang; HanjstTemplate hanjst; %><%
 
 data = new HashMap(); //- for tpl data container
-
 outx = new StringBuffer(); //- same as $out in -PHP for row strings output
 
 %><%!

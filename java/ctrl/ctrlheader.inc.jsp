@@ -18,5 +18,16 @@ url = (String)crsPage.get("url");
 sid = (String)crsPage.get("sid");
 
 userid = user.getId();
+userid = user.getId();
+//- lang again
+if(true){
+	HashMap langconf = new HashMap();
+	langconf.put("language", (String)data.get("language")); 
+	langconf.put("country", (String)data.get("languagecountry"));
+	lang = new Language(langconf);
+}
+
+//- start an inner modfs
+try{
 
 %>
