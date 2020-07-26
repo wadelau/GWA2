@@ -5,7 +5,7 @@
 //- shared comm in /ctrl
  %><%@include file="./ctrlheader.inc.jsp"%><%
 
-//- modules
+//- modules,  util,libs first
 %><% // @include file="../mod/User.class.jsp" //- relocated to comm/preheader.inc
 %><%
 %><%@include file="../mod/News.class.jsp"%><%

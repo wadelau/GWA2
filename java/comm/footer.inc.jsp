@@ -46,7 +46,7 @@ if(fmt.equals("")){
 			//- embedded in index.html
 			if(enableTplCache){
 				hmtpl = hanjst.getBy("cache:", "", Wht.initHashMap("key", tplCacheKey));
-				if(!(boolean)hmtpl.get(0)){ tplCacheReady = true; }
+				if(!(boolean)hmtpl.get(0)){ tplCacheReady = false; }
 				else{ tplcont = (String)hmtpl.get(1); }
 				if(tplCacheReady){
 					hmtpl = hanjst.getBy("cache:", "", Wht.initHashMap("key", tplCacheKey+mytpl));
@@ -75,7 +75,7 @@ if(fmt.equals("")){
 			String innertpl = (String)data.get("innertpl");
 			if(enableTplCache){
 				hmtpl = hanjst.getBy("cache:", "", Wht.initHashMap("key", tplCacheKey+mytpl));
-				if(!(boolean)hmtpl.get(0)){ tplCacheReady = true; }
+				if(!(boolean)hmtpl.get(0)){ tplCacheReady = false; }
 				else{ tplcont = (String)hmtpl.get(1); }
 				if(tplCacheReady){
 					if(innertpl != null && !innertpl.equals("")){

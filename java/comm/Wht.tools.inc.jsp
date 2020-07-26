@@ -22,7 +22,16 @@ public final static class Wht{
 	public static String get(HttpServletRequest request, String field){
 		String tmps = request.getParameter(field);
         if(tmps == null || tmps.equals("")){
-            tmps = (String)request.getAttribute(field);
+			//- float?
+			Object obj = request.getAttribute(field);
+			if(obj != null 
+				&& (obj instanceof Integer || obj instanceof Double 
+					|| obj instanceof Float || obj instanceof Long)){
+				tmps = String.valueOf(obj);
+			}
+			else{
+				tmps = (String)obj;
+			}
         }
         return Wht._enSafe(tmps);
 	}
@@ -351,9 +360,13 @@ public final static class Wht{
 		return firstMap;
 	}
 	
-	 //- rdmInt
+	//- rdmInt
     public static int rdmInt(){
-        return ((new java.util.Random()).nextInt((999999) + 100000));
+        return Wht.rdmInt(10000);
+    }
+	//- rdmInt with seed
+    public static int rdmInt(int mySeed){
+        return ((new java.util.Random()).nextInt((mySeed)));
     }
 }
 %>

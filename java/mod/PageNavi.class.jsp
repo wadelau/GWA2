@@ -418,7 +418,10 @@ public class PageNavi extends WebApp{
 	//-
 	private String addQuote(String s){
 		String str = "";
-		//- @todo
+		if(s.indexOf("'") > -1){
+			s = s.replaceAll("'", "\\'"); 
+		}
+		str = "'"+s+"'";
 		return str;
 	}
 
