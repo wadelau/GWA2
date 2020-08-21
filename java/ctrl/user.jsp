@@ -1,13 +1,15 @@
-<%
+<%@page 
+language="java" 
+pageEncoding="UTF-8"%><%
 /* controller of user mod
  * v2
+ * need pageEncoding for non-ascill characters in the source code, e.g. Chinese, Japanese, Russia... 17:29 2020-07-29
+
  */
 //- shared comm in /ctrl
  %><%@include file="./ctrlheader.inc.jsp"%><%
 
 //- modules,  util,libs first
-%><% // @include file="../mod/User.class.jsp" //- relocated to comm/preheader.inc
-%><%
 %><%@include file="../mod/News.class.jsp"%><%
 
 

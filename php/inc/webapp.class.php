@@ -7,6 +7,7 @@
  * Sat Aug  8 11:22:40 CST 2015
  * v0.2, Wed, 12 Oct 2016 13:07:02 +0800
  * imprvs on time field, Tue, 13 Mar, 2018 15:12:44
+ * imprvs on event-driven cache update, 14:17 2020-08-21
  */
 
 if(!defined('__ROOT__')){
@@ -212,10 +213,12 @@ class WebApp implements WebAppInterface{
 	 * update by extending to writeObject by wadelau, Sat May  7 11:06:37 CST 2016
 	 * # fieldname should precede with a space, e.g. "where a>?&& b < ?"
 	 */
-	function setBy($fields, $conditions){
+	function setBy($fields, $conditions, $withCache=null){
 		$hm = array();
 		if(strpos($fields, ':') !== false){ # write to  file: or http(s): or cache
-			$hm = $this->writeObject($type=$fields, $args=$conditions);
+			$args = $conditions;
+			if(!is_array($args) && $withCache != null){ $args = $withCache; }
+			$hm = $this->writeObject($type=$fields, $args);
 		}
 		else{
 			# write to db
@@ -260,6 +263,12 @@ class WebApp implements WebAppInterface{
 				if($this->getId() != ""){ $this->hmf["pagesize"] = 1; } # single record
 				$hm = $this->dba->update($sql, $this->hmf);
 				$hm[]['isupdate'] = $isupdate;
+				//- rm old cache when updt succ, 14:37 2020-08-21
+				$args = $conditions;
+				if(!is_array($args) && $withCache != null){ $args = $withCache; }
+				if(is_array($args) && $hm[0]){
+					$this->rmBy("cache:"+$args['key']);
+				}
 			}
 		}
 		return $hm;
@@ -342,28 +351,7 @@ class WebApp implements WebAppInterface{
 		$sql = trim($sql);
 		if($sql != null && $sql != ''){
 			$origSql = $sql;
-		if($withCache == ''){ $withCache = null; }
-        if($withCache != null){
-            $hm = $this->readObject($type='cache:', $args=$withCache);
-            if($hm[0]){
-                #debug(__FILE__.": get from cache succ. ckstr:[".$this->toString($withCache)."]");
-            }
-            else{
-                $this->set('cache:'.$origSql, $ckstr=$withCache['key']);
-                #debug(__FILE__.": get from cache failed, try db. ckstr:[".$ckstr."]");
-                $hm = $this->execBy($sql, $conditions);
-            }
-        }
-		else{
-		# remedy time fields in sql, Mar 13, 2018
-		foreach($this->timeFieldArr as $k=>$timef){
-			if(inString(' '.$timef, $sql) || inString(','.$timef, $sql)
-				&& !isset($this->hmf[$timef]) ){
-				$this->set($timef, $timeNow=date("Y-m-d H:i:s", time()));
-				debug("sql:[$sql] found unset timefield:$timef and remedy it by time:$timeNow.");
-			}
-		}
-            if($conditions == null){
+			if($conditions == null){
                 $conditions = '';
             }
             $pos = stripos($sql, "select ");
@@ -378,29 +366,55 @@ class WebApp implements WebAppInterface{
     			else{
                     $pos = stripos($sql, "show ");
                 }
-            }
-    		#error_log(__FILE__.": select!! sql:$pos");
-    		if($conditions != ''){
-    			if(strpos($sql, " where") === false){
-    				$sql .= " where ".$conditions;
-    			}
-    			else{
-    				$sql .= $conditions;
-    			}
-    		}
-            if($pos === 0){
-                $hm = $this->dba->select($sql, $this->hmf);
-                #error_log(__FILE__.": select!! sql:[$sql] pos:[$pos]");
-            }
-    		else{
-                #error_log(__FILE__.": update!! sql:[$sql] pos:[$pos]");
-                $hm = $this->dba->update($sql, $this->hmf);
-            }
-            #error_log(__FILE__.": execBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
-            if($pos === 0){
-                $this->_setCache($hm, $origSql);
-            }
-        }
+            }			
+			if($withCache == ''){ $withCache = null; }
+			if($pos === 0 && $withCache != null){
+				//- via cache
+				$hm = $this->readObject($type='cache:', $args=$withCache);
+				if($hm[0]){
+					#debug(__FILE__.": get from cache succ. ckstr:[".$this->toString($withCache)."]");
+				}
+				else{
+					$this->set('cache:'.$origSql, $ckstr=$withCache['key']);
+					#debug(__FILE__.": get from cache failed, try db. ckstr:[".$ckstr."]");
+					$hm = $this->execBy($sql, $conditions);
+				}
+			}
+			else{
+				//- via db
+				# remedy time fields in sql, Mar 13, 2018
+				foreach($this->timeFieldArr as $k=>$timef){
+					if(inString(' '.$timef, $sql) || inString(','.$timef, $sql)
+						&& !isset($this->hmf[$timef]) ){
+						$this->set($timef, $timeNow=date("Y-m-d H:i:s", time()));
+						debug("sql:[$sql] found unset timefield:$timef and remedy it by time:$timeNow.");
+					}
+				}
+				#error_log(__FILE__.": select!! sql:$pos");
+				if($conditions != ''){
+					if(strpos($sql, " where") === false){
+						$sql .= " where ".$conditions;
+					}
+					else{
+						$sql .= $conditions;
+					}
+				}
+				if($pos === 0){
+					$hm = $this->dba->select($sql, $this->hmf);
+					#error_log(__FILE__.": select!! sql:[$sql] pos:[$pos]");
+					//- set cache
+					$this->_setCache($hm, $origSql);
+				}
+				else{
+					#error_log(__FILE__.": update!! sql:[$sql] pos:[$pos]");
+					$hm = $this->dba->update($sql, $this->hmf);
+					//- rm old cache when updt succ, 14:30 2020-08-21
+					if($withCache != null && $hm[0]){
+						$this->rmBy("cache:"+$withCache['key']);
+					}
+				}
+				#error_log(__FILE__.": execBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
+			}
 		}
 		else{
 			$hm[0] = false;
@@ -430,11 +444,20 @@ class WebApp implements WebAppInterface{
 			}
 		}
 		else{
-			if(stripos($conditions, 'where ') === false){
-				$sql .= " where ";
+			$isRmCache = false;
+			if(strpos($conditions, 'cache:') > -1){ isRmCache = true; }
+			if($isRmCache){
+				//- rm cache when updt, xenxin@ufqi.com, 12:05 2020-08-20
+				//- args=cache:keyString
+				$hm = $this->writeObject("cache:", array("key"=>substr($conditions, 6)); // rm cache without value as key.
 			}
-			$sql .= $conditions;
-			$issqlready = 1;
+			else{
+				if(stripos($conditions, 'where ') === false){
+					$sql .= " where ";
+				}
+				$sql .= $conditions;
+				$issqlready = 1;
+			}
 		}
 		#debug(": rmBy: sql:[".$sql."] hmf:[".serialize($this->hmf)."] [1201241223].\n");
 		if($issqlready == 1){
@@ -702,7 +725,7 @@ class WebApp implements WebAppInterface{
 			$obj = array(0=>true);
 			if($this->cachea != null){
 			if(is_null($args['value'])){
-				$obj = $this->cachea->rm($args['key']);
+				$obj = $this->cachea->rm($args['key']); //- see this->rmBy
 			}
 			else{
 				#print_r($args);

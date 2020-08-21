@@ -243,7 +243,6 @@ public class WebApp implements WebAppInterface{
 		String[] fieldArr = fields.split(",");
 		String timeFields = java.util.Arrays.toString(this.timeFieldArr);
 		for(String f: fieldArr){
-			//String f = fieldArr[i];
 			f = f==null ? "" : f.trim();
 			if(Wht.inString(f, timeFields) && this.get(f).equals("")){
 				sqls.append(f).append("=NOW(), "); // assume MySQL?
@@ -278,6 +277,10 @@ public class WebApp implements WebAppInterface{
 			}
 			hm = this.dba.update(sqls.toString(), this.hmf);
 			hm.put("isupdate", isUpdate);
+			//-rm old cache when updt succ, 2020-08-20
+			if(xargs != null && (boolean)hm.get(0)){
+				this.rmBy("cache:"+xargs.get("key"));
+			}
 		}
 		sqls = null; args = null; fields = null;
 
@@ -301,24 +304,8 @@ public class WebApp implements WebAppInterface{
 	//- ported from GWA2PHP by wadelau, Sun Jul 17 22:13:39 CST 2016
 	public HashMap execBy(String sql, String args, HashMap hmCache){
 		HashMap hm = new HashMap();
-		args = args==null ? "" : args;
-        String origSql = sql;
-        //- via cache
-        if(hmCache != null && hmCache.size() > 0){
-            hm = this.readObject("cache:", hmCache);
-            if((boolean)hm.get(0)){
-                //-
-                debug(logTag + " execBy read cache succ..."+hmCache);
-            }
-            else{
-                debug(logTag + " execBy read cache failed and try db...");
-                this.set("cache:" + origSql, hmCache.get("key"));
-                hm = this.execBy(sql, args);
-            }
-        }
-        else{
-        //- db
-		String sqlx = null;
+		args = args==null ? "" : args.trim();
+        String origSql = sql; String sqlx = null;
 		int pos = -1;
 		if(sql == null || sql.equals("")){
 			hm.put("0", false);
@@ -340,9 +327,23 @@ public class WebApp implements WebAppInterface{
 				}
 			}
 		}
+        //- via cache
+        if(pos == 0 && hmCache != null && hmCache.size() > 0){
+            hm = this.readObject("cache:", hmCache);
+            if((boolean)hm.get(0)){
+                //- debug(logTag + " execBy read cache succ..."+hmCache);
+            }
+            else{
+                debug(logTag + " execBy read cache failed and try db...");
+                this.set("cache:" + origSql, hmCache.get("key"));
+                hm = this.execBy(sql, args);
+            }
+        }
+        else{
+        //- via db
 		// remedy for time fields, Mar 13, 2018
-		String nowStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-		for(String timef:this.timeFieldArr){
+		String nowStr = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date());
+		for(String timef : this.timeFieldArr){
 			if(sql.indexOf(timef) > -1 && this.get(timef).equals("")){
 				this.set(timef, (nowStr));	
 			}
@@ -357,15 +358,18 @@ public class WebApp implements WebAppInterface{
 		}
 		if(pos == 0){
 			//- read mode
-			hm = this.dba.select(sql, this.hmf);	
+			hm = this.dba.select(sql, this.hmf);
+			//- set cache
+			this._setCache(hm, origSql); 
 		}
 		else{
 			//- write mode
 			hm = this.dba.update(sql, this.hmf);
+			//-rm old cache when updt succ, 09:57 2020-08-20
+			if(hmCache != null && (boolean)hm.get(0)){
+				this.rmBy("cache:"+hmCache.get("key"));
+			}
 		}
-        if(pos == 0){
-            this._setCache(hm, origSql); 
-        }
 		sql = null; sqlx = null; args = null;
 
         }
@@ -390,7 +394,6 @@ public class WebApp implements WebAppInterface{
 		boolean isSqlReady = false;
 		StringBuffer sqlb = new StringBuffer("delete from ");
 		sqlb.append(this.getTbl()).append(" where ");
-
 		if(args.equals("")){
 			if(this.getId().equals("")){
 				hm.put(0, false);
@@ -405,10 +408,18 @@ public class WebApp implements WebAppInterface{
 			}
 		}
 		else{
-			sqlb.append(args);
-			isSqlReady = true;
+			boolean isRmCache = false;
+			if(args.indexOf("cache:")==0){ isRmCache = true; }
+			if(isRmCache){
+				//- rm cache when updt, xenxin@ufqi.com, 12:05 2020-08-20
+				//- args=cache:keyString
+				hm = this.writeObject("cache:", Wht.initHashMap("key", args.substring(6))); // rm cache without value as key.
+			}
+			else{
+				sqlb.append(args);
+				isSqlReady = true;
+			}
 		}
-		
 		if(isSqlReady){
 			System.out.println(logTag + " rmBy: sql:["+sqlb.toString()+"]");
 			hm = this.dba.update(sqlb.toString(), this.hmf);	
@@ -417,9 +428,7 @@ public class WebApp implements WebAppInterface{
 			}
 		}
 		sqlb = null; args = null;
-
 		return hm;
-
 	}
 
 	//-
@@ -515,7 +524,7 @@ public class WebApp implements WebAppInterface{
  
     //- private methods
     //- read an object 
-    private HashMap readObject(String type, HashMap args){
+    protected HashMap readObject(String type, HashMap args){
         HashMap rtnobj = new HashMap();
         type = type==null ? "" : type;
         HashMap hmtmp = new HashMap();
@@ -574,7 +583,7 @@ public class WebApp implements WebAppInterface{
     }
 
     //- write an object to somewhere
-    private HashMap writeObject(String type, HashMap args){
+    protected HashMap writeObject(String type, HashMap args){
         HashMap rtnobj = new HashMap();
         type = type==null ? "" : type;
         HashMap hmtmp = new HashMap();
@@ -583,7 +592,7 @@ public class WebApp implements WebAppInterface{
             rtnobj.put(0, true);
             if(this.cachea != null){
                 if(!args.containsKey("value")){
-                    rtnobj = this.cachea.rm((String)args.get("key"));
+                    rtnobj = this.cachea.rm((String)args.get("key")); //- see this.rmBy
                 }
                 else{
                     if(args.containsKey("expire")){

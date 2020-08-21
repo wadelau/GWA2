@@ -52,7 +52,7 @@ public class PageNavi extends WebApp{
 		this.pdef.put("barlength", 8); //- page list length
 
 		this.file = request.getRequestURL() + "";
-		this.query = request.getQueryString();
+		this.query = request.getQueryString()==null ? "" : request.getQueryString();
 		this.query = this.query.replaceAll("&pnpn=([0-9]*)", "");	
 		this.url = file + "?" + this.query;	
 		this.hmf.put("url", this.url);	
