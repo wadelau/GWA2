@@ -46,8 +46,14 @@ public class HanjstTemplate extends WebApp{
 		tplcont = tplcont==null ? "" : tplcont;
         String[] repTags = this.repPathTags; 
         for(int ti=0; ti<repTags.length; ti++){
-			tplcont = tplcont.replaceAll("'"+repTags[ti]+"/", "'"+viewdir+"/"+repTags[ti]+"/");
-            tplcont = tplcont.replaceAll("\""+repTags[ti]+"/",  "\""+viewdir +"/"+repTags[ti]+"/"); 
+			if(repTags[ti]!=null && !repTags[ti].equals("")){
+				if(tplcont.indexOf("'"+repTags[ti]+"/") > -1){
+					tplcont = tplcont.replaceAll("'"+repTags[ti]+"/", "'"+viewdir+"/"+repTags[ti]+"/");
+				}
+				if(tplcont.indexOf("\""+repTags[ti]+"/") > -1){
+					tplcont = tplcont.replaceAll("\""+repTags[ti]+"/",  "\""+viewdir +"/"+repTags[ti]+"/"); 
+				}
+			}
         }
         return tplcont;
     }
@@ -60,8 +66,12 @@ public class HanjstTemplate extends WebApp{
 		}
 		else{
 			//debug(tplcont); debug(replaceList);
+			String tmpks = null;
 			for(Object tmpk : replaceList.keySet()){
-				tplcont = tplcont.replaceAll((String)tmpk, String.valueOf(replaceList.get(tmpk)));
+				tmpks = (String)tmpk;
+				if(tplcont.indexOf(tmpks) > -1){
+					tplcont = tplcont.replaceAll(tmpks, String.valueOf(replaceList.get(tmpk)));
+				}
 			}
 		}
 		return tplcont;

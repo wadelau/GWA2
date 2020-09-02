@@ -36,8 +36,7 @@ public final class Filea { //- files administrator
 		else{
 			debug(Log_Tag+"Unknown fileDriver:["+fileDriver+"]. 1607021745.\n");	
 		}
-		//debug(Log_Tag+"dbDriver:["+dbDriver+"] dbc:["+this.dbDrv+"]. 1607021957.\n");	
-
+		//debug(Log_Tag+"dbDriver:["+dbDriver+"] dbc:["+this.dbDrv+"]. 1607021957.\n");
 	}
 
     //- destructor
@@ -47,11 +46,8 @@ public final class Filea { //- files administrator
 
 	//- 
 	public HashMap read(String myfile, HashMap args){
-	
 		HashMap hm = new HashMap();
-		
 		HashMap tmpHm = this.fileDrv.read(myfile, args);
-		
 		if((boolean)tmpHm.get(0)){ //- what's for?
 			hm.put(0, true);
 			try{
@@ -66,18 +62,13 @@ public final class Filea { //- files administrator
 			hm.put(1, tmpHm.get(1));
 		}
 		tmpHm = null; 
-
 		return hm;
-	
 	}
 	
 	//- 
 	public HashMap write(String myfile, String contents, HashMap args){
-	
 		HashMap hm = new HashMap();
-
 		HashMap tmpHm = this.fileDrv.write(myfile, contents, args);
-		
 		if((boolean)tmpHm.get(0)){
 			hm.put(0, true);
 			HashMap inHm = new HashMap();
@@ -88,12 +79,16 @@ public final class Filea { //- files administrator
 			hm.put(0, false);
 			hm.put(1, tmpHm.get(1));
 		}
-
 		//debug(Log_Tag+""+ (new Date())+" args:["+args+"] idxArr:["+idxArr+"]");	
 		tmpHm = null; 
-		
 		return hm;
+	}
 	
+	//-
+	public HashMap rm(String myfile){
+		HashMap hmResult = null;
+		hmResult = this.fileDrv.rm(myfile);
+		return hmResult;
 	}
 	
     //-
@@ -102,7 +97,7 @@ public final class Filea { //- files administrator
             this.fileDrv.close();
         }
     }
-		
+
 }
 
 
@@ -116,6 +111,8 @@ public interface FileDriver{
 	public HashMap read(String myfile, HashMap args);
 
 	public HashMap write(String myfile, String contents, HashMap args);
+	
+    public HashMap rm(String myfile);
 
     public void close();
 	

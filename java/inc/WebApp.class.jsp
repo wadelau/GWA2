@@ -408,12 +408,16 @@ public class WebApp implements WebAppInterface{
 			}
 		}
 		else{
-			boolean isRmCache = false;
+			boolean isRmCache = false;boolean isFile = false;
 			if(args.indexOf("cache:")==0){ isRmCache = true; }
+			else if(args.indexOf("file:")==0){ isFile = true; }
 			if(isRmCache){
 				//- rm cache when updt, xenxin@ufqi.com, 12:05 2020-08-20
 				//- args=cache:keyString
 				hm = this.writeObject("cache:", Wht.initHashMap("key", args.substring(6))); // rm cache without value as key.
+			}
+			else if(isFile){
+				hm = this.filea.rm(args.substring(5));
 			}
 			else{
 				sqlb.append(args);

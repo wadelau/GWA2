@@ -13,11 +13,15 @@
 public final class FileSystem implements FileDriver {
 
     private final static String Log_Tag = "inc/FileSystem ";
-
-    //- constructor
-	public FileSystem(FileConn fileConf){
-        //- @todo		
+    
+	//- constructor default
+	public FileSystem(){
+		this((new FileConn("")));
+	}
 	
+	//- constructor
+	public FileSystem(FileConn fileConf){
+        //- @todo
 	}
 
     //- destructor
@@ -27,7 +31,6 @@ public final class FileSystem implements FileDriver {
 
 	//-
 	public HashMap read(String myfile, HashMap args){
-	
 		HashMap hm = new HashMap();
         String contents = "";
         try{
@@ -40,10 +43,8 @@ public final class FileSystem implements FileDriver {
                 tmp = br.readLine() ;
             }
             contents = sbf.toString(); br = null ;
-
 			hm.put(0, true);
 			hm.put(1, contents);
-		
 		}
 		catch (Exception ex){
 			hm.put(0, false);
@@ -52,24 +53,19 @@ public final class FileSystem implements FileDriver {
 		}
 		finally{
 		}
-		
 		return hm;
-
 	}
 	
 	//-
 	public HashMap write(String myfile, String contents, HashMap args){
-	
 		HashMap hm = new HashMap();
         HashMap hmtmp = new HashMap();		
-
         try{
             FileWriter newfw = new FileWriter( myfile) ;
             newfw.write( contents ) ;
             newfw.flush() ;
             newfw.close();
             newfw = null ;
-            
             hm.put(0, true);
             hmtmp.put(0, myfile);
             hm.put(1, hmtmp); //- hm[1][0]
@@ -82,16 +78,13 @@ public final class FileSystem implements FileDriver {
 		}
 		finally{
 		}
-		
 		return hm;
-
 	}
 	
 	//-
 	public boolean open(String myfile){
         //- @todo
         boolean hasOpened = false;
-
         return hasOpened;
     } 
 
@@ -101,6 +94,34 @@ public final class FileSystem implements FileDriver {
         //- @todo
     }
 	
+	/** rm, delete file
+     *  @param String relativePath
+     */
+    public HashMap rm(String filePath){
+    	boolean isSucc = false;
+		String path = ""; String error = "";
+		if(filePath != null && !filePath.equals("")){
+			path = getServletContext().getRealPath("") 
+				+ File.separator + filePath.replace("/", File.separator);
+			debug(Log_Tag+"rm: path:"+path);
+			File f = new File(path);
+			if(f.exists() && f.isFile()){
+				f.delete();
+				isSucc = true;
+			}
+			else{
+				error = "Not exists or not file. 202009020947.";
+			}
+		}
+		else{
+			debug(Log_Tag+"rm: empty path:"+path);
+			error = "Empty filename. 202009020958.";
+		}
+		HashMap hmResult = new HashMap();
+		hmResult.put(0, isSucc);
+		hmResult.put(1, error);
+		return hmResult;
+    }
 	
 }
 
