@@ -1,4 +1,6 @@
-<%
+<%@page 
+language="java" 
+pageEncoding="UTF-8"%><%
 //- embedded in ./index, work with ./comm/header
 //- output and finalize the response
 

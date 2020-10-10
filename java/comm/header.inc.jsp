@@ -1,4 +1,6 @@
-<%
+<%@page 
+language="java" 
+pageEncoding="UTF-8"%><%
 //- app header
 %><%@include file="./preheader.inc.jsp"%><%
 rtvdir = request.getServletPath();
