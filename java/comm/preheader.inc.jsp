@@ -4,7 +4,8 @@ java.text.SimpleDateFormat,
 java.io.File,
 com.ufqi.gwa2.mod.Base62x"
 language="java" 
-pageEncoding="UTF-8"%><%
+pageEncoding="UTF-8" 
+session="false"%><%
 
 //-  preheader, embedded in all
 System.setProperty("sun.jnu.encoding", "UTF-8");

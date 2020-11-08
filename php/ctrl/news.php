@@ -1,7 +1,7 @@
 <?php
 # news
 #include_once($appdir."/mod/ads.class.php");
-include($appdir."/mod/pagenavi.class.php");
+include_once($appdir."/mod/pagenavi.class.php");
 include_once($appdir."/mod/news.class.php");
 
 # some other stuff

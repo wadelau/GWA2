@@ -20,6 +20,7 @@ require(__ROOT__."/inc/dba.class.php");
 require(__ROOT__."/inc/session.class.php");
 require(__ROOT__."/inc/cachea.class.php");
 require(__ROOT__."/inc/filesystem.class.php");
+require(__ROOT__."/inc/zeea.class.php");
 
 class WebApp implements WebAppInterface{
 	
