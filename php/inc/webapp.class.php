@@ -48,7 +48,9 @@ class WebApp implements WebAppInterface{
 	//- constructor
 	function __construct($args=null){
 		# db as backend
-		if($this->dba == null){ # Wed Oct 22 10:23:03 CST 2014
+		if($this->dba == null  || isset($args['dbconf'])){
+			# Wed Oct 22 10:23:03 CST 2014
+			# re-init if dbconf, 20:10 2020-11-17
 			$dbconf = isset($args['dbconf']) ? $args['dbconf'] : null;
 			$this->dba = new DBA($dbconf);
         }
@@ -181,7 +183,7 @@ class WebApp implements WebAppInterface{
 	//-
 	function setTbl($tbl, $tblPre=null){
 		$tblpre = '';
-		if($tblPre == null){ $tblpre = GConf::get('tblpre'); }
+		if($tblPre === null){ $tblpre = GConf::get('tblpre'); }
 		else{ $tblpre = $tblPre; }
 		if($tblpre != '' && strpos($tbl, $tblpre) !== 0){
 			$tbl = $tblpre.$tbl;
