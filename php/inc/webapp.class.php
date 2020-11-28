@@ -448,11 +448,11 @@ class WebApp implements WebAppInterface{
 		}
 		else{
 			$isRmCache = false;
-			if(strpos($conditions, 'cache:') > -1){ isRmCache = true; }
+			if(strpos($conditions, 'cache:') > -1){ $isRmCache = true; }
 			if($isRmCache){
 				//- rm cache when updt, xenxin@ufqi.com, 12:05 2020-08-20
 				//- args=cache:keyString
-				$hm = $this->writeObject("cache:", array("key"=>substr($conditions, 6)); // rm cache without value as key.
+				$hm = $this->writeObject("cache:", array("key"=>substr($conditions, 6))); // rm cache without value as key.
 			}
 			else{
 				if(stripos($conditions, 'where ') === false){
