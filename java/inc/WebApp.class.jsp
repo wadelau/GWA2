@@ -245,8 +245,13 @@ public class WebApp implements WebAppInterface{
 		for(String f: fieldArr){
 			f = f==null ? "" : f.trim();
 			if(Wht.inString(f, timeFields) && this.get(f).equals("")){
-				sqls.append(f).append("=NOW(), "); // assume MySQL?
-				this.hmf.remove(f);
+				if(!this.hmf.containsKey(f)){
+					sqls.append(f).append("=NOW(), "); // assume MySQL?
+					//this.hmf.remove(f);
+				}
+				else{
+					sqls.append(f).append("=?, ");
+				}
 			}
 			else{
 				sqls.append(f).append("=?, ");

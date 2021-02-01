@@ -239,8 +239,13 @@ class WebApp implements WebAppInterface{
 			foreach($fieldarr as $k => $v){
 				$v = trim($v);
 				if(in_array($v, $this->timeFieldArr) && !isset($this->hmf[$v])){
-					$sql .= $v."=NOW(), ";
-					unset($this->hmf[$v]);
+					if(!isset($this->hmf[$v])){
+						$sql .= $v."=NOW(), ";
+						#unset($this->hmf[$v]);
+					}
+					else{
+						$sql .= $v."=?, ";
+					}
 				}
 				else{
 					$sql .= $v."=?, ";
