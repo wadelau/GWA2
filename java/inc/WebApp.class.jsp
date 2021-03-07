@@ -606,7 +606,7 @@ public class WebApp implements WebAppInterface{
                 else{
                     if(args.containsKey("expire")){
                         rtnobj = this.cachea.set((String)args.get("key"),
-                                    args.get("value"), Integer.valueOf((String)args.get("expire")));
+                                    args.get("value"), Integer.valueOf(args.get("expire").toString()));
                     }
                     else{
                         rtnobj = this.cachea.set((String)args.get("key"),

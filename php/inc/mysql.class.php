@@ -51,7 +51,7 @@ class MYSQL {
 			}
 			
 			if(GConf::get('db_enable_utf8_affirm')){
-				$this->query("SET NAMES 'utf8'", null, null);
+				$this->query("SET NAMES 'utf8mb4'", null, null);
 			}
 		}
 		return $this->m_link;
