@@ -57,7 +57,7 @@ public final class SessionX implements SessionDriver {
 		}
 		else{
 			hmrtn.put(0, false);
-			hmrtn.put(1, "");
+			hmrtn.put(1, params); // 2rd round validate?
 		}
 		return hmrtn;
 	}
@@ -88,6 +88,20 @@ public final class SessionX implements SessionDriver {
     public String getCookieSidSep(){
         return this.Sep_Tag_For_Cookie;
     }
+
+	//- see https://ufqi.com/blog/recaptcha-based-on-message-digest/
+	public String generateVerifyId(){
+		String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-_,^";
+		char[] charArr = chars.toCharArray();
+		int veriLen = 100; int charLen = chars.length();
+		StringBuffer verIdBuf = new StringBuffer();
+		Random rd = new Random();
+		for(int i=0; i<veriLen; i++){
+			verIdBuf.append(charArr[rd.nextInt(charLen)]);
+		}
+		rd = null;
+		return verIdBuf.toString();
+	}
 
     //-
     public void close(){

@@ -56,14 +56,33 @@ public final static class Wht{
 	}
 
 	/*
-	 * getQuery,stead of request.getQueryString 
+	 * getQuery,stead of request.getQueryString , get|post, updt 15:50 2021-03-16
 	 * @param HTTPRequest, request
 	 * @return String, formated querystring	
 	 */
 	public static String getQuery(HttpServletRequest request){
-		String params = Wht._enSafe(request.getQueryString());
-		if(params.contentEquals("")) {}
-		else { params = "?" + params; }
+		String params = "";
+		String sMethod = request.getMethod().toUpperCase();
+		if(!sMethod.equals("POST")){
+			params = Wht._enSafe(request.getQueryString());
+			if(params.contentEquals("")){}
+			else { params = "?" + params; }
+		}
+		else{
+			Map hmParams = request.getParameterMap();
+			Iterator entries = hmParams.entrySet().iterator();
+			String key; String val;
+			while (entries.hasNext()) {
+				Map.Entry entry = (Map.Entry)entries.next();
+				key = (String)entry.getKey();
+				val = Wht.get(request, key);
+				params += key+"="+val+"&";
+			}
+			if(!params.equals("")){
+				params = "?"+params.substring(0, params.length()-1);
+			}
+			entries = null; hmParams = null;
+		}
 		return params;
 	}
 
@@ -292,6 +311,19 @@ public final static class Wht{
 		Date target = ca.getTime();
 		now = null; ca = null;
 		return target;
+	}
+	
+	//- date format
+	public static String dateFormat(Date d){
+		if(d==null){ d = new Date(); }
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return sdf.format(d);
+	}
+	//- date format in short, 16:30 2021-03-23
+	public static String dateFormatShort(Date d){
+		if(d==null){ d = new Date(); }
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		return sdf.format(d);
 	}
 	
 	//- get a string from an object, e.g. HashMap
