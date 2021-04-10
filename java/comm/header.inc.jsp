@@ -32,7 +32,7 @@ url = rtvdir + "/?sid=" + sid;
 user = new User();
 if(true){
 	userid = user.getUserIdByCookie(request);
-	if(!tmpUserId.equals("")){ user.setId(userid); }
+	if(!userid.equals("")){ user.setId(userid); }
 }
 //- lang
 if(true){

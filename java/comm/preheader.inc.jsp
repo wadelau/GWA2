@@ -6,7 +6,13 @@ com.ufqi.gwa2.mod.Base62x"
 language="java" 
 pageEncoding="UTF-8" 
 session="false"%><%
-
+/*
+ * Tomcat-9 and below, base servlet with package prefix: javax.servlet.*
+ * Tomcat-10 and above, base servlet with package prefix: jakarta.servlet.*
+ * What to do with GWA2 for this change?
+ * Help from Tomcat-10:  Java EE applications designed for Tomcat 9 and earlier may be placed in the $CATALINA_BASE/webapps-javaee directory and Tomcat will automatically convert them to Jakarta EE and copy them to the webapps directory.  
+ * https://github.com/apache/tomcat-jakartaee-migration
+ */
 //-  preheader, embedded in all
 System.setProperty("sun.jnu.encoding", "UTF-8");
 System.setProperty("file.encoding", "UTF-8"); //- set " -Dfile.encoding=utf8 " in jvm start script
