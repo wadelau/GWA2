@@ -9,7 +9,7 @@
  * @Xenxin@ufqi.com, Wadelau@hotmail.com
  * @Since July 07, 2016, refactor on Oct 10, 2018
  * @More at the page footer.
- * @Ver 1.9
+ * @Ver 2.1
  */
 
 "use strict"; //- we are serious
@@ -118,6 +118,11 @@ window.Hanjst = window.HanjstDefault;
 				}
 			}
 		}
+		//- override random string
+		var randStr = Hanjst['RandomString'];
+		if(typeof randStr != 'undefined' && randStr != null && randStr != ''){
+			window[tplVarTag+randStr] = Math.random().toString(36).substring(2, 6);
+		}
 	}
 	else{
 		console.log(logTag+'tplData:['+tplData+'] has error. 202006041759.'); 
@@ -138,7 +143,7 @@ window.Hanjst = window.HanjstDefault;
 			//console.log(tplRaw);
 			var tmppos = tplRaw.indexOf(' id="'+jsonDataId+'"');
 			if(tmppos == -1){
-				tmppos = tplRaw.indexOf(' id="'+jsonDataId+'"');
+				tmppos = tplRaw.indexOf(" id='"+jsonDataId+"'");
 			}
 			if(tmppos > -1){
 				tplRaw = tplRaw.substring(0, tmppos); // discard json data
@@ -408,12 +413,19 @@ window.Hanjst = window.HanjstDefault;
 									tpl2codeArr.push('\tblockLoopCount += 1;'); //- skip first else sentence
 									exprStr = '';  hasLoopElse = true;
 								}
-								if(tmpmatch[2].indexOf('(') == -1 && !hasLoopElse){
+								if(!hasLoopElse){
+									var tmpBrPos = tmpmatch[2].indexOf('(');
+									var tmpDotPos = tmpmatch[2].indexOf('.');
+									if(tmpBrPos == -1){
+										exprStr = tmpmatch[1] + '(' + tmpmatch[2] + ')';
+									}
+									else if(tmpDotPos > 0 && tmpDotPos < tmpBrPos){
+										exprStr = tmpmatch[1] + '(' + tmpmatch[2] + ')';
+									}
 									if(isDebug){
 									console.log(logTag+"illegal tpl sentence:["
-										+exprStr+"] but compatible.");
+										+exprStr+"] but compatible. tmpBrPos:"+tmpBrPos+" tmpDotPos:"+tmpDotPos);
 									}
-									exprStr = tmpmatch[1] + '(' + tmpmatch[2] + ')';
 								}
 							}
 							else{
@@ -496,8 +508,9 @@ window.Hanjst = window.HanjstDefault;
 		    if(isDebug){ console.log("tplParse:"+tplParse); }
         }
         catch(e1200){
-			console.log(JSON.stringify(e1200, Object.getOwnPropertyNames(e1200)));
-			//window.alert(tmpStr);
+			var tmpStr = JSON.stringify(e1200, Object.getOwnPropertyNames(e1200)); 
+			console.log(tmpStr);
+			if(isDebug){ window.alert((new Date())+':\n'+tmpStr); }
         }
 		Hanjst.tplObject.innerHTML = tplParse;
 		//- release objects		
@@ -682,10 +695,17 @@ window.Hanjst = window.HanjstDefault;
             matchStr = match[0]; segStr = match[1];
             myContNew = myContNew.replace(matchStr, "/*"+logTag+"DISCARD_MEMO_LINES*/");
 		}
-        memoRe = /[^(:|"|'|=)]\/\/(.*?)[\n\r]+/gm; // "//-" patterns
+        memoRe = /^[\s]*\/\/(.*?)[\n\r]*$/gm; // "//-" patterns at lines start, 21:41 2020-09-01
 		while(match = memoRe.exec(myCont)){
-            //console.log("memoRe:match:"); console.log(match);
+            //console.log("memoRe:match sta:"); console.log(match);
             matchStr = match[0]; segStr = match[1];
+            myContNew = myContNew.replace(matchStr, "/*"+segStr+"*/");
+        }
+		memoRe = /[ \s;]\/\/(.*?)[\n\r]*$/gm; // "//-" patterns between a line
+		while(match = memoRe.exec(myCont)){
+            //console.log("memoRe:match btw:"); console.log(match);
+            matchStr = match[0]; segStr = match[1];
+			if(matchStr.indexOf(';')==0){ matchStr = matchStr.substring(1); }
             myContNew = myContNew.replace(matchStr, "/*"+segStr+"*/");
         }
         myCont = myContNew;
@@ -870,5 +890,7 @@ window.Hanjst = window.HanjstDefault;
  * 17:49 Wednesday, May 20, 2020, + _enSafeExpr.
  * 09:52 Thursday, June 4, 2020, + import jsonDataId with script.
  * 11:42 6/11/2020, + {=$i+2} support.
+ * 21:42 2020-09-01, imprvs for regExp for remedyMemoLine.
+ * 09:08 2021-03-17, imprvs for debug in mobile browsers, +support for if conditionExpr
  *** !!!WARNING!!! PLEASE DO NOT COPY & PASTE PIECES OF THESE CODES!
  */
