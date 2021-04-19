@@ -90,14 +90,14 @@ public class Language extends WebApp{
 			Object tmpk; 
 			for(Object k : hmrtn.keySet()){
 				hmtmp = (HashMap)hmrtn.get(k);
-				tmpk = hmtmp.get("stype");
+				tmpk = hmtmp.get("itype");
 				if(hmtmp2.containsKey(tmpk)){
 					hmtmp3 = (HashMap)hmtmp2.get(tmpk);
 				}
 				else{
 					hmtmp3 = new HashMap();
 				}
-				hmtmp3.put(hmtmp.get("svalue"), hmtmp.get("skey"));
+				hmtmp3.put(hmtmp.get("ivalue"), hmtmp.get("ikey"));
 				hmtmp2.put(tmpk, hmtmp3);
 			}
             hmtmp = null; hmtmp3 = null; 

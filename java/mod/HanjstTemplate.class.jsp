@@ -24,7 +24,8 @@ public class HanjstTemplate extends WebApp{
     //- read tpl contents
 	public String readTemplate(String mytpl, String tpldir, String viewdir){
 		String tplcont = "";
-		HashMap hmtmp = this.getBy("file:", null, (new HashMap(){{put("file", tpldir+"/"+mytpl);}}));
+		final String tmpTpl = tpldir+"/"+mytpl;
+		HashMap hmtmp = this.getBy("file:", null, (new HashMap(){{put("file", tmpTpl);}}));
 		if((boolean)hmtmp.get(0)){
 			tplcont = (String)hmtmp.get(1);
 			tplcont = this.replacePath(tplcont, viewdir);

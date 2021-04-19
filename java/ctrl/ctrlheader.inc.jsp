@@ -18,7 +18,7 @@ url = (String)crsPage.get("url");
 sid = (String)crsPage.get("sid");
 
 userid = user.getId();
-userid = user.getId();
+
 //- lang again
 if(true){
 	HashMap langconf = new HashMap();

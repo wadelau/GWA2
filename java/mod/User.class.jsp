@@ -44,7 +44,7 @@ public class User extends WebApp{
 	}
 
 	//- get unique secureid
-	public String generateSecureId(HttpServletRequest request){
+	public String generateSid(HttpServletRequest request){
 		String sid = "";
 		sid = this.sessiona.generateSid(this, request);
 		return sid;

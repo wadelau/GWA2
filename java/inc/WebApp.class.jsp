@@ -650,7 +650,7 @@ public class WebApp implements WebAppInterface{
         boolean issucc = false;
         if((boolean)hm.get(0)){
             boolean noExtra = true;
-            String key = (String)this.get("cache:" + fields, noExtra);
+            final String key = (String)this.get("cache:" + fields, noExtra);
             if(key != null && !key.equals("")){
             	final HashMap hmtmp2 = hm;
                 this.setBy("cache:", (new HashMap(){{
