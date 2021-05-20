@@ -2,6 +2,11 @@
 //- something in end of a ctrl
 //- wadelau@ufqi.com,  Sat Jun 18 11:05:03 CST 2016
 
+//- for standalone template with inner child
+if(innertpl != null && !innertpl.equals("")){
+	data.put("innertpl", innertpl);
+}
+
 // strings need to be put back explictly
 crsPage.put("data", data);
 crsPage.put("outx", outx);

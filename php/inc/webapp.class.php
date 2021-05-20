@@ -268,7 +268,11 @@ class WebApp implements WebAppInterface{
 				$sql .= " where ".$conditions;
 			}
 			if($issqlready == 1){
-				if($this->getId() != ""){ $this->hmf["pagesize"] = 1; } # single record
+				boolean $needForgetPageSize = false;
+				if($this->getId() != ""){ 
+					if(!isset($this->hmf['pagesize'])){ $needForgetPageSize = true; }
+					$this->hmf["pagesize"] = 1; # single record
+				}
 				$hm = $this->dba->update($sql, $this->hmf);
 				$hm[]['isupdate'] = $isupdate;
 				//- rm old cache when updt succ, 14:37 2020-08-21
@@ -277,6 +281,7 @@ class WebApp implements WebAppInterface{
 				if(is_array($args) && $hm[0]){
 					$this->rmBy("cache:"+$args['key']);
 				}
+				if($needForgetPageSize){ unset($this->hmf['pagesize']); }
 			}
 		}
 		return $hm;

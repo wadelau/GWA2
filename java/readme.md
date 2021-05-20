@@ -4,8 +4,10 @@ General Web Application Architecture (GWA2) has been implemented in Java, which 
 
 ## JDK1.7 required ##
 need jdk1.7+
-	
 	tested on Resin 4.0+, Tomcat 8.0+
+	
+	2020 later, recommended  
+		jdk-11.0+, Tomcat-9.0+
 
 ## Third parties jars required  ##
 com.mysql.jdbc.driver,
@@ -42,6 +44,11 @@ append classpaths to environments (need restart):
 Keep subdirectories:
 	.setting
 	WebContent
+
+### For Eclipse since 2020, to exclude unexpected folders in project tree view:
+	Right-click a project folder in Project Explorer tree and go to "Properties".
+	Resource -> Resource Filters.
+	Add as many exclusion filters for files/folders as you like.
 	
 ## Source file format: Unix, UTF-8, No BOM
 if no such source file format, please put the line in each ctrl script:

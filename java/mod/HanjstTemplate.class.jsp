@@ -1,4 +1,4 @@
-<%
+﻿<%
 /* Template class for Hanjst 
  * v0.1,
  * wadelau@ufqi.com, Xenxin@ufqi.com
@@ -53,6 +53,9 @@ public class HanjstTemplate extends WebApp{
 				}
 				if(tplcont.indexOf("\""+repTags[ti]+"/") > -1){
 					tplcont = tplcont.replaceAll("\""+repTags[ti]+"/",  "\""+viewdir +"/"+repTags[ti]+"/"); 
+				}
+				if(tplcont.indexOf("./"+repTags[ti]+"/") > -1){
+					tplcont = tplcont.replaceAll("./"+repTags[ti]+"/",  viewdir +"/"+repTags[ti]+"/");
 				}
 			}
         }

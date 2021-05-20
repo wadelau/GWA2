@@ -502,7 +502,4 @@ class PageNavi extends WebApp{
 	   	return $isNumeric;
    }
    
-    
-   
 }
-

@@ -439,6 +439,14 @@ public class PageNavi extends WebApp{
 		return isnum;	
 	}
 	
+	//- override set, Thu Apr 29 02:06:44 UTC 2021
+    public void set(String k, Object v){
+        super.set(k, v);
+        if(this.request != null){
+            this.request.setAttribute(k, v);
+        }
+    }
+	
 	//- 
     private String _appendPostParams(HttpServletRequest request, String url, HashMap parahm){
         String rtnurl = url;

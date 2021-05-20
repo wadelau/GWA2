@@ -26,6 +26,7 @@ if(true){
 	langconf.put("country", (String)data.get("languagecountry"));
 	lang = new Language(langconf);
 }
+String innertpl = ""; //- for standalone template with inner child
 
 //- start an inner modfs
 try{

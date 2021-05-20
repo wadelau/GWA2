@@ -277,7 +277,9 @@ public class WebApp implements WebAppInterface{
 			sqls.append(" where ").append(args);
 		}
 		if(isSqlReady){
+			boolean needForgetPageSize = false; //- issue from zhangyifei, 11:08 2021-05-10
 			if(!this.getId().equals("")){
+				if(!this.hmf.containsKey("pagesize")){ needForgetPageSize = true;  }
 				this.hmf.put("pagesize", 1);
 			}
 			hm = this.dba.update(sqls.toString(), this.hmf);
@@ -286,6 +288,7 @@ public class WebApp implements WebAppInterface{
 			if(xargs != null && (boolean)hm.get(0)){
 				this.rmBy("cache:"+xargs.get("key"));
 			}
+			if(needForgetPageSize){ this.hmf.remove("pagesize"); }  
 		}
 		sqls = null; args = null; fields = null;
 
