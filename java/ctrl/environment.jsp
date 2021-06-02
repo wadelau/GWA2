@@ -1,9 +1,8 @@
-<%
-/* controller of user mod
+<%@page language="java" pageEncoding="UTF-8" autoFlush="true" session="false" trimDirectiveWhitespaces="true"%><%
+/* controller of environment mod
  * v2
  */
 %><%@include file="./ctrlheader.inc.jsp"%><%
-
 
 //- list request headers
 if(true){

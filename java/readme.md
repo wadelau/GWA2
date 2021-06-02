@@ -56,4 +56,17 @@ if no such source file format, please put the line in each ctrl script:
 	
 	Otherwise, it will raise illegal characters in page out.
 	
+## trim whitespaces for response
+	add  trimDirectiveWhitespaces="true" to each controller to remove end-of-line / empty line in reponse.
+	
+	<%@page language="java" pageEncoding="UTF-8" 
+		autoFlush="true" session="false" 
+		trimDirectiveWhitespaces="true"%>
+	
+	alternative approach, use rm eol shell script for each JSP file on server:
+		sizeinbyte=`ls -la $file | awk '{ print $5; }'`;
+		sizeinbyte=`expr $sizeinbyte - 1`;
+		lastchar=`tail -c 1 $file`;
+		/usr/bin/xxd -l $sizeinbyte $file | xxd -r > $file.tmp ;
+		/bin/mv -f $file.tmp $file ;
 	

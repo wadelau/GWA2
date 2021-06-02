@@ -5,7 +5,8 @@ java.io.File,
 com.ufqi.gwa2.mod.Base62x"
 language="java" 
 pageEncoding="UTF-8" 
-session="false"%><%
+session="false" 
+trimDirectiveWhitespaces="true"%><%
 /*
  * Tomcat-9 and below, base servlet with package prefix: javax.servlet.*
  * Tomcat-10 and above, base servlet with package prefix: jakarta.servlet.*

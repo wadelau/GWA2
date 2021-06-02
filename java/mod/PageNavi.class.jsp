@@ -301,7 +301,9 @@ public class PageNavi extends WebApp{
         if(pnsmx.equals("")){
             pnsmx = Wht.get(this.request, "pnsm");
         }
-		pnsmx = pnsmx.equals("") ? "or" : "and";
+		pnsmx = pnsmx.equals("") ? "or" : pnsmx;
+		pnsmx = pnsmx.equals("0") ? "or" : pnsmx;
+		pnsmx = pnsmx.equals("1") ? "and" : pnsmx;
         final String pnsm = pnsmx; //- used in enclosing hm.forEach
 		
 		int objpnps = Wht.parseInt(obj.get("pagesize"));

@@ -385,6 +385,10 @@ public final static class Wht{
 		if(firstMap!=null){
 			HashMap secMap = (HashMap)firstMap.get(secMapKey);
 			if(secMap==null){ secMap = new HashMap(); }
+			if(key==null || key.equals("")){
+				int secMapSize = secMap.size();
+				key = "" + secMapSize;
+			}
 			secMap.put(key, val);
 			firstMap.put(secMapKey, secMap);
 			hasDone = true;

@@ -1,6 +1,7 @@
 <%@page 
 language="java" 
-pageEncoding="UTF-8"%><%
+pageEncoding="UTF-8"
+trimDirectiveWhitespaces="true"%><%
 /* By this way, a request will trigger the second instance,
  * which may be an overheat on performace, but can be extended to a large scale
  * noted by wadelau @ Fri Jun 17 06:46:42 CST 2016

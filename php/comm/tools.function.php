@@ -96,13 +96,14 @@ function sendMail($to,$subject,$body, $from='', $local=0){
 //- string utils
 function startsWith($haystack, $needle){
     $length = strlen($needle);
-    return (substr($haystack, 0, $length) === $needle);
+    #return (substr($haystack, 0, $length) === $needle); # same value and same type
+	return (substr($haystack, 0, $length) == $needle); # same value only
 }
 
 function endsWith($haystack, $needle){
     $length = strlen($needle);
     $start  = $length * -1; //negative
-    return (substr($haystack, $start) === $needle);
+    return (substr($haystack, $start) == $needle);
 }
 
 function inList($needle, $haystack){
@@ -257,7 +258,7 @@ function redirect($url, $time=0, $msg='') {
 	$hideMsg .= "</body></html>";
     if (!headers_sent()) {
         // redirect
-        if (0 === $time) {
+        if (0 == $time) {
             header("Location: " . $url, true, 302);
 			print $hideMsg;
         }
