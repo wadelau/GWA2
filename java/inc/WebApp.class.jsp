@@ -1,4 +1,4 @@
-<%
+<%@page import="java.net.*, javax.mail.*, javax.mail.internet.*"%><%
 /* the Global and unique parent of all objects in this application
  * imprvs on time fields by Xenxin@ufqi, Tue, 13 Mar, 2018 19:24:12
  * first implemented in -PHP
@@ -22,6 +22,7 @@ public class WebApp implements WebAppInterface{
 	private final String[] timeFieldArr = new String[]{"inserttime", "createtime", "savetime",
 		"modifytime", "edittime", "updatetime", "dinserttime", "dupdatetime"};
     private final static String logTag = "inc/WebApp";
+	private boolean http_enable_gzip = false;
 
 	Dba dba = null;
 	Cachea cachea = null;
@@ -191,10 +192,12 @@ public class WebApp implements WebAppInterface{
 			sqls.append(" limit 1");
 		}
 		else{
-			if(pageSize == 0){
-				pageSize = 99999;
+			if(args.indexOf(" limit") < 0){
+				if(pageSize == 0){
+					pageSize = 99999;
+				}
+				sqls.append(" limit ").append((pageNum-1)*pageSize).append(", ").append(pageSize);
 			}
-			sqls.append(" limit ").append((pageNum-1)*pageSize).append(", ").append(pageSize);
 		}
 		hm = this.dba.select(sqls.toString(), this.hmf);	
         this._setCache(hm, fields);
@@ -586,7 +589,237 @@ public class WebApp implements WebAppInterface{
             }
         }
         else if(type.equals("url:")){
-            //- @todo
+            //- @todo: code optimize
+            rtnobj.put(0, true);
+            HttpURLConnection conn = null;
+            InputStream is = null;
+            OutputStream os = null;
+            BufferedReader br = null;
+            String targeturl = (String)args.get("targeturl");
+            String myMethod = (String)args.get("method");
+            if(myMethod == null || myMethod.equals("")){ myMethod = "get"; }
+            else{ myMethod = myMethod.toLowerCase(); }
+            if(myMethod.equals("post")){
+            	try{
+    	            URL url = new URL(targeturl);
+        	        conn = (HttpURLConnection)url.openConnection();
+        	        conn.setRequestMethod("POST");
+        	        conn.setDoOutput(true);
+        	        conn.setDoInput(true);
+	            	boolean enableZip = false;
+	            	if(args.get("header")!=null){
+	            		Iterator iterator = ((HashMap)args.get("header")).entrySet().iterator();
+	            		String k, v;
+	            		while (iterator.hasNext()) {
+	            			Map.Entry entry = (Map.Entry) iterator.next();
+	            			k = (String)entry.getKey();
+	            			v = String.valueOf(entry.getValue());
+	            			if(k.equals("Accept-Encoding")){
+	            				enableZip = true;
+	            			}
+	            			conn.setRequestProperty(k, v);
+	            		}
+	            	}
+	            	if(!enableZip && this.http_enable_gzip){
+	            		conn.setRequestProperty("Accept-Encoding", "gzip, deflate, compress");
+	            		enableZip = true;
+	            	}
+	            	String paraStr = "";
+	            	if(args.get("parameter")!=null){
+	            		//- http build query
+	            		if(args.get("parameter") instanceof HashMap){
+	            			paraStr += httpBuildQuery((HashMap)args.get("parameter"));
+	            		}
+						else{
+	            			paraStr += args.get("parameter").toString();
+	            		}
+	            	}
+	            	conn.setRequestProperty("Content-Length", String.valueOf(paraStr.length()));
+	            	//conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+					os = conn.getOutputStream();
+					os.write(paraStr.getBytes("utf-8"));
+					os.flush();
+					StringBuffer sbf = new StringBuffer();
+					is = conn.getInputStream();
+					br = new BufferedReader(new InputStreamReader(is, "UTF-8")); 
+	                String temp = null;
+	                while ((temp = br.readLine()) != null) {
+	                    sbf.append(temp);
+	                    sbf.append("\r\n");
+	                }
+                    int respCode = conn.getResponseCode();
+                    if(respCode >= HttpURLConnection.HTTP_OK && respCode< 300 ){ //- 200, 2xxx
+		                rtnobj.put(1, sbf.toString());
+					}
+					else{
+						rtnobj.put(0, false);
+						hmtmp.put("errcode", 1905012000);
+						hmtmp.put("errordesc", "response code error: "+ conn.getResponseCode()+"/resp"+sbf.toString() + url.toString());
+						rtnobj.put(1, hmtmp);
+					}
+            	}
+				catch(MalformedURLException e){
+            		rtnobj.put(0, false);
+            		hmtmp.put("errcode", 1905012012);
+					hmtmp.put("errordesc", e.toString() + " " + targeturl);
+					rtnobj.put(1, hmtmp);
+                }
+				catch(UnsupportedEncodingException e){
+                	rtnobj.put(0, false);
+            		hmtmp.put("errcode", 1905022243);
+					hmtmp.put("errordesc",  e.toString() + " " + targeturl);
+					rtnobj.put(1, hmtmp);
+            	}
+				catch(IOException e){
+            		rtnobj.put(0, false);
+            		hmtmp.put("errcode", 1905012015);
+					hmtmp.put("errordesc",  e.toString() + " " + targeturl);
+					rtnobj.put(1, hmtmp);
+                }
+				catch(Exception e){
+                	rtnobj.put(0, false);
+            		hmtmp.put("errcode", 1905012030);
+					hmtmp.put("errordesc",  e.toString() + " " + targeturl);
+					rtnobj.put(1, hmtmp);
+                }
+				finally{
+                	if (br!=null){
+                        try{
+                            br.close();
+                        }
+						catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                    if(os!=null){
+                        try{
+                            os.close();
+                        }
+						catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                    if (is!=null){
+                        try{
+                            is.close();
+                        }
+						catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                	if(conn!=null){
+                		conn.disconnect();
+                	}
+                }
+            }
+			else{
+				//- http(s) get, @fixme
+				if(args.get("parameter") != null){
+					targeturl += targeturl.indexOf("?") > -1 ? "&" : "?";
+					try{
+						targeturl += httpBuildQuery((HashMap)args.get("parameter"));
+					}
+                    catch(UnsupportedEncodingException e){
+						rtnobj.put(0, false);
+	            		hmtmp.put("errcode", 1905022243);
+						hmtmp.put("errordesc",  e.toString() + " " + targeturl);
+						rtnobj.put(1, hmtmp);
+						return rtnobj;
+					}
+				}
+				//debug(targeturl);
+				boolean enableZip = false;
+				try{
+					URL url = new URL(targeturl);
+	    	        conn = (HttpURLConnection)url.openConnection();
+	    	        conn.setRequestMethod("GET");
+	    	        if(args.get("header")!=null){
+	            		Iterator iterator = ((HashMap)args.get("header")).entrySet().iterator();
+	            		String k, v;
+	            		while (iterator.hasNext()) {
+	            			Map.Entry entry = (Map.Entry) iterator.next();
+	            			k = (String)entry.getKey();
+	            			v = (String)entry.getValue();
+	            			if(k.equals("Accept-Encoding")){
+	            				enableZip = true;
+	            			}
+	            			conn.setRequestProperty(k, v);
+	            		}
+	            	}
+	            	if(!enableZip && this.http_enable_gzip){
+	            		conn.setRequestProperty("Accept-Encoding", "gzip, deflate, compress");
+	            		enableZip = true;
+	            	}
+	            	conn.connect();
+                    int respCode = conn.getResponseCode(); 
+                    if(respCode >= HttpURLConnection.HTTP_OK && respCode < 300){
+						is = conn.getInputStream();
+						br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+						StringBuffer sbf = new StringBuffer();
+		                String temp = null;
+		                while ((temp = br.readLine()) != null) {
+		                    sbf.append(temp);
+		                    sbf.append("\r\n");
+		                }
+		                rtnobj.put(1, sbf.toString());
+		                //debug(sbf.toString());
+					}
+					else{
+						rtnobj.put(0, false);
+						hmtmp.put("errcode", 1905012000);
+						hmtmp.put("errordesc", "response code error: "+ conn.getResponseCode() + url.toString());
+						rtnobj.put(1, hmtmp);
+					}
+				}
+				catch(MalformedURLException e){
+					rtnobj.put(0, false);
+					hmtmp.put("errcode", 1905012012);
+					hmtmp.put("errordesc",  e.toString() + " " + targeturl);
+					rtnobj.put(1, hmtmp);
+				}
+				catch(IOException e){
+					rtnobj.put(0, false);
+					hmtmp.put("errcode", 1905012015);
+					hmtmp.put("errordesc",  e.toString() + " " + targeturl);
+					rtnobj.put(1, hmtmp);
+				}
+				catch(Exception e){
+					rtnobj.put(0, false);
+					hmtmp.put("errcode", 1905012030);
+					hmtmp.put("errordesc",  e.toString() + " " + targeturl);
+					rtnobj.put(1, hmtmp);
+                    e.printStackTrace();
+				}
+				finally{
+					if (br!=null){
+						try{
+							br.close();
+						}
+						catch (IOException e){
+							e.printStackTrace();
+						}
+					}
+					if(os!=null){
+						try{
+							os.close();
+						}
+						catch (IOException e){
+							e.printStackTrace();
+						}
+					}
+					if (is!=null){
+						try{
+							is.close();
+						}
+						catch (IOException e){
+							e.printStackTrace();
+						}
+					}
+					if(conn!=null){
+						conn.disconnect();
+					}
+				}
+			}
         }
         else{
            //- @todo 
@@ -669,6 +902,33 @@ public class WebApp implements WebAppInterface{
         }
         return issucc;
     }
+	
+	//- encode the url parameter
+	private String httpBuildQuery(HashMap hm) throws UnsupportedEncodingException{
+		String target = "";
+		Iterator iterator = hm.entrySet().iterator();
+		String k;
+		Object v;
+		while (iterator.hasNext()) {
+			Map.Entry entry = (Map.Entry) iterator.next();
+			k = (String)entry.getKey();
+			v = entry.getValue();
+			if(v instanceof String){
+				target+=k+"="+URLEncoder.encode(v.toString(), "utf-8")+"&";
+			}
+            else if(v instanceof Iterable){
+				Iterable iter = (Iterable)v;
+				for(Object o: iter){
+					target+=k+"="+URLEncoder.encode(o.toString(), "utf-8")+"&";
+				}
+			}
+            else{
+				target+=k+"="+URLEncoder.encode(v.toString(), "utf-8")+"&";
+			}
+		}
+		int length = target.length();
+		return length > 0 ? target.substring(0, length-1) : "";
+	}
 	
 }
 

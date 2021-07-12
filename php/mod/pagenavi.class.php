@@ -18,6 +18,7 @@ class PageNavi extends WebApp{
     var $dummy = '';
     const SID = 'sid';
 	const Omit_String = '----';
+	const GWA2_Tag_Skip = 'no-op'; # skip to next, 16:08 2021-06-03
 
    public function __construct(){
 
@@ -289,7 +290,10 @@ class PageNavi extends WebApp{
                         $fieldopv = "=";
                     }
 					else{
-						if(startsWith($fieldopv, '%')){
+						if($fieldopv == self::GWA2_Tag_Skip){
+							continue; # ommit, skip to next
+						}
+						else if(startsWith($fieldopv, '%')){
 							$fieldopv = urldecode($fieldopv);
 						}
                         $fieldopv = str_replace('&lt;', '<', $fieldopv);

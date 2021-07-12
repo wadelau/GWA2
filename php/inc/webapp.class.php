@@ -344,8 +344,10 @@ class WebApp implements WebAppInterface{
 				$sql .= " limit 1 ";
 			}
 			else{
-				if($pagesize == 0){ $pagesize = 99999; } # maximum records per query
-				$sql .= ' limit '.(($pagenum-1)*$pagesize).','.$pagesize;	
+				if(strpos($conditions, " limit") === false){
+					if($pagesize == 0){ $pagesize = 99999; } # maximum records per query
+					$sql .= ' limit '.(($pagenum-1)*$pagesize).','.$pagesize;
+				}				
 			}
 			#debug(__FILE__.": getBy, sql:[".$sql."] hmf:[".$this->toString($this->hmf)."] [1201241223].\n");
 			$hm = $this->dba->select($sql, $this->hmf);

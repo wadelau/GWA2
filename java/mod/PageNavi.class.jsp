@@ -10,6 +10,7 @@ public class PageNavi extends WebApp{
 	
 	// constants
 	private static final String logTag = "mod/PageNavi ";
+	private static final String GWA2_Tag_Skip = "no-op"; //- skip to next, 16:08 2021-06-03
 	
 	//- variables
 	private HashMap para = null;
@@ -343,7 +344,11 @@ public class PageNavi extends WebApp{
                     String fieldopv = Wht.get(this.request, "oppnsk"+field);
                     if(fieldopv.equals("")){ fieldopv = "="; }
                     else{
-                        if(fieldopv.indexOf("%") == 0){
+						String overRideOpv = (String)this.request.getAttribute("oppnsk"+field);
+						if(overRideOpv != null && overRideOpv.equals(this.GWA2_Tag_Skip)){
+							return; //- no-op, skip to next
+						}
+                        else if(fieldopv.indexOf("%") == 0){
                         //- urldecode, @todo
                         }
                         fieldopv = fieldopv.replaceAll("&lt;", "<");

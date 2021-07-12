@@ -243,8 +243,11 @@ function redirect($url, $time=0, $msg='') {
 	    }
 	}
 	$mstime = $time * 1000; # in case of milliseconds
-	$hideMsg = "<!DOCTYPE html><html><head>";
-	$hideMsg .= "<meta http-equiv=\"refresh\" content=\"".($time).";url='$url'\">";
+	$hideMsg = "<!DOCTYPE html><html><head><meta charset=\"utf-8\"/>"
+        ."<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"/>"
+        ."<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>";
+    #$hideMsg .= "<meta http-equiv=\"refresh\" content=\"".($time==503?($time*100):$time).";url='$url'\">"; # disable for seo
+    $hideMsg .= "<title>Redirecting...加载中...</title>";
 	$hideMsg .= "</head><body>";  # remedy Mon Nov 23 22:03:24 CST 2015
     if (empty($msg)){
         #$msg = "系统将在{$time}秒之后自动跳转到{$url}！";

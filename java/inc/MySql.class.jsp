@@ -97,7 +97,7 @@ public final class MySql implements DbDriver {
 	public HashMap query(String sqlstr, HashMap args, Object[] idxArr){
 	
 		HashMap hm = new HashMap();
-		hm.put("query-in-MySql", (new Date()));	
+		//hm.put("query-in-MySql", (new Date()));	
 
 		if(this.dbConn == null){
 			this._init();

@@ -15,6 +15,7 @@ trimDirectiveWhitespaces="true"%><%
  * https://github.com/apache/tomcat-jakartaee-migration
  */
 //-  preheader, embedded in all
+System.setProperty("user.timezone", "GMT+0000"); // set -Duser.timezone="GMT+0000" in jvm start script
 System.setProperty("sun.jnu.encoding", "UTF-8");
 System.setProperty("file.encoding", "UTF-8"); //- set " -Dfile.encoding=utf8 " in jvm start script
 request.setCharacterEncoding("UTF-8");

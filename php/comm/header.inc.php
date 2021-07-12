@@ -1,7 +1,7 @@
 <?php
 
 global $sid, $appdir, $siteid, $user, $userid, $isdbg, $lang;
-date_default_timezone_set("Europe/London"); # +0000
+date_default_timezone_set("GMT"); # UTC+0000
 session_start(); # in developping stage, using php built-in session manager
 
 # dir manipulate
