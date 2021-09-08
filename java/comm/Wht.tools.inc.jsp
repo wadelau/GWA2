@@ -119,7 +119,17 @@ public final static class Wht{
 	
 	//-
     public static int parseInt(Object obj){
-        return Wht.parseInt(String.valueOf(obj));
+        if(obj instanceof Double){
+			Double myD = (Double)obj;
+			return myD.intValue();
+		}
+		else if(obj instanceof Float){
+			Float myF = (Float)obj;
+			return myF.intValue();
+		}
+		else{
+			return Wht.parseInt(String.valueOf(obj));
+		}
     }
 
 	/*
