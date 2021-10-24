@@ -23,7 +23,7 @@ class PageNavi extends WebApp{
    public function __construct(){
 
        $para = array();
-       $pdef = array('pnpn'=>1,'pnps'=>100,'pntc'=>0, 'navilen'=>10); # 28 for development
+       $pdef = array('pnpn'=>1,'pnps'=>100,'pntc'=>0, 'navilen'=>5); # 28 for development
 
        $file = $_SERVER['PHP_SELF'];
        $query = $_SERVER['QUERY_STRING'];

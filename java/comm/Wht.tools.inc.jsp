@@ -85,6 +85,27 @@ public final static class Wht{
 		}
 		return params;
 	}
+	//- get array inputs from http request, 15:57 2021-10-17
+	//- e.g. check-box, multiple-select
+	public static String[] getArray(HttpServletRequest request, String field){
+		String[] tmpArr = request.getParameterValues(field);
+        if(tmpArr == null || tmpArr.length == 0){
+			Object obj = request.getAttribute(field);
+			if(obj != null 
+				&& (obj instanceof String[])){
+				tmpArr = (String[])obj;
+			}
+			else{
+				tmpArr = new String[1]; tmpArr[0] = (String)obj;
+			}
+        }
+		/*
+		for(String f : tmpArr){
+			debug("comm/Wht: getArray: "+field+" f:"+f+"");
+		}
+		*/
+        return tmpArr;
+	}
 
 	/*
 	 * ensafe user input

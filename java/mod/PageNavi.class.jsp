@@ -50,7 +50,7 @@ public class PageNavi extends WebApp{
 		 * oppnsk, operator of page navi search keyword
 		 * see GWA2 manual book
 		 */
-		this.pdef.put("barlength", 8); //- page list length
+		this.pdef.put("barlength", 5); //- page list length
 
 		this.file = request.getRequestURL() + "";
 		this.query = request.getQueryString()==null ? "" : request.getQueryString();
@@ -357,7 +357,9 @@ public class PageNavi extends WebApp{
                     //- list operators
                     strb.append(" ").append(pnsm).append(" ");
                     if(fieldopv.equals("inlist")){
-                        xvalue = this.addQuote(xvalue);
+                        if(xvalue.indexOf("'") > -1 || xvalue.indexOf("\"") > -1){
+							xvalue = this.addQuote(xvalue);
+						}
                         strb.append(field)
                             .append(" in (").append(xvalue).append(")");
                         obj.del(field);

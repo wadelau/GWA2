@@ -118,6 +118,7 @@ class WaterMark{
 		$tmpFileExt = end($tmpFileNameArr);
 		if(strpos($tmpFileExt, 'jpg') !== false){ $type = "jpg"; }
 		else if(strpos($tmpFileExt, 'jpeg') !== false){ $type = "jpg"; }
+		else if(strpos($tmpFileExt, 'jfif') !== false){ $type = "jpg"; }
 		else if(strpos($tmpFileExt, 'gif') !== false){ $type = "gif"; }
 		else if(strpos($tmpFileExt, 'bmp') !== false){ $type = "bmp"; }
 		else if(strpos($tmpFileExt, 'webp') !== false){ $type = "webp"; }

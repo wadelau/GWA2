@@ -281,7 +281,7 @@ function isImg($file){
 	$isimg = 0;
 	if($file != ''){
 		$tmpfileext = substr($file, strlen($file)-4);
-		if(in_array(strtolower($tmpfileext),array("jpeg",".jpg",".png",".gif",".bmp"))){
+		if(in_array(strtolower($tmpfileext),array("jpeg",".jpg",".png",".gif",".bmp","jfif"))){
 			$isimg = 1;
 		}
 	}
@@ -372,9 +372,7 @@ function debug($obj, $tag='', $output=null){
 	else{
 		error_log($s); # default mode
 	}
-	
 }
-
 
  // Wht: Web and/or HTTP Tools
  // get/set data from input and/or out and filter as expected

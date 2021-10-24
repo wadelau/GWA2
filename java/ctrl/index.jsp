@@ -10,6 +10,57 @@ trimDirectiveWhitespaces="true"%><%
 
 %><%@include file="./ctrlheader.inc.jsp"%><%
 
+//- vars
+List<FileItem> formItems = null; // in case of file uploads
+if(act.equals("partner2")){ //- specific actions limited
+	//- trans parameters if multipart for file upload, see inc/FileSystem
+	if (ServletFileUpload.isMultipartContent(request)) {
+		debug("ctr/item: submit form is multipart!");
+		ServletFileUpload sfileupld = new ServletFileUpload((new DiskFileItemFactory()));
+		formItems = sfileupld.parseRequest(request); // can only be parsed once!
+		if (formItems != null && formItems.size() > 0){
+			String iname, ivalue; byte[] bytes; Object lastVal;
+			for (FileItem item : formItems){
+				// processes only fields that are common form fields
+				if (item.isFormField()){
+					bytes = item.getFieldName().getBytes("ISO-8859-1"); // why 8859?
+					iname = new String(bytes, "UTF-8");
+					bytes = item.getString().getBytes("ISO-8859-1");
+					ivalue = new String(bytes, "UTF-8");
+					lastVal = request.getAttribute(iname);
+					if(lastVal != null){ 
+						// checkbox or multiple select
+						if(lastVal instanceof String[]){
+							String[] tmpArr = (String[])lastVal;
+							String[] tmpArr2 = new String[tmpArr.length+1];
+							for(int si=0; si<tmpArr.length; si++){
+								tmpArr2[si] = tmpArr[si];
+							}
+							tmpArr2[tmpArr.length] = ivalue;
+							request.setAttribute(iname, tmpArr2);
+						}
+						else{
+							String[] tmpArr = new String[2];
+							tmpArr[0] = String.valueOf(lastVal); tmpArr[1] = ivalue;
+							request.setAttribute(iname, tmpArr);
+						}
+					}
+					else{
+						request.setAttribute(iname, ivalue);
+					}
+					//debug("ctrl/user: iname:"+iname+", ivalue:"+ivalue+" lastVal:"+lastVal);
+				}
+				else{
+					debug("ctrl/user: not form field: iname:"+item.getFieldName()+", ivalue:"+item.getString().length());
+				}
+			}
+		}
+	}
+	else{
+		debug("ctr/item: not multipart.");
+	}
+}
+
 //- main busi logic
 
 //- outx and data should added up and should not out print in the child pages
