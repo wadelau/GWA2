@@ -2,7 +2,6 @@
 
 # handle api requests 
 
-include_once($appdir."/ctrl/include/language.php");
 include_once($appdir."/mod/purl.class.php");
 
 $ndnsR = "-R";

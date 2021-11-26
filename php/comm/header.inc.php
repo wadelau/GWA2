@@ -21,6 +21,7 @@ if($appdir == ''){
 require($appdir."/inc/config.class.php");
 require($appdir."/mod/user.class.php");
 require($appdir."/comm/tools.function.php");
+require($appdir."/mod/language.class.php");
 
 $siteid = $_CONFIG['siteid']; $isdbg = $_CONFIG['is_debug'];
 if($isdbg){
@@ -138,7 +139,7 @@ foreach($_REQUEST as $k=>$v){
 				}
 			}
             $data[$k] = $v;
-            if(true)){
+            if(true){
                 #eval("\${$k} = \"$v\";"); # risky
 				${$k} = $v;
             }
@@ -214,9 +215,11 @@ set_exception_handler('exception_handler');
 //- securityFileCheck , 
 //- Xenxin@ufqi
 // 11:17 Thursday, December 19, 2019
-function securityFileCheck($fv){
+function securityFileCheck($fv, $isFile=false){
 	$rtn = $fv;
-	$rtn = realpath($rtn);
+	if($isFile){
+		$rtn = realpath($rtn);
+	}
 	$badChars = array(';', '%3B', ' ', "%20", '&', "%26", "..", "//", './', "\\", '\.');
 	$rtn = str_replace($badChars, '', $rtn);
 	if(!preg_match('/^(?:[a-z0-9_\-\/#~]|\.(?!\.))+$/iD', $rtn)){

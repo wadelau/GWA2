@@ -36,7 +36,7 @@ if(true){
 	$conf['dbuser'] 	= 'DB_USER';
 	$conf['dbpassword'] 	= 'DB_PASSWORD';
 	$conf['dbname'] 	= 'DB_NAME';
-	$conf['dbdriver']	= 'MYSQL'; # 'MYSQL', 'MYSQLIX', 'PDOX', 'SQLSERVER', 'ORACLE' in support, UPCASE only
+	$conf['dbdriver']	= 'MYSQLIX'; # 'MYSQL', 'MYSQLIX', 'PDOX', 'SQLSERVER', 'ORACLE' in support, UPCASE only
 	$conf['db_enable_utf8_affirm'] = false; # append utf-8 affirm after db connection established, should be false in a all-utf-8 env.
 	$conf['dbsock'] = '/www/bin/mysql/mysql.sock'; # use only if dbhost=localhost since php7.0+
 	$conf['dbpersistent'] = true; # assume db connection pool per process is support
@@ -115,5 +115,13 @@ class GConf{
 	
 }
 
+# php8.0+
+# count($array) --> is_countable($array) && count($array) 
+# 00:44 2021-11-22
+if (!function_exists('is_countable')) {
+    function is_countable($var) {
+        return (is_array($var) || $var instanceof Countable);
+    }
+}
 
 ?>

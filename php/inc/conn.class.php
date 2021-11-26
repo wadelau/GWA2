@@ -29,7 +29,7 @@ class Config_Master{
 		$this->mDbPassword = $gconf->get('dbpassword');
 		$this->mDbDatabase = $gconf->get('dbname');
 		$this->mDbSock = $gconf->get('dbsock');
-		if(isset($gconf->get('dbpersistent'))){
+		if($gconf->get('dbpersistent') != null){
 			$this->mDbPersistent = $gconf->get('dbpersistent');
 		}
 	} 
@@ -52,7 +52,7 @@ class Config_Slave{
 		$this->mDbPassword = $gconf->get('dbpassword_slave');
 		$this->mDbDatabase = $gconf->get('dbname_slave');
 		$this->mDbSock = $gconf->get('dbsock');
-		if(isset($gconf->get('dbpersistent'))){
+		if($gconf->get('dbpersistent') != null){
 			$this->mDbPersistent = $gconf->get('dbpersistent');
 		}
 	} 

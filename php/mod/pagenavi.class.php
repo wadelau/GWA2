@@ -83,7 +83,9 @@ class PageNavi extends WebApp{
                            $para['url'] .= "&$kp=".$_REQUEST[$kp];
                }
            }
-           $para['url'] .= '&pnsm='.(isset($_REQUEST['pnsm'])?$_REQUEST['pnsm']:'and');
+		   if(strpos($para['url'], "&pnsm") < 1){
+			$para['url'] .= '&pnsm='.(isset($_REQUEST['pnsm'])?$_REQUEST['pnsm']:'and');
+		   }
        }
        #print_r($this->hmf);
 

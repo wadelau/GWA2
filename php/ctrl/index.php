@@ -1,7 +1,6 @@
 <?php
 
 # controlling of homepage
-include_once($appdir."/ctrl/include/language.php");
 #include_once($appdir."/mod/poll.class.php");
 
 #
@@ -13,18 +12,14 @@ include_once($appdir."/ctrl/include/language.php");
 $act = $act == '' ? 'index' : $act;
 
 if($act == 'index'){ # something displayed in homepage only, 09:55 11 June 2016
-	
-	if($act == 'index'){
-		#
-		
-	}
-	else{
-		
-		$data['resp'] = "Unknown act:[$act].";
-		
-	}
-
+	# something to do with act=index, 17:41 2021-11-26	
 }
+else{
+	
+	$data['resp'] = "Unknown act:[$act].";
+	
+}
+
 
 # tpl
 

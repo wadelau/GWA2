@@ -14,6 +14,7 @@ public class Language extends WebApp{
 	private ResourceBundle lang = null;
 	private boolean needSetLang = false;
 	private HashMap dictMap = new HashMap();
+	private HashMap dictMapKey = new HashMap();
 	private final String dictInfoTbl = "dict_infotbl";
 	private final String dictDetailTbl = "dict_detailtbl";
 	private final String logTag = "mod/Language ";
@@ -65,7 +66,7 @@ public class Language extends WebApp{
 		return this.needSetLang;
 	}
 	
-	//- get k->v pairs from dictDetailTbl
+	//- get k->v pairs from dictDetailTbl, with ivalue->ikey
 	public HashMap getDictList(String myk){
 		HashMap hmrtn = new HashMap();
 		int dictSize = this.dictMap.size();
@@ -77,9 +78,31 @@ public class Language extends WebApp{
 		}
 		return hmrtn;
 	}
+	//- get k->v pairs from dictDetailTbl, with ikey->ivalue
+	public HashMap getDictListByKey(String myk){
+		HashMap hmrtn = new HashMap();
+		int dictSize = this.dictMapKey.size();
+		if(dictSize < 1){
+			this.dictMapKey = _initDictMapByKey();
+		}
+		if(this.dictMapKey.containsKey(myk)){
+			hmrtn = (HashMap)this.dictMapKey.get(myk);
+		}
+		return hmrtn;
+	}
 	
-	//- init the dict map
+	//-
 	private HashMap _initDictMap(){
+		//- with pair of ivalue->ikey
+		return this._initDictMapX(0);
+	}
+	//-
+	private HashMap _initDictMapByKey(){
+		//- pair of ikey->ivalue, 10:26 2021-11-05
+		return this._initDictMapX(1);
+	}
+	//- init the dict map
+	private HashMap _initDictMapX(int myType){
 		HashMap hmrtn = new HashMap();
 		hmrtn = this.execBy("select * from "+this.dictDetailTbl+" where 1=1", "", 
 			(new HashMap(){{ put("key", "dict-detail-list"); }}));
@@ -97,7 +120,12 @@ public class Language extends WebApp{
 				else{
 					hmtmp3 = new HashMap();
 				}
-				hmtmp3.put(hmtmp.get("ivalue"), hmtmp.get("ikey"));
+				if(myType==0){
+					hmtmp3.put(hmtmp.get("ivalue"), hmtmp.get("ikey"));
+				}
+				else if(myType==1){
+					hmtmp3.put(hmtmp.get("ikey"), hmtmp.get("ivalue"));
+				}
 				hmtmp2.put(tmpk, hmtmp3);
 			}
             hmtmp = null; hmtmp3 = null; 

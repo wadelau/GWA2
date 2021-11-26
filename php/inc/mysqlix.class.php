@@ -26,7 +26,7 @@ class MYSQLIX {
 	 * and 5) active instances of all objects.
 	 */
 	var $m_persistent;
-	const Persistent_Tag = 'p:';
+	var Persistent_Tag = 'p:';
 	var $isdebug = 0; # debug mode
 
 	# 
@@ -40,7 +40,7 @@ class MYSQLIX {
 		$this->m_persistent = $config->mDbPersistent;
 		$this->m_link = null;
 		if($this->m_persistent){
-			$this->m_host = Persistent_Tag . $this->m_host;
+			$this->m_host = $this->Persistent_Tag . $this->m_host;
 		}
 	} 
 

@@ -268,7 +268,7 @@ class WebApp implements WebAppInterface{
 				$sql .= " where ".$conditions;
 			}
 			if($issqlready == 1){
-				boolean $needForgetPageSize = false;
+				$needForgetPageSize = false;
 				if($this->getId() != ""){ 
 					if(!isset($this->hmf['pagesize'])){ $needForgetPageSize = true; }
 					$this->hmf["pagesize"] = 1; # single record

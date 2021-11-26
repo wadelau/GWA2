@@ -6,7 +6,7 @@
 
 if(1){ # in some scenarios, this should be set as 0 to disable this function globally.
 	
-	if($argv && $argc > 0){ # run from cmd line?
+	if(isset($argv) && isset($argc) && $argc > 0){ # run from cmd line?
 		error_log(__FILE__.": run from cmd line. argc:[".$argc."]");
 		# e.g.  A-style
 		# /usr/local/php/bin/php -c /www/bin/php/php.ini "/path/to/index.php" "mod=mob" "act=get_offer" "fmt=json"
@@ -40,7 +40,8 @@ if(1){ # in some scenarios, this should be set as 0 to disable this function glo
 		if(function_exists('mb_internal_encoding')){
 		    mb_internal_encoding($myCharset);
 		    mb_http_output($myCharset);
-		    mb_http_input($myCharset);
+		    #mb_http_input($myCharset);
+			mb_http_input("L");
 		    mb_regex_encoding($myCharset);
 		}
 		else{

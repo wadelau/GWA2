@@ -483,7 +483,7 @@ function debug($obj, $tag='', $output=null){
 	 }
 	 
 	 #
-     public static function checkClientUa($myua='', $targetua, $user=null){
+     public static function checkClientUa($myua='', $targetua='', $user=null){
         $isMatch = false;
         if($myua == null || $myua == ''){
             $myua = $_SERVER['HTTP_USER_AGENT'];

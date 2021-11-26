@@ -57,6 +57,9 @@ class WaterMark{
 				if(function_exists('imagecreatefromwebp')){
 					$im = imagecreatefromwebp($imgf);
 				}
+				else{
+					error_log('mod/watermark: no imagecreatefromwebp? file:'.$imgf);
+				}
 			}
 			else if($imgt == 'bmp'){
 				$im = imagecreatefromwbmp($imgf);
