@@ -109,7 +109,9 @@ class WaterMark{
 			}
 				imagedestroy($im);
 			}
-		
+			else{
+				error_log("mod/watermark: addStr failed for img:".is_object($img)." type:".$imgt." for img:".$imgf);
+			}
 		}
 		return $this->imgPath;	
 	}
@@ -119,13 +121,21 @@ class WaterMark{
 		$type = "";
 		$tmpFileNameArr = explode(".", strtolower($this->imgPath));
 		$tmpFileExt = end($tmpFileNameArr);
-		if(strpos($tmpFileExt, 'jpg') !== false){ $type = "jpg"; }
-		else if(strpos($tmpFileExt, 'jpeg') !== false){ $type = "jpg"; }
-		else if(strpos($tmpFileExt, 'jfif') !== false){ $type = "jpg"; }
-		else if(strpos($tmpFileExt, 'gif') !== false){ $type = "gif"; }
-		else if(strpos($tmpFileExt, 'bmp') !== false){ $type = "bmp"; }
-		else if(strpos($tmpFileExt, 'webp') !== false){ $type = "webp"; }
-		else if(strpos($tmpFileExt, 'png') !== false){ $type = "png"; }
+		$realType = "";
+		$imgSizeInfo = getimagesize($this->imgPath);
+		if($imgSizeInfo){ $realType = $imgSizeInfo[2]; } # width, height and mime
+		if(strpos($tmpFileExt, 'jpg') !== false 
+			|| ($realType==IMG_JPG)){ $type = "jpg"; }
+		else if(strpos($tmpFileExt, 'jpeg') !== false
+			|| $realType==IMG_JPEG){ $type = "jpg"; }
+		else if(strpos($tmpFileExt, 'gif') !== false
+			|| $realType==IMG_GIF){ $type = "gif"; }
+		else if(strpos($tmpFileExt, 'bmp') !== false
+			|| $realType==IMG_BMP){ $type = "bmp"; }
+		else if(strpos($tmpFileExt, 'webp') !== false
+			|| $realType==IMG_WEBP){ $type = "webp"; }
+		else if(strpos($tmpFileExt, 'png') !== false
+			|| $realType==IMG_PNG){ $type = "png"; }
 		else{ $type = ""; }
 		#error_log("mod/watermark: getType type:".$type." for img:".$this->imgPath." ext:$tmpFileExt");
 

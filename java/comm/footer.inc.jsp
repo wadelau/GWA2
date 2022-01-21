@@ -44,6 +44,8 @@ if(fmt.equals("")){
 		if(!(boolean)Config.get("is_debug") && (boolean)Config.get("enable_cache")){ enableTplCache = true; }
 		else{ tplCacheReady = false;}
 		HashMap hmtpl = null; String intplcont = "";
+		HashMap hmReplace = (HashMap)data.get("outReplaceList"); 
+		if(hmReplace==null){ hmReplace = new HashMap(); }
 		if(needDispIndex){ 
 			//- embedded in index.html
 			if(enableTplCache){
@@ -70,6 +72,7 @@ if(fmt.equals("")){
 					hmtpl = hanjst.setBy("cache:", "", cacheArgs);
 				}
 			}
+			intplcont = hanjst.replaceElement(intplcont, hmReplace);
 			data.put("embedtpl", intplcont); // same with tpl
 		}
 		else{
@@ -105,13 +108,14 @@ if(fmt.equals("")){
 					}
 				}
 			}
+			intplcont = hanjst.replaceElement(intplcont, hmReplace);
 			data.put("innertpl", intplcont);
 		}
 		tplcont = tplcont==null ? "" : tplcont;
         String jsondata = hanjst.map2Json(data);
 
         //- replaces
-        tplcont = hanjst.replaceElement(tplcont, (HashMap)data.get("outReplaceList"));
+        tplcont = hanjst.replaceElement(tplcont, hmReplace);
 		tplcont = tplcont.replace(hanjstJsonDataTag, jsondata);
 		
 		//- print out contents
