@@ -591,65 +591,65 @@ public class WebApp implements WebAppInterface{
         else if(type.equals("url:")){
             //- @todo: code optimize
             rtnobj.put(0, true);
-            HttpURLConnection conn = null;
-            InputStream is = null;
-            OutputStream os = null;
-            BufferedReader br = null;
-            String targeturl = (String)args.get("targeturl");
-            String myMethod = (String)args.get("method");
-            if(myMethod == null || myMethod.equals("")){ myMethod = "get"; }
-            else{ myMethod = myMethod.toLowerCase(); }
-            if(myMethod.equals("post")){
-            	try{
-    	            URL url = new URL(targeturl);
-        	        conn = (HttpURLConnection)url.openConnection();
-        	        conn.setRequestMethod("POST");
-        	        conn.setDoOutput(true);
-        	        conn.setDoInput(true);
-	            	boolean enableZip = false;
-	            	if(args.get("header")!=null){
-	            		Iterator iterator = ((HashMap)args.get("header")).entrySet().iterator();
-	            		String k, v;
-	            		while (iterator.hasNext()) {
-	            			Map.Entry entry = (Map.Entry) iterator.next();
-	            			k = (String)entry.getKey();
-	            			v = String.valueOf(entry.getValue());
-	            			if(k.equals("Accept-Encoding")){
-	            				enableZip = true;
-	            			}
-	            			conn.setRequestProperty(k, v);
-	            		}
-	            	}
-	            	if(!enableZip && this.http_enable_gzip){
-	            		conn.setRequestProperty("Accept-Encoding", "gzip, deflate, compress");
-	            		enableZip = true;
-	            	}
-	            	String paraStr = "";
-	            	if(args.get("parameter")!=null){
-	            		//- http build query
-	            		if(args.get("parameter") instanceof HashMap){
-	            			paraStr += httpBuildQuery((HashMap)args.get("parameter"));
-	            		}
+			HttpURLConnection conn = null; InputStream is = null;
+			OutputStream os = null; BufferedReader br = null;
+			String targeturl = (String)args.get("targeturl");
+			String myMethod = (String)args.get("method"); int readTimeout = 60;
+			if(myMethod == null || myMethod.equals("")){ myMethod = "get"; }
+			else{ myMethod = myMethod.toLowerCase(); }
+			if(myMethod.equals("post")){
+				try{
+					URL url = new URL(targeturl);
+					conn = (HttpURLConnection)url.openConnection();
+					conn.setRequestMethod("POST");
+					conn.setDoOutput(true); conn.setDoInput(true);
+					conn.setConnectTimeout(5*1000); conn.setReadTimeout(readTimeout*1000);
+					boolean enableZip = false; boolean needJsonBody = false; //- default is Form Url Encoded
+					if(args.get("header")!=null){
+						Iterator iterator = ((HashMap)args.get("header")).entrySet().iterator();
+						String k, v;
+						while (iterator.hasNext()) {
+							Map.Entry entry = (Map.Entry) iterator.next();
+							k = (String)entry.getKey();
+							v = String.valueOf(entry.getValue());
+							if(k.equals("Accept-Encoding")){
+								enableZip = true;
+							}
+							else if(k.equals("Content-Type")){
+								if(v.equals("application/json")){ needJsonBody = true; }
+							}
+							conn.setRequestProperty(k, v);
+						}
+					}
+					if(!enableZip && this.http_enable_gzip){
+						conn.setRequestProperty("Accept-Encoding", "gzip, deflate, compress");
+						enableZip = true;
+					}
+					String paraStr = "";
+					if(args.get("parameter")!=null){
+						//- http build query
+						if(args.get("parameter") instanceof HashMap){
+							paraStr += httpBuildQuery((HashMap)args.get("parameter"), needJsonBody);
+						}
 						else{
-	            			paraStr += args.get("parameter").toString();
-	            		}
-	            	}
-	            	conn.setRequestProperty("Content-Length", String.valueOf(paraStr.length()));
-	            	//conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+							paraStr += args.get("parameter").toString();
+						}
+					}
+					conn.setRequestProperty("Content-Length", String.valueOf(paraStr.length()));
+					//conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded"); // maybe needJsonBody
 					os = conn.getOutputStream();
-					os.write(paraStr.getBytes("utf-8"));
-					os.flush();
+					os.write(paraStr.getBytes("utf-8")); os.flush();
 					StringBuffer sbf = new StringBuffer();
 					is = conn.getInputStream();
 					br = new BufferedReader(new InputStreamReader(is, "UTF-8")); 
-	                String temp = null;
-	                while ((temp = br.readLine()) != null) {
-	                    sbf.append(temp);
-	                    sbf.append("\r\n");
-	                }
-                    int respCode = conn.getResponseCode();
-                    if(respCode >= HttpURLConnection.HTTP_OK && respCode< 300 ){ //- 200, 2xxx
-		                rtnobj.put(1, sbf.toString());
+					String temp = null;
+					while ((temp = br.readLine()) != null) {
+						sbf.append(temp);
+						sbf.append("\r\n");
+					}
+					int respCode = conn.getResponseCode();
+					if(respCode >= HttpURLConnection.HTTP_OK && respCode< 300 ){ //- 200, 2xxx
+						rtnobj.put(1, sbf.toString());
 					}
 					else{
 						rtnobj.put(0, false);
@@ -657,71 +657,71 @@ public class WebApp implements WebAppInterface{
 						hmtmp.put("errordesc", "response code error: "+ conn.getResponseCode()+"/resp"+sbf.toString() + url.toString());
 						rtnobj.put(1, hmtmp);
 					}
-            	}
+				}
 				catch(MalformedURLException e){
-            		rtnobj.put(0, false);
-            		hmtmp.put("errcode", 1905012012);
+					rtnobj.put(0, false);
+					hmtmp.put("errcode", 1905012012);
 					hmtmp.put("errordesc", e.toString() + " " + targeturl);
 					rtnobj.put(1, hmtmp);
-                }
+				}
 				catch(UnsupportedEncodingException e){
-                	rtnobj.put(0, false);
-            		hmtmp.put("errcode", 1905022243);
+					rtnobj.put(0, false);
+					hmtmp.put("errcode", 1905022243);
 					hmtmp.put("errordesc",  e.toString() + " " + targeturl);
 					rtnobj.put(1, hmtmp);
-            	}
+				}
 				catch(IOException e){
-            		rtnobj.put(0, false);
-            		hmtmp.put("errcode", 1905012015);
+					rtnobj.put(0, false);
+					hmtmp.put("errcode", 1905012015);
 					hmtmp.put("errordesc",  e.toString() + " " + targeturl);
 					rtnobj.put(1, hmtmp);
-                }
+				}
 				catch(Exception e){
-                	rtnobj.put(0, false);
-            		hmtmp.put("errcode", 1905012030);
+					rtnobj.put(0, false);
+					hmtmp.put("errcode", 1905012030);
 					hmtmp.put("errordesc",  e.toString() + " " + targeturl);
 					rtnobj.put(1, hmtmp);
-                }
+				}
 				finally{
-                	if (br!=null){
-                        try{
-                            br.close();
-                        }
+					if (br!=null){
+						try{
+							br.close();
+						}
 						catch (IOException e){
-                            e.printStackTrace();
-                        }
-                    }
-                    if(os!=null){
-                        try{
-                            os.close();
-                        }
+							e.printStackTrace();
+						}
+					}
+					if(os!=null){
+						try{
+							os.close();
+						}
 						catch (IOException e){
-                            e.printStackTrace();
-                        }
-                    }
-                    if (is!=null){
-                        try{
-                            is.close();
-                        }
+							e.printStackTrace();
+						}
+					}
+					if (is!=null){
+						try{
+							is.close();
+						}
 						catch (IOException e){
-                            e.printStackTrace();
-                        }
-                    }
-                	if(conn!=null){
-                		conn.disconnect();
-                	}
-                }
-            }
+							e.printStackTrace();
+						}
+					}
+					if(conn!=null){
+						conn.disconnect();
+					}
+				}
+			}
 			else{
 				//- http(s) get, @fixme
 				if(args.get("parameter") != null){
 					targeturl += targeturl.indexOf("?") > -1 ? "&" : "?";
 					try{
-						targeturl += httpBuildQuery((HashMap)args.get("parameter"));
+						targeturl += httpBuildQuery((HashMap)args.get("parameter"), false);
 					}
-                    catch(UnsupportedEncodingException e){
+					catch(UnsupportedEncodingException e){
 						rtnobj.put(0, false);
-	            		hmtmp.put("errcode", 1905022243);
+						hmtmp.put("errcode", 1905022243);
 						hmtmp.put("errordesc",  e.toString() + " " + targeturl);
 						rtnobj.put(1, hmtmp);
 						return rtnobj;
@@ -731,38 +731,39 @@ public class WebApp implements WebAppInterface{
 				boolean enableZip = false;
 				try{
 					URL url = new URL(targeturl);
-	    	        conn = (HttpURLConnection)url.openConnection();
-	    	        conn.setRequestMethod("GET");
-	    	        if(args.get("header")!=null){
-	            		Iterator iterator = ((HashMap)args.get("header")).entrySet().iterator();
-	            		String k, v;
-	            		while (iterator.hasNext()) {
-	            			Map.Entry entry = (Map.Entry) iterator.next();
-	            			k = (String)entry.getKey();
-	            			v = (String)entry.getValue();
-	            			if(k.equals("Accept-Encoding")){
-	            				enableZip = true;
-	            			}
-	            			conn.setRequestProperty(k, v);
-	            		}
-	            	}
-	            	if(!enableZip && this.http_enable_gzip){
-	            		conn.setRequestProperty("Accept-Encoding", "gzip, deflate, compress");
-	            		enableZip = true;
-	            	}
-	            	conn.connect();
-                    int respCode = conn.getResponseCode(); 
-                    if(respCode >= HttpURLConnection.HTTP_OK && respCode < 300){
+					conn = (HttpURLConnection)url.openConnection();
+					conn.setRequestMethod("GET");
+					conn.setConnectTimeout(5*1000); conn.setReadTimeout(readTimeout*1000);
+					if(args.get("header")!=null){
+						Iterator iterator = ((HashMap)args.get("header")).entrySet().iterator();
+						String k, v;
+						while (iterator.hasNext()) {
+							Map.Entry entry = (Map.Entry) iterator.next();
+							k = (String)entry.getKey();
+							v = (String)entry.getValue();
+							if(k.equals("Accept-Encoding")){
+								enableZip = true;
+							}
+							conn.setRequestProperty(k, v);
+						}
+					}
+					if(!enableZip && this.http_enable_gzip){
+						conn.setRequestProperty("Accept-Encoding", "gzip, deflate, compress");
+						enableZip = true;
+					}
+					conn.connect();
+					int respCode = conn.getResponseCode(); 
+					if(respCode >= HttpURLConnection.HTTP_OK && respCode < 300){
 						is = conn.getInputStream();
 						br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 						StringBuffer sbf = new StringBuffer();
-		                String temp = null;
-		                while ((temp = br.readLine()) != null) {
-		                    sbf.append(temp);
-		                    sbf.append("\r\n");
-		                }
-		                rtnobj.put(1, sbf.toString());
-		                //debug(sbf.toString());
+						String temp = null;
+						while ((temp = br.readLine()) != null) {
+							sbf.append(temp);
+							sbf.append("\r\n");
+						}
+						rtnobj.put(1, sbf.toString());
+						//debug(sbf.toString());
 					}
 					else{
 						rtnobj.put(0, false);
@@ -788,7 +789,7 @@ public class WebApp implements WebAppInterface{
 					hmtmp.put("errcode", 1905012030);
 					hmtmp.put("errordesc",  e.toString() + " " + targeturl);
 					rtnobj.put(1, hmtmp);
-                    e.printStackTrace();
+					e.printStackTrace();
 				}
 				finally{
 					if (br!=null){
@@ -903,31 +904,64 @@ public class WebApp implements WebAppInterface{
         return issucc;
     }
 	
-	//- encode the url parameter
-	private String httpBuildQuery(HashMap hm) throws UnsupportedEncodingException{
+	//- encode the url parameter, with needJsonBody 22:10 2022-01-23
+	private String httpBuildQuery(HashMap hm, boolean needJsonBody) throws UnsupportedEncodingException{
 		String target = "";
 		Iterator iterator = hm.entrySet().iterator();
-		String k;
-		Object v;
+		String k; Object v; 
+		if(needJsonBody){ target = "{"; }
 		while (iterator.hasNext()) {
-			Map.Entry entry = (Map.Entry) iterator.next();
+			Map.Entry entry = (Map.Entry)iterator.next();
 			k = (String)entry.getKey();
 			v = entry.getValue();
 			if(v instanceof String){
-				target+=k+"="+URLEncoder.encode(v.toString(), "utf-8")+"&";
-			}
-            else if(v instanceof Iterable){
-				Iterable iter = (Iterable)v;
-				for(Object o: iter){
-					target+=k+"="+URLEncoder.encode(o.toString(), "utf-8")+"&";
+				if(needJsonBody){
+					target += "\""+k+"\":\""+URLEncoder.encode(v.toString(), "utf-8")+"\",";
+				}
+				else{
+					target+=k+"="+URLEncoder.encode(v.toString(), "utf-8")+"&";
 				}
 			}
-            else{
+			else if(v instanceof Integer || v instanceof Float 
+				|| v instanceof Double || v instanceof Long){
+				if(needJsonBody){
+					target += "\""+k+"\":"+v+",";
+				}
+				else{
+					target+=k+"="+URLEncoder.encode(v.toString(), "utf-8")+"&";
+				}	
+			}
+			else if(v instanceof Iterable){
+				Iterable iter = (Iterable)v;				
+				if(needJsonBody){
+					String vArr = "[";
+					for(Object o: iter){
+						vArr += URLEncoder.encode(o.toString(), "utf-8")+",";
+					}
+					vArr += vArr.substring(0, vArr.length()-1) + "]";
+					target += "\""+k+"\":"+vArr+",\n";
+				}
+				else{
+					for(Object o: iter){
+						target+=k+"="+URLEncoder.encode(o.toString(), "utf-8")+"&"; //-?
+					}
+				}
+			}
+			else{
 				target+=k+"="+URLEncoder.encode(v.toString(), "utf-8")+"&";
 			}
 		}
 		int length = target.length();
-		return length > 0 ? target.substring(0, length-1) : "";
+		if(needJsonBody){
+			if(target.substring(length-1).equals(",")){
+				target = target.substring(0, length-1); // remove , from the end for json
+			}
+			target += "}"; 
+		}
+		else{
+			target = length > 0 ? target.substring(0, length-1) : "";
+		}
+		return target;
 	}
 	
 }

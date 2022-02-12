@@ -8,7 +8,7 @@
 
 // the application entry...
 
-synchronized(this){ //- global thread-safe, bgn
+//synchronized(this){ //- global thread-safe, bgn, Thread.sleep(30*1000);  the capability to control the access of multiple threads to any shared resource. need to narrow-down to smallest scope, 16:15 2022-02-11
 
 //-  entry header
 %><%@include file="./comm/header.inc.jsp"%><%
@@ -95,6 +95,6 @@ if(true){
 //- footer
 %><%@include file="./comm/footer.inc.jsp"%><%
 
-} //- global thread-safe, end
+//} //- global thread-safe, end, need to narrow-down to smallest scope, 16:15 2022-02-11
 
 %>

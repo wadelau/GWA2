@@ -137,7 +137,7 @@ else{
 }
 
 //- set lang if reqtLang
-if(lang.getLang2Cookie()){
+if(lang != null && lang.getLang2Cookie()){
 	Cookie mycki = new Cookie(user.getCookieSid(),
 	user.generateSid(request)+"."+lang.getTag()); //- sid and userId
 	mycki.setMaxAge(86400*1*1); //- a single day

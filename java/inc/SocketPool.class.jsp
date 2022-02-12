@@ -387,7 +387,7 @@ public static class SocketPool{
                     index=Wht.parseInt(map.get("index"));
                     init=(String)map.get("init");
                     if (init!=null && init.equals("long")){
-                        System.out.println("Session init long i:"+i);
+                        debug(Log_Tag + " Session init long i:"+i);
                     }
                     map=null;
                     if(socket==null){

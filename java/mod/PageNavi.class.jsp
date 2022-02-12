@@ -141,6 +141,7 @@ public class PageNavi extends WebApp{
 		int pnps = Wht.parseInt(this.para.get("pnps"));
 		int navilen = Wht.parseInt(this.para.get("barlength"));
 		int totalpage = (pntc % pnps) == 0 ? (pntc / pnps) : (Wht.parseInt(pntc / pnps) + 1);
+		pnpn = pnpn < 1 ? 1 : pnpn;
 		tmpurl = (String)this.para.get("url");
 		int endpage = pnpn + navilen;
 		 
@@ -198,6 +199,7 @@ public class PageNavi extends WebApp{
 		int pnps = Wht.parseInt(this.para.get("pnps"));
 		int navilen = Wht.parseInt(this.para.get("barlength"));
 		int totalpage = (pntc % pnps) == 0 ? (pntc / pnps) : (Wht.parseInt(pntc / pnps) + 1);
+		pnpn = pnpn < 1 ? 1 : pnpn;
 		tmpurl = (String)this.para.get("url");
 		int endpage = pnpn + navilen;
 		int[] pageArr = new int[navilen*2];
