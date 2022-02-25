@@ -5,7 +5,7 @@
 //- inherit crsPage from caller
 HashMap crsPage = (HashMap)request.getAttribute("crsPage");
 
-data = (HashMap)crsPage.get("data");
+data = (ConcurrentHashMap)crsPage.get("data");
 outx = (StringBuffer)crsPage.get("outx");
 user = new User((HashMap)crsPage.get("user"));
 	outx.append("ctrl/ctrlheader: time-from-index: ["+user.get("time-in-index")+"]");
@@ -18,12 +18,13 @@ url = (String)crsPage.get("url");
 sid = (String)crsPage.get("sid");
 
 userid = user.getId();
+if(data == null){ data = new ConcurrentHashMap(); }
 
 //- lang again
 if(true){
 	HashMap langconf = new HashMap();
-	langconf.put("language", (String)data.get("language")); 
-	langconf.put("country", (String)data.get("languagecountry"));
+	langconf.put("language", Wht.getString(data, "language")); 
+	langconf.put("country", Wht.getString(data, "languagecountry"));
 	lang = new Language(langconf);
 }
 String innertpl = ""; //- for standalone template with inner child

@@ -2,6 +2,7 @@
 import="java.util.*,
 java.text.SimpleDateFormat,
 java.io.File,
+java.util.concurrent.ConcurrentHashMap,
 com.ufqi.gwa2.mod.Base62x"
 language="java" 
 pageEncoding="UTF-8" 
@@ -36,13 +37,35 @@ request.setCharacterEncoding("UTF-8");
 
 //- global variables across the app, embedded in two types of files: /index, /ctrl/xxx
 //- need to init before manipulate
-%><%!String sid, appdir, siteid, fmt, mytpl, mod, act, rtvdir, url, userid;
-HashMap data; StringBuffer outx; User user; Language lang; HanjstTemplate hanjst; %><%
+%><%!static ConcurrentHashMap globalDataHolder;%><%
+//- local variables inside a thread, as of inside a method
+String sid, appdir, siteid, fmt, mytpl, mod, act, rtvdir, url, userid;
+ConcurrentHashMap data; StringBuffer outx; User user; Language lang; HanjstTemplate hanjst; 
 
-data = new HashMap(); //- for tpl data container
+globalDataHolder = new ConcurrentHashMap(); //- shared cross all threads, inside a process
+data = new ConcurrentHashMap(); //- for tpl data container, locally, inside a thread
 outx = new StringBuffer(); //- same as $out in -PHP for row strings output
 
 %><%!
+//- write/read global data into/from a thread-safe holder, 09:18 2022-02-24
+//- see comm/footer
+public static void globalData(String key, Object value){ //- write
+	String dataKey = "GWA2-" + ProcessHandle.current().pid() + "-" + Thread.currentThread().getId();
+	ConcurrentHashMap hmData = (ConcurrentHashMap)globalDataHolder.get(dataKey);
+	if(hmData == null){ hmData = new ConcurrentHashMap(); }
+	hmData.put(key, (value==null?"":value));
+	globalDataHolder.put(dataKey, hmData);
+}
+public static Object globalData(String key){ //- read
+	String dataKey = "GWA2-" + ProcessHandle.current().pid() + "-" + Thread.currentThread().getId();
+	ConcurrentHashMap hmData = (ConcurrentHashMap)globalDataHolder.get(dataKey);
+	if(hmData == null){ hmData = new ConcurrentHashMap(); }
+	Object obj;
+	if(key == null || key.equals("")){ obj = hmData; }
+	else{ obj = hmData.get(key); }
+	return obj;
+}
+
 /*
 * # write log in a simple approach
 * # by wadelau@ufqi.com, Sat Oct 17 17:38:26 CST 2015

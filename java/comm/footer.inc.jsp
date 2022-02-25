@@ -10,13 +10,19 @@ if(fmt.equals("")){
 	}
 	else{
         //- Hanjst template engine
-        if(hanjst == null){ hanjst = new HanjstTemplate(); }
+        hanjst = new HanjstTemplate();
+		//- global data merging into local data, 13:10 2022-02-24, see comm/preheader
+		if(true){
+			ConcurrentHashMap hmGlobal = (ConcurrentHashMap)globalData(""); //- read all with this threadId
+			for(Object objKey : hmGlobal.keySet()){
+				data.put(objKey, hmGlobal.get(objKey));
+			}
+		}
 		//- mytpl
         //debug("mytpl:"+mytpl);
 		data.put("mytpl", mytpl);
 		data.put("url", url);
-		String resrcPathPrefix = (String)Config.get("resrc_path_prefix");
-		data.put("resrcPathPrefix", resrcPathPrefix);
+		data.put("resrcPathPrefix", Wht.getString(Config.getConf(), "resrc_path_prefix"));
 		data.put("sid", sid);
 		data.put("userid", user.getId());
 

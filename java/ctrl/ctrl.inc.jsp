@@ -15,10 +15,11 @@ public void includeCtrl(){
 		//sid = "" + (new java.util.Random()).nextInt();
 
 		//outx.append("\t/ctrl/include: sid:["+sid+"]\n");
-
-		data.put("sid", sid);
-
-		data.put("time", (new Date()));
+		
+		if(data == null){ data = new ConcurrentHashMap(); }
+		//data.put("sid", (sid==null?"":sid));
+		//data.put("time", (new Date()));
+		globalData("time", (new Date()));
 
 	}
 
@@ -29,7 +30,8 @@ public void setCrsPageResponse(HashMap crsPage, javax.servlet.http.HttpServletRe
 	
 	//- response headers from child/crs page
 	try{
-
+		StringBuffer outx = (StringBuffer)globalData("outx");
+		if(outx == null){ outx = new StringBuffer(); }
 	Iterator entries = crsPage.entrySet().iterator();
 	while (entries.hasNext()) {
 		Map.Entry entry = (Map.Entry) entries.next();
@@ -61,6 +63,7 @@ public void setCrsPageResponse(HashMap crsPage, javax.servlet.http.HttpServletRe
 			//out.println("not resp Key = " + key );
 		}
 	}
+		globalData("outx", outx);
 
 	}
 	catch(Exception ex){

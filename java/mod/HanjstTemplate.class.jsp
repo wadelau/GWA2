@@ -34,7 +34,7 @@ public class HanjstTemplate extends WebApp{
 	}
 	
 	//- HashMap 2 JSON
-    public String map2Json(HashMap hmdata){
+    public String map2Json(ConcurrentHashMap hmdata){
         String rtnStr = "";
         GsonBuilder gsonMapBuilder = new GsonBuilder();
         Gson gsonObject = gsonMapBuilder.create();

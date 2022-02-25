@@ -410,7 +410,7 @@ public final static class Wht{
     }
 	
 	//- set an element into a 2-d map
-	public static HashMap set2DMap(HashMap firstMap, String secMapKey, 
+	public static HashMap set2DMap(ConcurrentHashMap firstMap, String secMapKey, 
 			String key, Object val){
 		boolean hasDone = false;
 		if(firstMap!=null){

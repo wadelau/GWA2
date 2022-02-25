@@ -4,6 +4,7 @@
  * v0.1, Thu Jun  9 14:02:51 CST 2016
  * v0.2, Thu Jul 28 04:19:21 CST 2016
  * v0.3, Tue Jul  2 12:02:28 HKT 2019, + global thread-safe
+ * v0.4, disable synchronized by default, +ConcurrentHashMap, thread-related data holder? 22:44 Wednesday, February 23, 2022
  */
 
 // the application entry...
@@ -68,7 +69,7 @@ if((new File(realModfs)).exists()){
 
 	// variables needs to be retrieved explictly 
     //
-    data = (HashMap)crsPage.get("data");
+    data = (ConcurrentHashMap)crsPage.get("data");
     outx = (StringBuffer)crsPage.get("outx");
 	mod = (String)crsPage.get("mod");
 	act = (String)crsPage.get("act");
