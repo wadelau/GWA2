@@ -250,7 +250,28 @@ public final static class Wht{
 		}
 		return matched;
 	}
-
+	
+	//- judge string content is empty or not
+	public static boolean isEmpty(String str){
+		return str==null || str.length()==0;
+	}
+	/*
+	 * returns true when the contents of the two strings are not empty and the content is equal
+	 * @param String str1
+	 * @param String str2
+	 * @return boolean true|false
+	 */
+	public static boolean contentEqual(String str1, String str2){
+		if(isEmpty(str1)||isEmpty(str2)){
+			return false;
+		}
+		return str1.equals(str2);
+	}
+	//-
+	public static boolean equals(String s1, String s2){
+		return Wht.contentEqual(s1, s2);
+	}
+	
 	//
 	//-- some special functional methods
 	//

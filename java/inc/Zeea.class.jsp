@@ -9,6 +9,8 @@ java.security.NoSuchAlgorithmException,java.io.UnsupportedEncodingException"%><%
 %><%!
 public static final class Zeea{
 	//- variables
+	public static final String Java_File_Default_Charset = "ISO-8859-1";
+    public static final String Java_UTF8_Charset = "UTF-8";
 	double ver = 0.1;
 
 	//- constructor
@@ -57,7 +59,81 @@ public static final class Zeea{
 		catch (UnsupportedEncodingException var7){
 			return mdStr;
 		}
-	} 
+	}
+	
+	/** 
+     * @param encryptKey  密钥 
+     * @param encryptText 签名内容 
+     * @param encryptAlgorithm 签名算法 
+     * @return 
+     */  
+    private static String encryptHAMC(String encryptKey, String encryptText, String encryptAlgorithm){   
+        String hamcStr = "";
+		try{
+        	javax.crypto.SecretKey secretKey = new javax.crypto.spec.SecretKeySpec(encryptKey.getBytes("UTF-8"), encryptAlgorithm); 
+            javax.crypto.Mac mac = javax.crypto.Mac.getInstance(secretKey.getAlgorithm()); 
+            mac.init(secretKey);
+            byte[] encryptBytes = mac.doFinal(encryptText.getBytes("UTF-8"));
+            return byte2hex(encryptBytes);
+        }
+        catch (UnsupportedEncodingException e) {
+			return hamcStr;
+		}
+		catch (NoSuchAlgorithmException e) {
+			return hamcStr;
+		}
+		catch (java.security.InvalidKeyException e) {
+			return hamcStr;
+		} 
+    }
+	
+    /*
+     * byte array change to HexString
+     */
+    private static String byte2hex(byte[] b) {
+       StringBuffer sb = new StringBuffer(b.length * 2);
+       int v;
+       for (int i = 0; i < b.length; i++) {
+         v = b[i] & 0xff;
+         if (v < 16) {
+           sb.append('0');
+         }
+         sb.append(Integer.toHexString(v));
+       }
+       return sb.toString();
+     }
+    
+    
+   	//- hmacsha1
+    public static String hmacsha1(String encryptKey, String encryptText){
+    	return encryptHAMC(encryptKey, encryptText, "HmacSHA1");
+    }
+	
+    //-Base64Encode
+    public static String base64Encode(String txt){
+        String enc = "";
+        try{
+            byte[] bytes = txt.getBytes(Zeea.Java_UTF8_Charset);
+            enc = java.util.Base64.getEncoder().encodeToString(bytes);
+        }
+        catch(Exception ex1535){
+            ex1535.printStackTrace();
+        }
+        return enc;
+    }
+
+    //-Base64Decode
+    public static String base64Decode(String txt){
+        String dec = "";
+        try{
+            byte[] bytes = java.util.Base64.getDecoder().decode(txt);
+            dec = new String(bytes);
+        }
+        catch(Exception ex1535){
+            ex1535.printStackTrace();
+        }
+        return dec;
+    }
 
 }
 %>

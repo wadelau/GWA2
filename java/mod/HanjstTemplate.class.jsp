@@ -41,6 +41,37 @@ public class HanjstTemplate extends WebApp{
         rtnStr = gsonObject.toJson(hmdata);
         return rtnStr;
     }
+	//- JSON string2Map 07:58 2022-03-06, why here, read json config?
+	public HashMap string2Map(String respStr){
+		HashMap hmResult = new HashMap();
+		GsonBuilder gsonMapBuilder = new GsonBuilder();
+		Gson gsonObject = gsonMapBuilder.create();
+		HashMap hmResult2 = gsonObject.fromJson(respStr, HashMap.class);
+		//debug(logTag+" string2Map: respStr:"+respStr+" hmResult2:"+hmResult2);
+		hmResult = hmResult2;
+		return hmResult;
+	}
+	//- 11:53 2022-01-24, why here?
+	public HashMap cvs2Map(String listStr){
+		HashMap hmResult = new HashMap(100);
+		String[] lineArr = listStr.trim().split("\n"); //- why trim?
+		String[] firstLineArr = lineArr[0].trim().split(",");;
+		int arrSize = lineArr.length; String[] tmpArr = new String[firstLineArr.length];
+		HashMap hmTmp = new HashMap(); int j = 0;
+		//arrSize = 10;
+		for(int i=1; i<arrSize; i++){
+			tmpArr = lineArr[i].trim().split(",");
+			hmTmp = new HashMap(); j = 0;
+			//debug(logTag+" cvs2Map: line:["+lineArr[i]+"]");
+			for(String key : firstLineArr){
+				hmTmp.put(key, tmpArr[j]); 
+				//debug(logTag+" cvs2Map: key:["+key+"] arr-j:["+tmpArr[j]+"]");
+				j++;
+			}
+			hmResult.put(""+(i-1), hmTmp);
+		}
+		return hmResult;
+	}
 
     //- replace resrc path
     public String replacePath(String tplcont, String viewdir){
