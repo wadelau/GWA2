@@ -360,7 +360,7 @@ public class PageNavi extends WebApp{
                     strb.append(" ").append(pnsm).append(" ");
                     if(fieldopv.equals("inlist")){
                         if(xvalue.indexOf("'") > -1 || xvalue.indexOf("\"") > -1){
-							xvalue = this.addQuote(xvalue);
+							xvalue = this.addQuote(xvalue, fieldopv);
 						}
                         strb.append(field)
                             .append(" in (").append(xvalue).append(")");
@@ -369,8 +369,8 @@ public class PageNavi extends WebApp{
                     else if(fieldopv.equals("inrange")){
                         String[] sArr = xvalue.split(",");
                         strb.append("(").append(field).append(" >= ")
-                            .append(this.addQuote(sArr[0])).append(" and ").append(field)
-                            .append(" <= ").append(this.addQuote(sArr[1])).append(")");
+                            .append(this.addQuote(sArr[0], fieldopv)).append(" and ").append(field)
+                            .append(" <= ").append(this.addQuote(sArr[1], fieldopv)).append(")");
                         obj.del(field);
                     }
                     else if(fieldopv.equals("contains")){
@@ -430,9 +430,31 @@ public class PageNavi extends WebApp{
 	private String addQuote(String s){
 		String str = "";
 		if(s.indexOf("'") > -1){
-			s = s.replaceAll("'", "\\'"); 
+			s = s.replaceAll("'", "\\'");
 		}
 		str = "'"+s+"'";
+		return str;
+	}
+	//-
+	private String addQuote(String s, String opv){
+		String str = "";
+		if(opv != null && (opv.equals("inlist") ||opv.equals("inrange"))){
+			if(s.indexOf("'") == 0
+				|| s.indexOf("\"") == 0){
+				str = s; //- already quoted
+			}
+			else if(s.indexOf("'") < 0
+				&& s.indexOf("\"") < 0)){
+				str = s; //- numeric?
+			}
+			else{
+				str = "";
+				debug(logTag+" addQuote: unsupported inlist parameters:["+s+"]");
+			}
+		}
+		else{
+			str = this.addQuote(s);
+		}
 		return str;
 	}
 

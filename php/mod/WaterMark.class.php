@@ -80,14 +80,14 @@ class WaterMark{
 			#imagestring($stamp, 3, 20, 40, '(c) 2021-99 gMIS', 0x0000FF);
 			// Set the margins for the stamp and get the height/width of the stamp image
 			$imsx = imagesx($im); $imsy = imagesy($im);
-			$marge_right = $imsx / 4; $marge_bottom = $imsy / 4;
+			$marge_right = $imsx / 6; $marge_bottom = $imsy / 6;
 			$sx = imagesx($stamp); $sy = imagesy($stamp);
 			// Merge the stamp onto our photo with an opacity of 50%
 			if($imsx < ($sx+$marge_right)){
-				imagecopymerge($im, $stamp, 0, 0, 0, 0, $sx, $sy, 50);
+				imagecopymerge($im, $stamp, 0, 0, 0, 0, $sx, $sy, 80);
 			}
 			else{
-				imagecopymerge($im, $stamp, ($imsx - $sx - $marge_right), ($imsy - $sy - $marge_bottom), 0, 0, $sx, $sy, 50);
+				imagecopymerge($im, $stamp, ($imsx - $sx - $marge_right), ($imsy - $sy - $marge_bottom), 0, 0, $sx, $sy, 80);
 			}
 			// Save the image to file and free memory
 			if($imgt == 'jpg'){
