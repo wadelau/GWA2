@@ -52,7 +52,7 @@ public class HanjstTemplate extends WebApp{
 		return hmResult;
 	}
 	//- 11:53 2022-01-24, why here?
-	public HashMap cvs2Map(String listStr){
+	public HashMap csv2Map(String listStr){
 		HashMap hmResult = new HashMap(100);
 		String[] lineArr = listStr.trim().split("\n"); //- why trim?
 		String[] firstLineArr = lineArr[0].trim().split(",");;
@@ -62,10 +62,10 @@ public class HanjstTemplate extends WebApp{
 		for(int i=1; i<arrSize; i++){
 			tmpArr = lineArr[i].trim().split(",");
 			hmTmp = new HashMap(); j = 0;
-			//debug(logTag+" cvs2Map: line:["+lineArr[i]+"]");
+			//debug(logTag+" csv2Map: line:["+lineArr[i]+"]");
 			for(String key : firstLineArr){
 				hmTmp.put(key, tmpArr[j]); 
-				//debug(logTag+" cvs2Map: key:["+key+"] arr-j:["+tmpArr[j]+"]");
+				//debug(logTag+" csv2Map: key:["+key+"] arr-j:["+tmpArr[j]+"]");
 				j++;
 			}
 			hmResult.put(""+(i-1), hmTmp);

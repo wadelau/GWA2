@@ -11,6 +11,7 @@ public class PageNavi extends WebApp{
 	// constants
 	private static final String logTag = "mod/PageNavi ";
 	private static final String GWA2_Tag_Skip = "no-op"; //- skip to next, 16:08 2021-06-03
+	private static final boolean GWA2_Is_Parse_Blank = true; //- since 2022-05-12
 	
 	//- variables
 	private HashMap para = null;
@@ -375,10 +376,12 @@ public class PageNavi extends WebApp{
                     }
                     else if(fieldopv.equals("contains")){
                         strb.append(field).append(" like ?");
+						xvalue = this._parseBlank(fieldopv, xvalue);
                         obj.set(field, "%"+xvalue+"%");
                     }
                     else if(fieldopv.equals("notcontains")){
                         strb.append(field).append(" not like ?");
+						xvalue = this._parseBlank(fieldopv, xvalue);
                         obj.set(field, "%"+xvalue+"%");
                     }
                     else if(fieldopv.equals("startswith")){
@@ -496,6 +499,29 @@ public class PageNavi extends WebApp{
         return rtnurl;
     }
 
+	//- 
+	//- parseBlank, compatible with blank and question mark in keywords
+	//- 2022-05-12, xenxin@ufqi.com
+	private String _parseBlank(String op, String xvalue){	
+		String myvalue = xvalue;
+		if(GWA2_Is_Parse_Blank 
+			&& (op.equals("contains") || op.equals("notcontains"))){
+			boolean hasFuzzy = false;
+			if(Wht.inString(" ", myvalue)){
+				myvalue = myvalue.replaceAll(" ", "%");	hasFuzzy = true;	
+			}
+			if(Wht.inString("?", myvalue)){		
+				myvalue = myvalue.replaceAll("?", "%");	hasFuzzy = true;	
+			}
+			if(Wht.inString("？", myvalue)){
+				myvalue = myvalue.replaceAll("？", "%"); hasFuzzy = true;
+			}
+			if(hasFuzzy){ 
+				//- @todo
+			}
+		}
+		return myvalue;
+	}
 }
 
 %>

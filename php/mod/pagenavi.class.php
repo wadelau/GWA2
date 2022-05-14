@@ -19,11 +19,13 @@ class PageNavi extends WebApp{
     const SID = 'sid';
 	const Omit_String = '----';
 	const GWA2_Tag_Skip = 'no-op'; # skip to next, 16:08 2021-06-03
+	const GWA2_Is_Parse_Blank = 1; # parse blank in keywords, 2022-05-13.
+	const Default_Page_Size = 30;
 
    public function __construct(){
 
        $para = array();
-       $pdef = array('pnpn'=>1,'pnps'=>100,'pntc'=>0, 'navilen'=>5); # 28 for development
+       $pdef = array('pnpn'=>1,'pnps'=>Default_Page_Size,'pntc'=>0, 'navilen'=>5); # 28 for development
 
        $file = $_SERVER['PHP_SELF'];
        $query = $_SERVER['QUERY_STRING'];
@@ -364,10 +366,12 @@ class PageNavi extends WebApp{
                     }
 					else if($fieldopv == 'contains'){
                         $condition .= " ".$pnsm." "."$field like ?";
+						$v = $this->_parseBlank($fieldopv, $v);
                         $gtbl->set($field, "%".$v."%");
                     }
 					else if($fieldopv == 'notcontains'){
                         $condition .= " ".$pnsm." "."$field not like ?";
+						$v = $this->_parseBlank($fieldopv, $v);
                         $gtbl->set($field, "%".$v."%");
                     }
 					else if($fieldopv == 'containslist'){
@@ -509,4 +513,26 @@ class PageNavi extends WebApp{
 	   	return $isNumeric;
    }
    
+   //- 
+   //- parse blank or question mark in keywords
+   //- 2022-05-13, xenxin@ufqi.com
+   private function _parseBlank($op, $opv){
+	   if(GWA2_Is_Parse_Blank == 1 
+			&& ($op == 'contains' || $op == 'notcontains')){
+		   boolean $hasFuzzy = false;
+		   if(strpos($opv, " ") > 0){
+			   $opv = str_replace(" ", "%", $opv); $hasFuzzy = true;
+		   }
+		   if(strpos($opv, "?") > 0){
+			   $opv = str_replace("?", "%", $opv); $hasFuzzy = true;
+		   }
+		   if(strpos($opv, "？") > 0){
+			   $opv = str_replace("？", "%", $opv); $hasFuzzy = true;
+		   }
+		   if($hasFuzzy){
+			   # @todo
+		   }
+	   }
+	   return $opv;
+   }
 }
