@@ -503,7 +503,7 @@ public class PageNavi extends WebApp{
 	//- parseBlank, compatible with blank and question mark in keywords
 	//- 2022-05-12, xenxin@ufqi.com
 	private String _parseBlank(String op, String xvalue){	
-		String myvalue = xvalue;
+		String myvalue = xvalue.trim();
 		if(GWA2_Is_Parse_Blank 
 			&& (op.equals("contains") || op.equals("notcontains"))){
 			boolean hasFuzzy = false;

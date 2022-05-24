@@ -517,6 +517,7 @@ class PageNavi extends WebApp{
    //- parse blank or question mark in keywords
    //- 2022-05-13, xenxin@ufqi.com
    private function _parseBlank($op, $opv){
+	   $opv = trim($opv);
 	   if(GWA2_Is_Parse_Blank == 1 
 			&& ($op == 'contains' || $op == 'notcontains')){
 		   boolean $hasFuzzy = false;
