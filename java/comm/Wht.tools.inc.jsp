@@ -352,7 +352,6 @@ public final static class Wht{
 	public static Date getDay(int adjustDay){
 		return getDateDiff(adjustDay*86400);
 	}
-	
 	//- get date by diff in second
 	//- Xenxin, 09:11 Saturday, April 18, 2020
 	public static Date getDateDiff(int mySecond){
@@ -363,6 +362,36 @@ public final static class Wht{
 		Date target = ca.getTime();
 		now = null; ca = null;
 		return target;
+	}
+	//- get date from string
+	public static Date getDate(String dateStr){
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+		Date date = null;
+		try{ 
+			if(dateStr.length() == 10){
+				date = Wht.getDateShort(dateStr);
+			}
+			else{
+				date = formatter.parse(dateStr);
+			}
+		}
+		catch(Exception expt){ expt.printStackTrace(); }
+		return date;
+	}
+	//- get date from string, short
+	public static Date getDateShort(String dateStr){
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+		Date date = null;
+		try{
+			if(dateStr.length() > 10){
+				date = Wht.getDate(dateStr);
+			}
+			else{
+				date = formatter.parse(dateStr);
+			}
+		}
+		catch(Exception expt){ expt.printStackTrace(); }
+		return date;
 	}
 	
 	//- date format
