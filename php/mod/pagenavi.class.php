@@ -173,16 +173,31 @@ class PageNavi extends WebApp{
 	#
    function getOrder(){
        $order = "";
-       foreach($_REQUEST as $k=>$v){
-            if(strpos($k,"pnob") === 0){
-                $order .= substr($k,4);
-				if($v == 1){
+	   $pnoo = trim($_REQUEST['pnoo']); //- //- order of multiple order-by fields, 2022-07-16 05:55
+	   if($pnoo == ''){
+		   foreach($_REQUEST as $k=>$v){
+				if(strpos($k,"pnob") === 0){
+					$order .= substr($k,4);
+					if($v == 1){
+						$order .= " desc";
+					}
+					$order .= ",";
+					#break; # allow multiple order fields
+				}
+			}
+	    }
+		else{
+			$orderFieldArr = explode(",", $pnoo);
+			$xvalue = null;
+			foreach($orderFieldArr as $k=>$v){
+				$xvalue = trim($_REQUEST['pnob'.$v]);
+				$order .= $v;
+				if($xvalue == 1){
 					$order .= " desc";
 				}
 				$order .= ",";
-                #break; # allow multiple order fields
-            }
-        }
+			}
+		}
 		if($order != ''){
 			$order .= "1 "; # + "order by 1 ", compatible with this->get('isasc')
 		}

@@ -253,16 +253,31 @@ public class PageNavi extends WebApp{
 	public String getOrder(){
 		String str = "";
 		StringBuffer strb = new StringBuffer();
-		this.parahm.forEach((k, v)->{
-			String xname = (String)k; String xvalue = (String)v;
-			if(xname.indexOf("pnob") > -1){
-				strb.append(xname.substring(4));
+		String pboo = Wht.get(this.request, "pnoo"); //- order of multiple order-by fields, 2022-07-16 05:42
+		if(pnoo.equals("")){
+			this.parahm.forEach((k, v)->{
+				String xname = (String)k; String xvalue = (String)v;
+				if(xname.indexOf("pnob") > -1){
+					strb.append(xname.substring(4));
+					if(xvalue.equals("1")){
+						strb.append(" desc"); //- 0 for asc, 1 for desc
+					}
+					strb.append(",");
+				}
+				});
+		}
+		else{
+			String[] orderFieldArr = pnoo.split(",");
+			String xvalue = null;
+			for(String f : orderFieldArr){
+				xvalue = Wht.getString(parahm, "pnob"+f);
+				strb.append(f);
 				if(xvalue.equals("1")){
 					strb.append(" desc"); //- 0 for asc, 1 for desc
 				}
 				strb.append(",");
 			}
-			});
+		}
 		str = strb.toString();
 		if(str.equals("")){}
 		else{
