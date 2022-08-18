@@ -253,7 +253,7 @@ public class PageNavi extends WebApp{
 	public String getOrder(){
 		String str = "";
 		StringBuffer strb = new StringBuffer();
-		String pboo = Wht.get(this.request, "pnoo"); //- order of multiple order-by fields, 2022-07-16 05:42
+		String pnoo = Wht.get(this.request, "pnoo"); //- order of multiple order-by fields, 2022-07-16 05:42
 		if(pnoo.equals("")){
 			this.parahm.forEach((k, v)->{
 				String xname = (String)k; String xvalue = (String)v;
