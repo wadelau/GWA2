@@ -18,7 +18,7 @@ General Web Application Architecture.  通用網絡應用架構.
 .
 
 
-### GWA2 is cross-scripts programming framework for web applications.
+### GWA2 is a cross-script programming framework for web applications.
 
 
 * From Interface to Interactions
@@ -70,7 +70,7 @@ General Web Application Architecture.  通用網絡應用架構.
 
 ----
 
-***[GWA2 Updates](http://ufqi.com/blog/category/computer-tech/%E9%80%9A%E7%94%A8%E7%BD%91%E7%BB%9C%E5%BA%94%E7%94%A8%E6%9E%B6%E6%9E%84/)***
+***[GWA2 Updates](http://ufqi.com/blog/category/computer-tech/%E9%80%9A%E7%94%A8%E7%BD%91%E7%BB%9C%E5%BA%94%E7%94%A8%E6%9E%B6%E6%9E%84/)*** &rarr;
 
 GWA2写日志的两种方法setBy和debug
 
