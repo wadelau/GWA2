@@ -66,6 +66,7 @@ class WaterMark{
 			}
 			#error_log("mod/watermark: addStr type:".$imgt." for img:".$imgf." im:$im");
 			if($im != null){
+				$transparentX = 38;
 				// First we create our stamp image manually from GD
 				$stamp = imagecreatetruecolor(120, 50);
 			#imagefilledrectangle($stamp, 0, 0, 99, 69, 0x0000FF);
@@ -84,10 +85,10 @@ class WaterMark{
 			$sx = imagesx($stamp); $sy = imagesy($stamp);
 			// Merge the stamp onto our photo with an opacity of 50%
 			if($imsx < ($sx+$marge_right)){
-				imagecopymerge($im, $stamp, 0, 0, 0, 0, $sx, $sy, 80);
+				imagecopymerge($im, $stamp, 0, 0, 0, 0, $sx, $sy, $transparentX);
 			}
 			else{
-				imagecopymerge($im, $stamp, ($imsx - $sx - $marge_right), ($imsy - $sy - $marge_bottom), 0, 0, $sx, $sy, 80);
+				imagecopymerge($im, $stamp, ($imsx - $sx - $marge_right), ($imsy - $sy - $marge_bottom), 0, 0, $sx, $sy, $transparentX);
 			}
 			// Save the image to file and free memory
 			if($imgt == 'jpg'){
