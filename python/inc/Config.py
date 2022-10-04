@@ -22,7 +22,7 @@ class Config:
 
     def setConf(self, myConf):
         for key, value in myConf.items():
-            print("inc/Config:key:{} value:{}".format(key, value));
+            #print("inc/Config:key:{} value:{}".format(key, value));
             self.conf[key] = value;
 
 #
@@ -32,12 +32,23 @@ if True:
     myConf = {};
 
     myConf['is_debug'] = 1;
+    # db info
+    myConf['dbhost'] = "";
+    myConf['dbport'] = 3306;
+    myConf['dbuser'] = "";
+    myConf['dbpwd'] = "";
+    myConf['dbname'] = "";
+    myConf['dbdriver'] = "MYSQL"; # //- MYSQL, SQLSERVER, ORACLE, INFORMIX, SYBASE
+    myConf['db_enable_utf8_affirm'] = False;
+    myConf['db_enable_socket_pool'] = True;
+    # cache
+    # session
+    # file
+    # template
     # ...
     #
-
+    # set into env.
     myConfig.setConf(myConf);
 
 #
 conf = myConfig.getConf();
-
-

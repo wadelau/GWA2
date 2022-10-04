@@ -39,6 +39,10 @@ if act == 'index':
     print("ctrl/"+mod+":mySet/myGet: mykey:{}, myval:{}, myval2:{}".format(mykey, myval, myval2));
     data['myval'] = myval2;
 
+    hmResult = ffund.getInfo("040046");
+    print("ctrl/"+mod+":getBy: hmResult:{}".format(hmResult));
+
+
 elif act == 'list':
     print("ctrl/"+mod+": act:{} is ready in mod:{}. 202209241807.".format(act, mod));
     pass;

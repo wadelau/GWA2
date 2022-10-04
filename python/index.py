@@ -27,16 +27,17 @@ if __name__ == "__main__":
 
     __import__("comm.cmdline-inc");
     
-    args = sys.argv[1];
-    if args.find('?') > -1:
-        args = args[1:];
-    argsList = args.split('&');
-    for seg in argsList:
-        pair = seg.split('=');
-        if pair[0] == 'mod':
-            mod = pair[1];
-        elif pair[0] == 'act':
-            act = pair[1];
+    if len(sys.argv) > 1:
+        args = sys.argv[1];
+        if args.find('?') > -1:
+            args = args[1:];
+        argsList = args.split('&');
+        for seg in argsList:
+            pair = seg.split('=');
+            if pair[0] == 'mod':
+                mod = pair[1];
+            elif pair[0] == 'act':
+                act = pair[1];
 
 # 
 data['timestamp'] = time.time(); 

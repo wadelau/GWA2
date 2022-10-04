@@ -8,9 +8,12 @@ from inc import WebApp;
 
 class FinanceFund(WebApp.WebApp):
 
-    def __init__(self):
-        pass;
+    basetbl = "finance_fund_infotbl";
 
+    def __init__(self):
+        self.setTbl(self.basetbl);
+        hmcfg = {};
+        super().__init__(hmcfg);
 
     def mySet(self, key, value):
         #print("mod/FinanceFund: mySet: key:{} value:{}".format(key, value));
@@ -19,3 +22,9 @@ class FinanceFund(WebApp.WebApp):
     def myGet(self, key):
         #print("mod/FinanceFund: myGet: key:{} value:{}".format(key, self.get(key)));
         return self.get(key);
+
+    def getInfo(self, icode):
+        self.set("icode", icode);
+        hmResult = self.getBy("id, icode, iname", "icode=%s", hmCache={});
+
+        return hmResult;
