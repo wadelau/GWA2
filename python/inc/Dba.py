@@ -42,7 +42,7 @@ class Dba:
         hasLimitOne = False;
         pageSize = 0;
         hmResult = {};
-        print("inc/Dba: select: sql:{}".format(sql));
+        #print("inc/Dba: select: sql:{}".format(sql));
         if "pagesize" in args:
             pageSize = args["pagesize"];
 
@@ -64,6 +64,14 @@ class Dba:
     #
     def update(self, sql, args):
         hm = {};
+        idxArr = self.sortObject(sql, args);
+        hmResult = self.myDriver.query(sql, args, idxArr);
+        if hmResult[0]:
+            hm[0] = True;
+            hm[1] = {"insertedid":hmResult[1], "affectedrows":hmResult[2]};
+        else:
+            hm[0] = False;
+            hm[1] = hmResult[1];
 
         return hm;
 
@@ -71,19 +79,29 @@ class Dba:
     def sortObject(self, sql, hmArgs):
         obj = [];
         tmpk = "";
+        keyPosList = {}
         for key in hmArgs:
-            print("\t{} k:{}, val:{}".format(self.logTag, key, hmArgs[key]));
+            #print("\t{} k:{}, val:{}".format(self.logTag, key, hmArgs[key]));
             for op in self.Sql_Operator_List:
                 #print("\t{} op:{}".format(self.logTag, op));
                 tmpk = key+op+'%';
                 if tmpk in sql:
+                    keyPosList[key] = sql.find(tmpk);
                     obj.append(hmArgs[key]);
-                    print("\t{} op:{} found val:{}".format(self.logTag, op, hmArgs[key]));
+                    #print("\t{} op:{} found val:{}".format(self.logTag, op, hmArgs[key]));
                 else:
                     tmpk = key+' '+op+' %';
                     if tmpk in sql:
+                        keyPosList[key] = sql.find(tmpk);
                         obj.append(hmArgs[key]);
-                        print("\t{} op:{} found val:{}".format(self.logTag, op, hmArgs[key]));
+                        #print("\t\t{} op:{} found val:{}".format(self.logTag, op, hmArgs[key]));
+        #
+        sortedPosList = dict(sorted(keyPosList.items(), key=lambda item: item[1]));
+        obj2 = [];
+        for key in sortedPosList:
+            #print("\t{} sortedkey:{} pos:{}".format(self.logTag, key, sortedPosList[key]));
+            obj2.append(hmArgs[key]);
+        obj = obj2;
 
         return obj;
 

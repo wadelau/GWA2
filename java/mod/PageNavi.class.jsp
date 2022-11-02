@@ -258,11 +258,17 @@ public class PageNavi extends WebApp{
 			this.parahm.forEach((k, v)->{
 				String xname = (String)k; String xvalue = (String)v;
 				if(xname.indexOf("pnob") > -1){
-					strb.append(xname.substring(4));
-					if(xvalue.equals("1")){
-						strb.append(" desc"); //- 0 for asc, 1 for desc
+					String overRideOpv = String.valueOf(this.request.getAttribute("pnob"+field));
+					if(overRideOpv != null && overRideOpv.equals(this.GWA2_Tag_Skip)){
+						isNoop = true;
 					}
-					strb.append(",");
+					if(!isNoop){
+						strb.append(field);
+						if(xvalue.equals("1")){
+							strb.append(" desc"); //- 0 for asc, 1 for desc
+						}
+						strb.append(",");
+					}
 				}
 				});
 		}

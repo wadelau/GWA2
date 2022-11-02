@@ -17,8 +17,10 @@ from inc import Config;
 mod = "index"; # controller routing
 act = "index"; # methods
 _REQUEST = {};
+_RESPONSE = {};
 out = ""; # output string
 data = {} # output container for format, e.g. json
+crsPage = {};
 
 if __name__ == "__main__":
     print(f"Cmdline-Arguments count: {len(sys.argv)}")
@@ -38,18 +40,22 @@ if __name__ == "__main__":
                 mod = pair[1];
             elif pair[0] == 'act':
                 act = pair[1];
+            #
+            _REQUEST[pair[0]] = pair[1];
+        crsPage['_REQUEST'] = _REQUEST;
 
 # 
 data['timestamp'] = time.time(); 
 data['timestamp_gm'] = time.gmtime(); 
-print("./index: mod:{} act:{} config:{}".format(mod, act, Config.myConf));
+#print("./index: mod:{} act:{} config:{}".format(mod, act, Config.myConf));
 
 if os.path.isfile('./ctrl/'+mod+'.py'):
-    crsPage = {};
     crsPage['mod'] = mod;
     crsPage['act'] = act;
     crsPage['out'] = out;
     crsPage['data'] = data;
+    crsPage['_REQUEST'] = _REQUEST;
+    crsPage['_RESPONSE'] = _RESPONSE;
     Config.crsPage = crsPage;
 
     __import__("ctrl."+mod, globals(), locals());
@@ -59,6 +65,8 @@ if os.path.isfile('./ctrl/'+mod+'.py'):
     act = crsPage['act'];
     out = crsPage['out'];
     data = crsPage['data'];
+    _REQUEST = crsPage['_REQUEST'];
+    _RESPONSE = crsPage['_RESPONSE'];
 
 else:
     print("./index: mod:{} not exist. 202209241657.".format(mod));

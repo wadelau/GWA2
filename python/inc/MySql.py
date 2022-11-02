@@ -32,7 +32,8 @@ class MySql(DbDriver.DbDriver):
 
         self.dbConn = mysql.connector.connect(
             host=self.myHost, user=self.myUser,
-            password=self.myPwd, database=self.myDb
+            password=self.myPwd, database=self.myDb,
+            connect_timeout=86400
             );
         self.dbCursor = self.dbConn.cursor();
 
@@ -40,13 +41,16 @@ class MySql(DbDriver.DbDriver):
     def query(self, sql, args, idxArr):
         hm = {};
         self.dbCursor = self.dbConn.cursor();
+        #print("inc/MySql: query: sql:{}, idxArr:{}".format(sql, idxArr));
         self.dbCursor.execute(sql, idxArr);
         self.dbConn.commit();
-        lastId = dbCursor.lastrowid;
+        lastId = self.dbCursor.lastrowid;
+        affectedRow = self.dbCursor.rowcount;
         if True:
             hm[0] = True;
             hm[1] = lastId;
-
+            hm[2] = affectedRow; # why ?
+                
         return hm;
 
     # 
@@ -55,7 +59,18 @@ class MySql(DbDriver.DbDriver):
         self.dbCursor = self.dbConn.cursor();
         self.dbCursor.execute(sql, idxArr);
         myResult = self.dbCursor.fetchone();
-        if len(myResult) > 0:
+        if myResult != None and len(myResult) > 0:
+            field_names = [i[0] for i in self.dbCursor.description];
+            #print(field_names);
+            #print(myResult);
+            hmResult2 = {}; hmResult3 = {};
+            for fi in range(len(field_names)):
+                fname = field_names[fi];
+                #print("fi:{} fname:{}".format(fi, fname));
+                hmResult3[fname] = myResult[fi];
+            hmResult2 = hmResult3;
+            #
+            myResult = hmResult2;
             hm[0] = True;
             hm[1] = {0:myResult};
         else:
@@ -70,7 +85,20 @@ class MySql(DbDriver.DbDriver):
         self.dbCursor = self.dbConn.cursor();
         self.dbCursor.execute(sql, idxArr);
         myResult = self.dbCursor.fetchall();
-        if len(myResult) > 0:
+        if myResult != None and len(myResult) > 0:
+            field_names = [i[0] for i in self.dbCursor.description];
+            #print(field_names);
+            hmResult2 = {};
+            for (ri, row) in enumerate(myResult):
+                hmResult3 = {};
+                #print(row);
+                for fi in range(len(field_names)):
+                    fname = field_names[fi];
+                    #print("ri:{} fi:{} fname:{}".format(ri, fi, fname));
+                    hmResult3[fname] = row[fi];
+                hmResult2[ri] = hmResult3;
+            #
+            myResult = hmResult2;
             hm[0] = True;
             hm[1] = myResult;
         else:
