@@ -35,12 +35,26 @@ class MySql(DbDriver.DbDriver):
             password=self.myPwd, database=self.myDb,
             connect_timeout=86400
             );
-        self.dbCursor = self.dbConn.cursor();
+        self.dbCursor = self.dbConn.cursor(buffered=True);
+
+    #
+    # added by xenxin@ufqi, Fri Dec  9 03:16:32 UTC 2022
+    def reConnect(self):
+        self.dbConn = mysql.connector.connect(
+            host=self.myHost, user=self.myUser,
+            password=self.myPwd, database=self.myDb,
+            connect_timeout=86400
+            );
+        self.dbCursor = self.dbConn.cursor(buffered=True);
 
     #
     def query(self, sql, args, idxArr):
         hm = {};
-        self.dbCursor = self.dbConn.cursor();
+        #self.dbCursor = self.dbConn.cursor(buffered=True);
+        try:
+            self.dbCursor = self.dbConn.cursor(buffered=True);
+        except:
+            self.reConnect();
         #print("inc/MySql: query: sql:{}, idxArr:{}".format(sql, idxArr));
         self.dbCursor.execute(sql, idxArr);
         self.dbConn.commit();
@@ -56,7 +70,11 @@ class MySql(DbDriver.DbDriver):
     # 
     def readSingle(self, sql, args, idxArr):
         hm = {};
-        self.dbCursor = self.dbConn.cursor();
+        try:
+            self.dbCursor = self.dbConn.cursor(buffered=True);
+        except:
+            self.reConnect();
+            
         self.dbCursor.execute(sql, idxArr);
         myResult = self.dbCursor.fetchone();
         if myResult != None and len(myResult) > 0:
@@ -82,7 +100,12 @@ class MySql(DbDriver.DbDriver):
     # 
     def readBatch(self, sql, args, idxArr):
         hm = {};
-        self.dbCursor = self.dbConn.cursor();
+        #self.dbCursor = self.dbConn.cursor(buffered=True);
+        try:
+            self.dbCursor = self.dbConn.cursor(buffered=True);
+        except:
+            self.reConnect();
+
         self.dbCursor.execute(sql, idxArr);
         myResult = self.dbCursor.fetchall();
         if myResult != None and len(myResult) > 0:
