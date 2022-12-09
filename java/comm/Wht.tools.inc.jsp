@@ -205,49 +205,64 @@ public final static class Wht{
 	}
 
 	/*
-	 * startsWith, batchly java.lang.String.startsWith, with haystack split by "|"
+	 * startsWith, batchly java.lang.String.startsWith, with needle split by "|"
 	 * @param String needle, which will be used to search with
 	 * @param String haystack, which will be used in
 	 * @return boolean true|false
 	 */
-	public static boolean startsWith(String needle,String haystack){
+	public static boolean startsWith(String haystack, String needle){
 		boolean matched=false;
 		if(needle==null || haystack==null || haystack.equals("")){
 			return matched;
 		}	
 		else{
-			java.util.regex.Pattern regp=java.util.regex.Pattern.compile("^("+haystack+").*");
-			java.util.regex.Matcher regm=regp.matcher(needle);
-			if(regm.matches()){
-				matched=true;
+			if(needle.indexOf("|") > 0){
+				java.util.regex.Pattern regp=java.util.regex.Pattern.compile("^("+needle+").*");
+				java.util.regex.Matcher regm=regp.matcher(haystack);
+				if(regm.matches()){
+					matched=true;
+				}
+				regp=null;
+				regm=null;
 			}
-			regp=null;
-			regm=null;
+			else{
+				if(haystack.indexOf(needle) == 0){
+					matched = true;
+				}
+			}
 		}
+		//debug("comm/Wht startsWith: haystack:"+haystack+" needle:"+needle+" matched:"+matched);
 		return matched;
-
 	}
 
 	/*
-	 * endsWith, batchly java.lang.String.endsWith, with haystack split by "|"
+	 * endsWith, batchly java.lang.String.endsWith, with needle split by "|"
 	 * @param String needle, which will be used to search with
 	 * @param String haystack, which will be used in
 	 * @return boolean true|false
 	 */
-	public static boolean endsWith(String needle,String haystack){
+	public static boolean endsWith(String haystack, String needle){
 		boolean matched=false;
 		if(needle==null || haystack==null || haystack.equals("")){
 			return matched;
 		}	
 		else{
-			java.util.regex.Pattern regp=java.util.regex.Pattern.compile(".*("+haystack+")$");
-			java.util.regex.Matcher regm=regp.matcher(needle);
-			if(regm.matches()){
-				matched=true;
+			if(needle.indexOf("|") > 0){
+				java.util.regex.Pattern regp=java.util.regex.Pattern.compile(".*("+needle+")$");
+				java.util.regex.Matcher regm=regp.matcher(haystack);
+				if(regm.matches()){
+					matched=true;
+				}
+				regp=null;
+				regm=null;
 			}
-			regp=null;
-			regm=null;
+			else{
+				if(haystack.lastIndexOf(needle) == haystack.length()-needle.length()){
+					matched = true;
+				}
+			}
 		}
+		//debug("comm/Wht endsWith: haystack:"+haystack+" needle:"+needle+" matched:"+matched);
 		return matched;
 	}
 	
