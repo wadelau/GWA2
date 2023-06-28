@@ -118,6 +118,7 @@ if(fmt.equals("")){
 			data.put("innertpl", intplcont);
 		}
 		tplcont = tplcont==null ? "" : tplcont;
+		data.put("outReplaceList", (new HashMap())); //- reset to empty
         String jsondata = hanjst.map2Json(data);
 
         //- replaces
