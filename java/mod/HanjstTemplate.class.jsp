@@ -3,6 +3,7 @@
  * v0.1,
  * wadelau@ufqi.com, Xenxin@ufqi.com
  * Fri Jan  4 01:59:34 UTC 2019
+ * work with GWA2 in Java
  */
 
 %><%@page import="com.google.gson.Gson,
