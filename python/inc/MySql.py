@@ -56,9 +56,12 @@ class MySql(DbDriver.DbDriver):
         except:
             self.reConnect();
         #print("inc/MySql: query: sql:{}, idxArr:{}".format(sql, idxArr));
-        self.dbCursor.execute(sql, idxArr);
-        self.dbConn.commit();
-        lastId = self.dbCursor.lastrowid;
+		try:
+			self.dbCursor.execute(sql, idxArr);
+			self.dbConn.commit();
+        except:
+			print("inc/MySql: query: failed. sql:{}, idxArr:{}".format(sql, idxArr));
+		lastId = self.dbCursor.lastrowid;
         affectedRow = self.dbCursor.rowcount;
         if True:
             hm[0] = True;
@@ -74,10 +77,15 @@ class MySql(DbDriver.DbDriver):
             self.dbCursor = self.dbConn.cursor(buffered=True);
         except:
             self.reConnect();
-            
-        self.dbCursor.execute(sql, idxArr);
-        myResult = self.dbCursor.fetchone();
-        if myResult != None and len(myResult) > 0:
+        
+		myResult = None;
+		try:
+			self.dbCursor.execute(sql, idxArr);
+			myResult = self.dbCursor.fetchone();
+        except:
+			print("inc/MySql: readSingle: failed. sql:{}, idxArr:{}".format(sql, idxArr));
+			
+		if myResult != None and len(myResult) > 0:
             field_names = [i[0] for i in self.dbCursor.description];
             #print(field_names);
             #print(myResult);
@@ -105,10 +113,15 @@ class MySql(DbDriver.DbDriver):
             self.dbCursor = self.dbConn.cursor(buffered=True);
         except:
             self.reConnect();
-
-        self.dbCursor.execute(sql, idxArr);
-        myResult = self.dbCursor.fetchall();
-        if myResult != None and len(myResult) > 0:
+		
+		myResult = None;
+		try:
+			self.dbCursor.execute(sql, idxArr);
+			myResult = self.dbCursor.fetchall();
+        except:
+			print("inc/MySql: readBatch: failed. sql:{}, idxArr:{}".format(sql, idxArr));
+			
+		if myResult != None and len(myResult) > 0:
             field_names = [i[0] for i in self.dbCursor.description];
             #print(field_names);
             hmResult2 = {};
