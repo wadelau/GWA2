@@ -346,7 +346,7 @@ public class WebApp implements WebAppInterface{
             }
             else{
                 debug(logTag + " execBy read cache failed and try db...");
-                this.set("cache:" + origSql, hmCache.get("key"));
+                this.set("cache:" + Zeea.md5(origSql), hmCache.get("key"));
                 hm = this.execBy(sql, args);
             }
         }
@@ -371,7 +371,7 @@ public class WebApp implements WebAppInterface{
 			//- read mode
 			hm = this.dba.select(sql, this.hmf);
 			//- set cache
-			this._setCache(hm, origSql); 
+			this._setCache(hm, Zeea.md5(origSql)); 
 		}
 		else{
 			//- write mode
