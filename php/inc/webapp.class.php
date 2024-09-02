@@ -19,7 +19,8 @@ require_once(__ROOT__."/inc/config.class.php");
 require(__ROOT__."/inc/dba.class.php");
 require(__ROOT__."/inc/session.class.php");
 require(__ROOT__."/inc/cachea.class.php");
-require(__ROOT__."/inc/filesystem.class.php");
+require(__ROOT__."/inc/filea.class.php");
+//require(__ROOT__."/inc/filesystem.class.php");
 require(__ROOT__."/inc/zeea.class.php");
 
 class WebApp implements WebAppInterface{
@@ -66,7 +67,7 @@ class WebApp implements WebAppInterface{
 		if(GConf::get('enable_file')){
 			if($this->filea == null){
 				$fileconf = isset($args['fileconf']) ? $args['fileconf'] : null;
-				$this->filea = new CacheA($fileconf);
+				$this->filea = new FileA($fileconf);
 				#print_r(__FILE__."cachea:[".$this->cachea."]");
 			}
 		}

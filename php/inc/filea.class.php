@@ -52,7 +52,7 @@ class FileA {
 	}
 	
 	//- close
-	private function close(){
+	function close(){
 	    //- @todo
 	    # need sub class override.
 	    $this->filehdl->close();

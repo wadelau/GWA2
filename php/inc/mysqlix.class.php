@@ -217,7 +217,7 @@ class MYSQLIX {
 				$a = strpos($sql,"?");
 				$i = 0;
 				$n = count($idxarr);
-				while($a !== false){
+				while($n > 0 && $a !== false){
 					if($i>$n){
 						$this->sayErr("_enSafe, fields not matched with vars.sql:["
 							.$origSql."] i:[".$i."] n:[".$n."].");
