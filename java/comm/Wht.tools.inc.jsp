@@ -398,10 +398,14 @@ public final static class Wht{
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 		Date date = null;
 		try{
-			if(dateStr.length() > 10){
+			int strLen = dateStr.length();
+			if(strLen > 10){
 				date = Wht.getDate(dateStr);
 			}
 			else{
+				if(strLen == 8){ 
+					dateStr = dateStr.substring(0,4)+"-"+dateStr.substring(4,6)+"-"+dateStr.substring(6,8); 
+				}
 				date = formatter.parse(dateStr);
 			}
 		}

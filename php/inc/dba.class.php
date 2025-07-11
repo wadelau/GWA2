@@ -72,7 +72,8 @@ class DBA {
 		$idxarr = $this->hm2idxArray($sql,$hmvars);
     	#print_r($idxarr);
 		$haslimit1 = 0;
-		if((array_key_exists('pagesize',$hmvars) && $hmvars['pagesize'] == 1) || strpos($sql,"limit 1 ") != false){
+		if((array_key_exists('pagesize',$hmvars) && $hmvars['pagesize']==1 && strpos($sql,"limit ")==false) 
+			|| strpos($sql,"limit 1 ") != false){
 			$result = $this->dbconn->readSingle($sql, $hmvars,$idxarr); # why need this? @todo need to be removed.
 			$haslimit1 = 1;
 		}

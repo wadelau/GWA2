@@ -369,6 +369,9 @@ public class PageNavi extends WebApp{
                     if(fieldopv.equals("")){ fieldopv = "="; }
                     else{
 						String overRideOpv = (String)this.request.getAttribute("oppnsk"+field);
+						if(overRideOpv == null || overRideOpv.equals("")){
+							overRideOpv = (String)this.request.getAttribute("pnsk"+field);
+						}
 						if(overRideOpv != null && overRideOpv.equals(this.GWA2_Tag_Skip)){
 							return; //- no-op, skip to next
 						}
